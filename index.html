@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ahoraclario — Sales CRM</title>
+<style>
+:root{
+  --ink:#111827; --muted:#6B7280; --line:#E5E7EB; --bg:#FAFAFC; --card:#FFFFFF;
+  --primary:#4F46E5; --primary-dark:#4338CA; --primary-light:#EEF2FF;
+  --green:#059669; --green-bg:#ECFDF5; --amber:#D97706; --amber-bg:#FFFBEB;
+  --red:#DC2626; --red-bg:#FEF2F2;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit}
+a{color:var(--primary);text-decoration:none}
+.hidden{display:none !important}
+
+/* ---- Login ---- */
+#login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#EEF2FF,#FAFAFC)}
+.login-box{background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(79,70,229,.12);padding:40px;width:100%;max-width:380px}
+.login-logo{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;margin-bottom:18px}
+.login-box h1{font-size:20px;margin:0 0 4px}
+.login-box p{color:var(--muted);font-size:13px;margin:0 0 24px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:9px;font-size:14px}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--primary)}
+.btn{border:none;border-radius:9px;padding:11px 18px;font-size:14px;font-weight:700;cursor:pointer}
+.btn-primary{background:var(--primary);color:#fff;width:100%}
+.btn-primary:hover{background:var(--primary-dark)}
+.login-err{color:var(--red);font-size:12.5px;margin-bottom:12px;display:none}
+
+/* ---- App shell ---- */
+#app{display:none}
+#app.open{display:flex;min-height:100vh}
+.sidebar{width:230px;flex-shrink:0;background:#fff;border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:0 8px 22px}
+.sb-logo .mark{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px}
+.sb-logo b{font-size:15px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;color:var(--muted);font-size:13.5px;font-weight:600;cursor:pointer;margin-bottom:2px;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--primary-light)}
+.nav-item.active{background:var(--primary-light);color:var(--primary)}
+.sb-bottom{margin-top:auto;padding-top:14px;border-top:1px solid var(--line)}
+.sb-user{font-size:12.5px;color:var(--muted);padding:0 8px}
+.sb-user b{color:var(--ink);display:block;font-size:13.5px}
+.sb-logout{font-size:12px;color:var(--red);cursor:pointer;margin-top:6px;display:inline-block}
+
+.main{flex:1;padding:26px 32px;overflow-x:hidden}
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
+.page-head h1{font-size:22px;margin:0 0 4px}
+.page-head p{color:var(--muted);font-size:13px;margin:0}
+
+/* ---- Stat cards ---- */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
+.stat .n{font-size:24px;font-weight:800;color:var(--primary)}
+.stat[data-c="green"] .n{color:var(--green)}
+.stat[data-c="amber"] .n{color:var(--amber)}
+.stat .l{font-size:11.5px;color:var(--muted);margin-top:3px}
+
+/* ---- Table ---- */
+.tbl-wrap{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:11px 14px;background:#FAFAFC;color:var(--muted);font-weight:700;font-size:11.5px;border-bottom:1px solid var(--line)}
+td{padding:11px 14px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:none}
+tr.row-click{cursor:pointer}
+tr.row-click:hover{background:var(--primary-light)}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px}
+.badge-source{background:var(--primary-light);color:var(--primary)}
+
+/* ---- Buttons ---- */
+.btn-add{background:var(--primary);color:#fff;border:none;border-radius:9px;padding:10px 18px;font-size:13.5px;font-weight:700}
+.btn-add:hover{background:var(--primary-dark)}
+.btn-ghost{background:var(--primary-light);color:var(--primary);border:none;border-radius:9px;padding:9px 15px;font-size:12.5px;font-weight:700}
+.btn-danger{background:var(--red-bg);color:var(--red);border:none;border-radius:9px;padding:9px 15px;font-size:12.5px;font-weight:700}
+
+/* ---- Kanban ---- */
+.board{display:flex;gap:12px;overflow-x:auto;padding-bottom:14px}
+.col{flex:0 0 240px;display:flex;flex-direction:column}
+.col-head{padding:9px 12px;border-radius:9px 9px 0 0;font-size:12px;font-weight:700;background:#EEF0F6;color:var(--ink);display:flex;justify-content:space-between}
+.col-body{background:#F3F4F8;border:1px solid var(--line);border-top:none;border-radius:0 0 9px 9px;flex:1;min-height:100px;padding:8px;display:flex;flex-direction:column;gap:7px}
+.col-body.dragover{background:var(--primary-light)}
+.kcard{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px 11px;cursor:grab;font-size:12.5px}
+.kcard:active{cursor:grabbing}
+.kcard b{display:block;font-size:12.5px;margin-bottom:3px}
+.kcard .meta{color:var(--muted);font-size:10.5px;display:flex;justify-content:space-between;margin-top:5px}
+.kcard .mrr{color:var(--green);font-weight:700}
+
+/* ---- Panel (slide-over) ---- */
+.overlay{position:fixed;inset:0;background:rgba(17,24,39,.45);display:none;align-items:center;justify-content:flex-end;z-index:200}
+.overlay.open{display:flex}
+.panel{background:#fff;height:100%;width:100%;max-width:560px;overflow-y:auto;padding:26px}
+.panel-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.panel-close{background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer}
+.ps{border:1px solid var(--line);border-radius:12px;margin-bottom:14px}
+.ps-head{padding:10px 14px;background:#FAFAFC;border-bottom:1px solid var(--line);border-radius:12px 12px 0 0;font-size:12.5px;font-weight:700;display:flex;justify-content:space-between}
+.ps-body{padding:14px}
+.fi-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.fi{margin-bottom:10px}
+.fi label{display:block;font-size:10.5px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.fi input,.fi select,.fi textarea{width:100%;padding:8px 10px;border:1.5px solid var(--line);border-radius:7px;font-size:12.5px}
+.mini-list{display:flex;flex-direction:column;gap:7px}
+.mini-item{border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:12px}
+.mini-item b{font-size:12.5px}
+.timeline-item{padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}
+.timeline-item:last-child{border-bottom:none}
+.timeline-item .t{color:var(--muted);font-size:10.5px}
+
+/* ---- Modal ---- */
+.modal-overlay{position:fixed;inset:0;background:rgba(17,24,39,.45);display:none;align-items:center;justify-content:center;z-index:300;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:14px;padding:24px;width:100%;max-width:440px;max-height:88vh;overflow-y:auto}
+.modal h3{margin:0 0 16px;font-size:16px}
+.modal-actions{display:flex;gap:8px;margin-top:16px}
+.modal-actions button{flex:1}
+
+.toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;padding:12px 18px;border-radius:9px;font-size:13px;z-index:400;display:none;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+.toast.show{display:block}
+.empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">A</div>
+    <h1>Ahoraclario</h1>
+    <p>Founder Sales CRM'e giriş yapın.</p>
+    <div class="login-err" id="loginErr"></div>
+    <div class="field"><label>Kullanıcı Adı</label><input id="li-user" type="text"></div>
+    <div class="field"><label>Şifre</label><input id="li-pass" type="password"></div>
+    <button class="btn btn-primary" onclick="doLogin()">Giriş Yap</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="sidebar">
+    <div class="sb-logo"><div class="mark">A</div><b>Ahoraclario</b></div>
+    <button class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">📊 Dashboard</button>
+    <button class="nav-item" data-page="pipeline" onclick="showPage('pipeline')">🧭 Pipeline</button>
+    <button class="nav-item" data-page="companies" onclick="showPage('companies')">🏢 Şirketler</button>
+    <button class="nav-item" data-page="tasks" onclick="showPage('tasks')">✅ Görevler</button>
+    <div class="sb-bottom">
+      <div class="sb-user"><b id="sbUserName"></b>Founder</div>
+      <span class="sb-logout" onclick="doLogout()">Çıkış Yap</span>
+    </div>
+  </div>
+  <div class="main" id="main"></div>
+</div>
+
+<!-- Şirket Detay Paneli -->
+<div class="overlay" id="companyOverlay">
+  <div class="panel" id="companyPanel"></div>
+</div>
+
+<!-- Yeni Şirket Modal -->
+<div class="modal-overlay" id="addCompanyModal">
+  <div class="modal">
+    <h3>+ Yeni Şirket</h3>
+    <div class="fi"><label>Şirket Adı *</label><input id="nc-name" type="text"></div>
+    <div class="fi-row">
+      <div class="fi"><label>Sektör</label><input id="nc-industry" type="text" placeholder="Vize Danışmanlığı"></div>
+      <div class="fi"><label>Ülke</label><input id="nc-country" type="text" placeholder="Türkiye"></div>
+    </div>
+    <div class="fi-row">
+      <div class="fi"><label>Website</label><input id="nc-website" type="text"></div>
+      <div class="fi"><label>Kaynak</label>
+        <select id="nc-source">
+          <option value="">—</option>
+          <option>LinkedIn</option><option>Cold Email</option><option>Instagram</option>
+          <option>Google</option><option>Referral</option><option>Website</option>
+          <option>Facebook</option><option>Direct Outreach</option><option>Networking</option>
+          <option>AIESEC</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="fi"><label>Not</label><textarea id="nc-notes" rows="2"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeAddCompanyModal()">Vazgeç</button>
+      <button class="btn-add" onclick="submitAddCompany()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// 🔧 DEĞİŞTİRİN: Supabase Edge Function adresiniz
+const EDGE_FUNCTION_URL = 'https://XXXXX-BURAYA-KENDI-SUPABASE-PROJE-ADRESINIZI-YAZIN.supabase.co/functions/v1/ahoraclario-handler';
+
+const STAGES = ["Prospect","Researched","Contacted","Replied","Discovery Call","Demo","Proposal","Negotiation","Won"];
+const STAGE_COLORS = {Prospect:"#6B7280",Researched:"#2563EB",Contacted:"#4F46E5",Replied:"#7C3AED",
+  "Discovery Call":"#C026D3","Demo":"#D97706","Proposal":"#059669","Negotiation":"#DC2626","Won":"#16A34A"};
+
+let CU = null; // { token, name, username }
+let companies = [], opportunities = [], tasks = [];
+let currentPage = 'dashboard';
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+async function api(action, params={}){
+  try{
+    const res = await fetch(EDGE_FUNCTION_URL, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action, token: CU?.token, ...params })
+    });
+    const d = await res.json();
+    if(!d.success){
+      if(d.error?.status === 401){ doLogout(true); }
+      toast('Hata: ' + (d.error?.message || 'Bilinmeyen hata'));
+    }
+    return d;
+  }catch(e){ toast('Bağlantı hatası'); return {success:false}; }
+}
+
+// ── GİRİŞ ──
+async function doLogin(){
+  const username = document.getElementById('li-user').value.trim();
+  const password = document.getElementById('li-pass').value;
+  const errEl = document.getElementById('loginErr');
+  errEl.style.display='none';
+  if(!username || !password){ errEl.textContent='Kullanıcı adı ve şifre gerekli'; errEl.style.display='block'; return; }
+  const d = await api('login', { username, password });
+  if(!d.success){ errEl.textContent = d.error?.message || 'Giriş başarısız'; errEl.style.display='block'; return; }
+  CU = { token: d.token, name: d.user.name, username: d.user.username };
+  sessionStorage.setItem('ahoraclario_session', JSON.stringify(CU));
+  enterApp();
+}
+function doLogout(silent){
+  if(CU && !silent) api('logout');
+  CU = null;
+  sessionStorage.removeItem('ahoraclario_session');
+  document.getElementById('app').classList.remove('open');
+  document.getElementById('login-screen').style.display='flex';
+}
+function enterApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').classList.add('open');
+  document.getElementById('sbUserName').textContent = CU.name;
+  showPage('dashboard');
+}
+(function tryRestoreSession(){
+  try{
+    const raw = sessionStorage.getItem('ahoraclario_session');
+    if(raw){ CU = JSON.parse(raw); enterApp(); }
+  }catch(e){}
+})();
+
+// ── SAYFA YÖNLENDİRME ──
+async function showPage(page){
+  currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.page===page));
+  const main = document.getElementById('main');
+  main.innerHTML = '<div class="empty">Yükleniyor...</div>';
+  if(page==='dashboard') await renderDashboard();
+  else if(page==='pipeline') await renderPipeline();
+  else if(page==='companies') await renderCompanies();
+  else if(page==='tasks') await renderTasks();
+}
+
+// ══════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════
+async function renderDashboard(){
+  const d = await api('getDashboard');
+  const main = document.getElementById('main');
+  if(!d.success){ main.innerHTML='<div class="empty">Yüklenemedi</div>'; return; }
+  main.innerHTML = `
+    <div class="page-head"><div><h1>Günaydın, ${esc(CU.name)} 👋</h1><p>İşte satış operasyonunun bugünkü özeti.</p></div></div>
+    <div class="stats">
+      <div class="stat"><div class="n">₺${(d.pipelineValue||0).toLocaleString('tr-TR')}</div><div class="l">Pipeline Değeri</div></div>
+      <div class="stat"><div class="n">${d.totalCompanies||0}</div><div class="l">Toplam Şirket</div></div>
+      <div class="stat" data-c="amber"><div class="n">${d.tasksToday||0}</div><div class="l">Bugünkü Follow-up</div></div>
+      <div class="stat" data-c="amber"><div class="n">${d.tasksOverdue||0}</div><div class="l">Geciken Görev</div></div>
+      <div class="stat" data-c="green"><div class="n">${d.wonCount||0}</div><div class="l">Kazanılan Anlaşma</div></div>
+      <div class="stat" data-c="green"><div class="n">${d.totalCustomers||0}</div><div class="l">Müşteriye Dönüşen</div></div>
+    </div>
+    <div class="ps">
+      <div class="ps-head">Pipeline Dağılımı</div>
+      <div class="ps-body" style="display:flex;flex-wrap:wrap;gap:10px">
+        ${STAGES.map(s=>`<div style="flex:1;min-width:100px;text-align:center;padding:10px;border-radius:9px;background:${STAGE_COLORS[s]}18">
+          <div style="font-size:18px;font-weight:800;color:${STAGE_COLORS[s]}">${(d.stageCounts&&d.stageCounts[s])||0}</div>
+          <div style="font-size:10.5px;color:var(--muted);margin-top:2px">${s}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════
+// ŞİRKETLER
+// ══════════════════════════════════════════════
+async function renderCompanies(){
+  const d = await api('getCompanies');
+  companies = d.companies || [];
+  const main = document.getElementById('main');
+  main.innerHTML = `
+    <div class="page-head">
+      <div><h1>Şirketler</h1><p>${companies.length} potansiyel/mevcut şirket</p></div>
+      <button class="btn-add" onclick="openAddCompanyModal()">+ Yeni Şirket</button>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Şirket</th><th>Sektör</th><th>Ülke</th><th>Kaynak</th><th>Aşama</th><th>Tahmini MRR</th><th>Durum</th></tr></thead>
+        <tbody>${companies.length===0?'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted)">Henüz şirket yok</td></tr>':companies.map(c=>`
+          <tr class="row-click" onclick="openCompanyPanel('${c.id}')">
+            <td><b>${esc(c.name)}</b></td>
+            <td>${esc(c.industry||'—')}</td>
+            <td>${esc(c.country||'—')}</td>
+            <td>${c.lead_source?`<span class="badge badge-source">${esc(c.lead_source)}</span>`:'—'}</td>
+            <td>${c.current_stage?`<span style="color:${STAGE_COLORS[c.current_stage]||'#666'};font-weight:700;font-size:11.5px">${esc(c.current_stage)}</span>`:'—'}</td>
+            <td>${c.current_mrr?'₺'+Number(c.current_mrr).toLocaleString('tr-TR'):'—'}</td>
+            <td>${c.is_customer?'<span class="badge" style="background:var(--green-bg);color:var(--green)">Müşteri</span>':'<span class="badge" style="background:#F3F4F6;color:var(--muted)">Aday</span>'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function openAddCompanyModal(){ document.getElementById('addCompanyModal').classList.add('open'); }
+function closeAddCompanyModal(){
+  document.getElementById('addCompanyModal').classList.remove('open');
+  ['name','industry','country','website','notes'].forEach(k=>document.getElementById('nc-'+k).value='');
+  document.getElementById('nc-source').value='';
+}
+async function submitAddCompany(){
+  const name = document.getElementById('nc-name').value.trim();
+  if(!name){ toast('Şirket adı zorunludur'); return; }
+  const company = {
+    name, industry: document.getElementById('nc-industry').value.trim(),
+    country: document.getElementById('nc-country').value.trim(),
+    website: document.getElementById('nc-website').value.trim(),
+    lead_source: document.getElementById('nc-source').value,
+    research_notes: document.getElementById('nc-notes').value.trim(),
+  };
+  const d = await api('addCompany', { company });
+  if(d.success){
+    toast('✓ Şirket eklendi');
+    closeAddCompanyModal();
+    if(currentPage==='companies') renderCompanies(); else if(currentPage==='pipeline') renderPipeline();
+    // ilk fırsatı da otomatik oluşturalım ki hemen pipeline'da görünsün
+    await api('addOpportunity', { companyId: d.company.id, opportunity:{stage:'Prospect'} });
+  }
+}
+
+// ── Şirket Detay Paneli ──
+async function openCompanyPanel(companyId){
+  const d = await api('getCompanyDetail', { companyId });
+  if(!d.success) return;
+  const c = d.company;
+  const panel = document.getElementById('companyPanel');
+  panel.innerHTML = `
+    <div class="panel-top">
+      <div><h2 style="margin:0 0 4px">${esc(c.name)}</h2>
+        <div style="font-size:12px;color:var(--muted)">${esc(c.industry||'—')} · ${esc(c.country||'—')}</div></div>
+      <button class="panel-close" onclick="closeCompanyPanel()">✕</button>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">Şirket Profili</div>
+      <div class="ps-body">
+        <div class="fi-row">
+          <div class="fi"><label>Sektör</label><input id="ec-industry" value="${escAttr(c.industry)}"></div>
+          <div class="fi"><label>Ülke</label><input id="ec-country" value="${escAttr(c.country)}"></div>
+        </div>
+        <div class="fi-row">
+          <div class="fi"><label>Website</label><input id="ec-website" value="${escAttr(c.website)}"></div>
+          <div class="fi"><label>Şirket Büyüklüğü</label><input id="ec-size" value="${escAttr(c.company_size)}" placeholder="10-20"></div>
+        </div>
+        <div class="fi-row">
+          <div class="fi"><label>Instagram</label><input id="ec-instagram" value="${escAttr(c.instagram)}"></div>
+          <div class="fi"><label>LinkedIn</label><input id="ec-linkedin" value="${escAttr(c.linkedin)}"></div>
+        </div>
+        <div class="fi-row">
+          <div class="fi"><label>Mevcut CRM</label><input id="ec-crm" value="${escAttr(c.current_crm)}" placeholder="Excel + WhatsApp"></div>
+          <div class="fi"><label>Kaynak</label>
+            <select id="ec-source">
+              <option value="">—</option>
+              ${["LinkedIn","Cold Email","Instagram","Google","Referral","Website","Facebook","Direct Outreach","Networking","AIESEC","Other"].map(s=>`<option ${c.lead_source===s?'selected':''}>${s}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="fi"><label>Ağrı Noktası (Pain Point)</label><input id="ec-pain" value="${escAttr(c.pain_point)}"></div>
+        <div class="fi"><label>Araştırma Notları</label><textarea id="ec-notes" rows="3">${esc(c.research_notes)}</textarea></div>
+        <button class="btn-add" style="width:100%" onclick="saveCompanyProfile('${c.id}')">Kaydet</button>
+      </div>
+    </div>
+
+    ${c.is_customer ? `<div class="ps"><div class="ps-head" style="background:var(--green-bg);color:var(--green)">✓ Müşteri</div>
+      <div class="ps-body" style="font-size:12.5px">
+        Müşteri Oldu: <b>${c.customer_since||'—'}</b> · Plan: <b>${esc(c.plan||'—')}</b> · MRR: <b>₺${c.mrr?Number(c.mrr).toLocaleString('tr-TR'):'0'}</b>
+      </div></div>` : ''}
+
+    <div class="ps">
+      <div class="ps-head">Fırsatlar (${d.opportunities.length})<span style="cursor:pointer;color:var(--primary)" onclick="quickAddOpportunity('${c.id}')">+ Ekle</span></div>
+      <div class="ps-body mini-list">
+        ${d.opportunities.length===0?'<div style="color:var(--muted);font-size:12px">Henüz fırsat yok.</div>':d.opportunities.map(o=>`
+          <div class="mini-item">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <b style="color:${STAGE_COLORS[o.stage]||'#666'}">${esc(o.stage)}</b>
+              <span style="color:var(--green);font-weight:700">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span>
+            </div>
+            <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap">
+              ${STAGES.concat(['Lost','No Response','Not a Fit']).map(s=>`<span onclick="moveOpportunityStage('${o.id}','${s}','${c.id}')" style="font-size:9.5px;padding:3px 7px;border-radius:12px;cursor:pointer;background:${o.stage===s?STAGE_COLORS[s]||'#666':'#F3F4F6'};color:${o.stage===s?'#fff':'var(--muted)'}">${s}</span>`).join('')}
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">Kişiler (${d.contacts.length})<span style="cursor:pointer;color:var(--primary)" onclick="showAddContactForm('${c.id}')">+ Ekle</span></div>
+      <div class="ps-body mini-list" id="contactsList">
+        ${d.contacts.length===0?'<div style="color:var(--muted);font-size:12px">Henüz kişi yok.</div>':d.contacts.map(p=>`
+          <div class="mini-item"><b>${esc(p.full_name)}</b> — ${esc(p.position||'—')}<br>
+          <span style="color:var(--muted)">${esc(p.email||'')} ${p.phone?' · '+esc(p.phone):''}</span></div>`).join('')}
+        <div id="addContactForm-${c.id}" class="hidden" style="margin-top:6px">
+          <div class="fi-row"><div class="fi"><input id="nct-name" placeholder="Ad Soyad"></div><div class="fi"><input id="nct-pos" placeholder="Pozisyon"></div></div>
+          <div class="fi-row"><div class="fi"><input id="nct-email" placeholder="E-posta"></div><div class="fi"><input id="nct-phone" placeholder="Telefon"></div></div>
+          <button class="btn-add" style="width:100%" onclick="submitAddContact('${c.id}')">Kişiyi Kaydet</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">Görevler (${d.tasks.filter(t=>t.status==='Open').length} açık)<span style="cursor:pointer;color:var(--primary)" onclick="showAddTaskForm('${c.id}')">+ Ekle</span></div>
+      <div class="ps-body mini-list" id="tasksList">
+        ${d.tasks.length===0?'<div style="color:var(--muted);font-size:12px">Görev yok.</div>':d.tasks.map(t=>`
+          <div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;${t.status==='Completed'?'opacity:.5':''}">
+            <span>${t.status==='Completed'?'✓ ':''}${esc(t.title)} ${t.due_date?`<span style="color:var(--muted)">· ${t.due_date}</span>`:''}</span>
+            ${t.status==='Open'?`<span style="cursor:pointer;color:var(--green);font-size:11px" onclick="completeTaskQuick('${t.id}','${c.id}')">Tamamla</span>`:''}
+          </div>`).join('')}
+        <div id="addTaskForm-${c.id}" class="hidden" style="margin-top:6px">
+          <div class="fi"><input id="ntk-title" placeholder="Görev — örn: Ahmet'e follow-up yap"></div>
+          <div class="fi"><input id="ntk-due" type="date"></div>
+          <button class="btn-add" style="width:100%" onclick="submitAddTask('${c.id}')">Görevi Kaydet</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">Zaman Çizelgesi</div>
+      <div class="ps-body">
+        ${d.activities.length===0?'<div style="color:var(--muted);font-size:12px">Henüz aktivite yok.</div>':d.activities.map(a=>`
+          <div class="timeline-item"><div>${esc(a.description)}</div><div class="t">${fmtDT(a.created_at)} · ${esc(a.created_by||'')}</div></div>`).join('')}
+      </div>
+    </div>
+
+    <button class="btn-danger" style="width:100%;margin-top:6px" onclick="deleteCompanyConfirm('${c.id}')">🗑 Şirketi Sil</button>
+  `;
+  document.getElementById('companyOverlay').classList.add('open');
+}
+function closeCompanyPanel(){ document.getElementById('companyOverlay').classList.remove('open'); }
+
+async function saveCompanyProfile(companyId){
+  const company = {
+    industry: document.getElementById('ec-industry').value.trim(),
+    country: document.getElementById('ec-country').value.trim(),
+    website: document.getElementById('ec-website').value.trim(),
+    company_size: document.getElementById('ec-size').value.trim(),
+    instagram: document.getElementById('ec-instagram').value.trim(),
+    linkedin: document.getElementById('ec-linkedin').value.trim(),
+    current_crm: document.getElementById('ec-crm').value.trim(),
+    lead_source: document.getElementById('ec-source').value,
+    pain_point: document.getElementById('ec-pain').value.trim(),
+    research_notes: document.getElementById('ec-notes').value.trim(),
+  };
+  const d = await api('updateCompany', { companyId, company });
+  if(d.success){ toast('✓ Kaydedildi'); }
+}
+
+async function quickAddOpportunity(companyId){
+  const d = await api('addOpportunity', { companyId, opportunity:{stage:'Prospect'} });
+  if(d.success){ toast('✓ Fırsat eklendi'); openCompanyPanel(companyId); }
+}
+async function moveOpportunityStage(opportunityId, newStage, companyId){
+  let lostReason = null;
+  if(newStage === 'Lost'){ lostReason = prompt('Kayıp sebebi (isteğe bağlı): Too expensive, No need, No budget, Using another CRM, Bad timing, No response, Not decision maker, Competitor, Other') || ''; }
+  const d = await api('updateOpportunityStage', { opportunityId, stage:newStage, lostReason });
+  if(d.success){ toast('✓ Aşama güncellendi: ' + newStage); openCompanyPanel(companyId); if(currentPage==='pipeline') renderPipeline(); }
+}
+
+function showAddContactForm(companyId){ document.getElementById('addContactForm-'+companyId).classList.remove('hidden'); }
+async function submitAddContact(companyId){
+  const contact = {
+    full_name: document.getElementById('nct-name').value.trim(),
+    position: document.getElementById('nct-pos').value.trim(),
+    email: document.getElementById('nct-email').value.trim(),
+    phone: document.getElementById('nct-phone').value.trim(),
+  };
+  if(!contact.full_name){ toast('İsim zorunludur'); return; }
+  const d = await api('addContact', { companyId, contact });
+  if(d.success){ toast('✓ Kişi eklendi'); openCompanyPanel(companyId); }
+}
+
+function showAddTaskForm(companyId){ document.getElementById('addTaskForm-'+companyId).classList.remove('hidden'); }
+async function submitAddTask(companyId){
+  const task = { title: document.getElementById('ntk-title').value.trim(), due_date: document.getElementById('ntk-due').value || null };
+  if(!task.title){ toast('Görev başlığı zorunludur'); return; }
+  const d = await api('addTask', { companyId, task });
+  if(d.success){ toast('✓ Görev eklendi'); openCompanyPanel(companyId); }
+}
+async function completeTaskQuick(taskId, companyId){
+  const d = await api('completeTask', { taskId });
+  if(d.success){ toast('✓ Görev tamamlandı'); openCompanyPanel(companyId); }
+}
+async function deleteCompanyConfirm(companyId){
+  if(!confirm('Bu şirketi ve tüm ilişkili kayıtları silmek istediğinize emin misiniz?')) return;
+  const d = await api('deleteCompany', { companyId });
+  if(d.success){ toast('🗑 Şirket silindi'); closeCompanyPanel(); renderCompanies(); }
+}
+
+// ══════════════════════════════════════════════
+// PIPELINE (Kanban, sürükle-bırak)
+// ══════════════════════════════════════════════
+async function renderPipeline(){
+  const d = await api('getOpportunities');
+  opportunities = d.opportunities || [];
+  const main = document.getElementById('main');
+  main.innerHTML = `
+    <div class="page-head"><div><h1>Pipeline</h1><p>Kartları sürükleyip bırakarak aşama değiştirebilirsiniz.</p></div></div>
+    <div class="board">
+      ${STAGES.map(s=>{
+        const items = opportunities.filter(o=>o.stage===s);
+        return `<div class="col">
+          <div class="col-head" style="background:${STAGE_COLORS[s]}18;color:${STAGE_COLORS[s]}">${s}<span>${items.length}</span></div>
+          <div class="col-body" data-stage="${s}" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="onDropCard(event,'${s}')">
+            ${items.map(o=>`
+              <div class="kcard" draggable="true" ondragstart="onDragStart(event,'${o.id}')" onclick="openCompanyPanel('${o.company_id}')">
+                <b>${esc(o.companies?.name||'—')}</b>
+                <div style="color:var(--muted)">${esc(o.companies?.country||'')}</div>
+                <div class="meta"><span class="mrr">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span><span>${daysSince(o.stage_changed_at)}g</span></div>
+              </div>`).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+let draggedOppId = null;
+function onDragStart(e, oppId){ draggedOppId = oppId; }
+async function onDropCard(e, newStage){
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  if(!draggedOppId) return;
+  let lostReason = null;
+  if(newStage === 'Lost'){ lostReason = prompt('Kayıp sebebi (isteğe bağlı):') || ''; }
+  const d = await api('updateOpportunityStage', { opportunityId: draggedOppId, stage: newStage, lostReason });
+  if(d.success){ toast('✓ ' + newStage + ' aşamasına taşındı'); renderPipeline(); }
+  draggedOppId = null;
+}
+
+// ══════════════════════════════════════════════
+// GÖREVLER
+// ══════════════════════════════════════════════
+async function renderTasks(){
+  const d = await api('getTasks');
+  tasks = d.tasks || [];
+  const today = new Date().toISOString().slice(0,10);
+  const overdue = tasks.filter(t=>t.due_date && t.due_date < today);
+  const todayT = tasks.filter(t=>t.due_date === today);
+  const upcoming = tasks.filter(t=>t.due_date && t.due_date > today);
+  const noDate = tasks.filter(t=>!t.due_date);
+
+  function section(title, list, color){
+    if(list.length===0) return '';
+    return `<div class="ps"><div class="ps-head" style="color:${color}">${title} (${list.length})</div>
+      <div class="ps-body mini-list">${list.map(t=>`
+        <div class="mini-item" style="display:flex;justify-content:space-between;align-items:center">
+          <span><b>${esc(t.companies?.name||'')}</b> — ${esc(t.title)} ${t.due_date?`<span style="color:var(--muted)">· ${t.due_date}</span>`:''}</span>
+          <span style="cursor:pointer;color:var(--green);font-size:11px" onclick="completeTaskFromList('${t.id}')">Tamamla</span>
+        </div>`).join('')}</div></div>`;
+  }
+  document.getElementById('main').innerHTML = `
+    <div class="page-head"><div><h1>Görevler</h1><p>${tasks.length} açık görev</p></div></div>
+    ${section('🔴 Geciken', overdue, 'var(--red)')}
+    ${section('🟡 Bugün', todayT, 'var(--amber)')}
+    ${section('🟢 Yaklaşan', upcoming, 'var(--green)')}
+    ${section('Tarihsiz', noDate, 'var(--muted)')}
+    ${tasks.length===0?'<div class="empty">Açık görev yok — harika!</div>':''}
+  `;
+}
+async function completeTaskFromList(taskId){
+  const d = await api('completeTask', { taskId });
+  if(d.success){ toast('✓ Tamamlandı'); renderTasks(); }
+}
+
+// ── Yardımcılar ──
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function escAttr(s){ return esc(s); }
+function fmtDT(iso){ if(!iso) return '—'; const d=new Date(iso); return d.toLocaleDateString('tr-TR')+' '+d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }
+function daysSince(iso){ if(!iso) return 0; return Math.max(0, Math.floor((Date.now()-new Date(iso).getTime())/86400000)); }
+</script>
+</body>
+</html>
