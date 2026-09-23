@@ -703,29 +703,35 @@ async function renderMyDay(){
       <span style="cursor:pointer;color:var(--green);font-size:11px;flex-shrink:0;margin-left:10px" onclick="completeTaskFromList('${t.id}')">Complete</span>
     </div>`;
   }
+  function demoMeetingRow(m){
+    return `<div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;border-left:3px solid #A78BFA">
+      <span onclick="openCompanyPanel('${m.company_id}')" style="cursor:pointer"><b>${esc(m.companies?.name||'')}</b> — ${esc(m.title)} ${m.start_time?`<span style="color:var(--muted)">· ${m.start_time}</span>`:''}</span>
+      <span style="cursor:pointer;color:var(--green);font-size:11px;flex-shrink:0;margin-left:10px" onclick="updateMeeting('${m.id}','Completed','')">Complete</span>
+    </div>`;
+  }
   function section(title, color, bodyHtml, count){
     return `<div class="ps"><div class="ps-head" style="color:${color}">${title}${count!==undefined?` (${count})`:''}</div><div class="ps-body mini-list">${bodyHtml}</div></div>`;
   }
 
   const activitySummary = [
-    ['email_sent','📧 Email'], ['linkedin_message','💼 LinkedIn'], ['call','📞 Arama'],
-    ['reply_received','↩️ Cevap'], ['demo_completed','🖥️ Demo'], ['proposal_sent','📄 Teklif'],
+    ['email_sent','📧 Email'], ['linkedin_message','💼 LinkedIn'], ['call','📞 Calls'],
+    ['reply_received','↩️ Replies'], ['demo_completed','🖥️ Demos'], ['proposal_sent','📄 Proposals'],
   ].map(([type,label]) => `<span class="badge" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);margin-right:6px">${label}: <b>${d.activityCounts?.[type]||0}</b></span>`).join('');
 
   main.innerHTML = `
     <div class="page-head"><div><h1>☀️ My Day</h1><p>Everything you need to focus on today.</p></div></div>
 
-    ${d.overdueTasks.length ? section('🔴 Overdue Follow-up\'lar', 'var(--red)', d.overdueTasks.map(t=>taskRow(t,'#F87171')).join(''), d.overdueTasks.length) : ''}
-    ${section('📩 Follow-ups Today\'lar', 'var(--amber)', d.todayTasks.length?d.todayTasks.map(t=>taskRow(t,'#F59E0B')).join(''):'<div style="color:var(--muted);font-size:12px">No tasks for today.</div>', d.todayTasks.length)}
+    ${d.overdueTasks.length ? section('🔴 Overdue Follow-ups', 'var(--red)', d.overdueTasks.map(t=>taskRow(t,'#F87171')).join(''), d.overdueTasks.length) : ''}
+    ${section('📩 Follow-ups Today', 'var(--amber)', d.todayTasks.length?d.todayTasks.map(t=>taskRow(t,'#F59E0B')).join(''):'<div style="color:var(--muted);font-size:12px">No tasks for today.</div>', d.todayTasks.length)}
 
-    ${d.demosToday.length ? section('🖥️ Today\'s Demos', 'var(--purple)', d.demosToday.map(t=>taskRow(t,'#A78BFA')).join(''), d.demosToday.length) : ''}
+    ${d.demosToday.length ? section('🖥️ Today\'s Demos', 'var(--purple)', d.demosToday.map(m=>demoMeetingRow(m)).join(''), d.demosToday.length) : ''}
 
     ${section('🎯 Not Yet Contacted Prospects', 'var(--blue)',
       d.notContacted.length?d.notContacted.map(c=>`<div class="mini-item" style="cursor:pointer" onclick="openCompanyPanel('${c.companyId}')"><b>${esc(c.companyName||'—')}</b> <span style="color:var(--muted)">— no contact logged yet</span></div>`).join(''):'<div style="color:var(--muted);font-size:12px">Great, everyone has been contacted!</div>',
       d.notContacted.length)}
 
     ${section('💰 Proposals Awaiting Response', 'var(--green)',
-      d.openProposals.length?d.openProposals.map(o=>`<div class="mini-item" style="cursor:pointer" onclick="openCompanyPanel('${o.company_id}')"><b>${esc(o.companies?.name||'—')}</b> <span style="color:var(--green);font-weight:700">₺${o.estimated_mrr?Number(o.estimated_mrr).toLocaleString('tr-TR'):'—'}</span></div>`).join(''):'<div style="color:var(--muted);font-size:12px">No pending proposals.</div>',
+      d.openProposals.length?d.openProposals.map(o=>`<div class="mini-item" style="cursor:pointer" onclick="openCompanyPanel('${o.company_id}')"><b>${esc(o.companies?.name||'—')}</b> <span style="color:var(--green);font-weight:700">${o.mrr?'₺'+Number(o.mrr).toLocaleString('tr-TR')+'/mo':(o.value?'₺'+Number(o.value).toLocaleString('tr-TR'):'—')}</span> <span class="badge" style="background:var(--surface-2);color:var(--muted);margin-left:6px">${esc(o.status)}</span></div>`).join(''):'<div style="color:var(--muted);font-size:12px">No pending proposals.</div>',
       d.openProposals.length)}
 
     ${d.upcomingTasks.length ? section('🟢 Upcoming (7 days)', 'var(--green)', d.upcomingTasks.map(t=>taskRow(t,'#39D98A')).join(''), d.upcomingTasks.length) : ''}
@@ -1304,7 +1310,11 @@ async function submitAddMeeting(companyId){
 }
 async function updateMeeting(meetingId, status, companyId){
   const d = await api('updateMeetingStatus', { meetingId, status });
-  if(d.success){ toast('✓ Meeting ' + status.toLowerCase()); openCompanyPanel(companyId); }
+  if(d.success){
+    toast('✓ Meeting ' + status.toLowerCase());
+    if(companyId){ openCompanyPanel(companyId); }
+    else if(currentPage==='myday'){ renderMyDay(); }
+  }
 }
 
 // ── Proposals ──
@@ -1348,9 +1358,20 @@ async function renderPipeline(){
           <div class="col-body" data-stage="${s}" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="onDropCard(event,'${s}')">
             ${items.map(o=>`
               <div class="kcard" style="--stat-color:${STAGE_COLORS[s]}" draggable="true" ondragstart="onDragStart(event,'${o.id}')" onclick="openOpportunityDetail('${o.id}')">
-                <b>${esc(o.companies?.name||'—')}</b>
-                <div style="color:var(--muted)">${esc(o.companies?.country||'')}</div>
-                <div class="meta"><span class="mrr">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span><span>${daysSince(o.stage_changed_at)}g</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
+                  <b>${esc(o.companies?.name||'—')}</b>
+                  ${o.companies?.priority==='High'?'<span title="High priority">🔥</span>':''}
+                </div>
+                <div style="color:var(--muted);font-size:10.5px">${esc(o.companies?.industry||'')}${o.companies?.industry&&o.companies?.country?' · ':''}${esc(o.companies?.country||'')}</div>
+                ${o.primary_contact_name?`<div style="font-size:10.5px;color:var(--muted);margin-top:4px">👤 ${esc(o.primary_contact_name)}</div>`:''}
+                <div class="meta">
+                  <span class="mrr">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span>
+                  <span style="display:flex;align-items:center;gap:6px">
+                    <span style="color:${leadScoreColor(o.lead_score||0)};font-weight:700">🎯${o.lead_score||0}</span>
+                    <span>${daysSince(o.stage_changed_at)}d</span>
+                  </span>
+                </div>
+                ${o.next_task?`<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border-subtle);font-size:10px;color:var(--amber)">📅 ${esc(o.next_task.title)}${o.next_task.due_date?' · '+o.next_task.due_date:''}</div>`:''}
               </div>`).join('')}
           </div>
         </div>`;
