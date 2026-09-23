@@ -515,7 +515,7 @@ async function toggleNotifications(){
 })();
 
 // ── SAYFA YÖNLENDİRME ──
-async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter){
+async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter, periodFilter){
   currentPage = page;
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.page===page));
   const main = document.getElementById('main');
@@ -523,7 +523,7 @@ async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter
   if(page==='dashboard') await renderDashboard();
   else if(page==='myday') await renderMyDay();
   else if(page==='pipeline') await renderPipeline(stageFilter);
-  else if(page==='companies') await renderCompanies(searchQuery, sourceFilter);
+  else if(page==='companies') await renderCompanies(searchQuery, sourceFilter, periodFilter);
   else if(page==='tasks') await renderTasks(taskFilter);
   else if(page==='analytics') await renderAnalytics();
   else if(page==='settings') await renderSettings();
@@ -535,7 +535,7 @@ async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter
 async function renderDashboard(){
   const [d, oppsRes, anaRes] = await Promise.all([ api('getDashboard'), api('getOpportunities'), api('getAnalytics') ]);
   const main = document.getElementById('main');
-  if(!d.success){ main.innerHTML='<div class="empty">Failed to load</div>'; return; }
+  if(!d.success){ main.innerHTML='<div class="empty">Unable to load data.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderDashboard()">↻ Retry</span></div>'; return; }
   const opps = oppsRes.success ? oppsRes.opportunities : [];
   const analytics = anaRes.success ? anaRes : null;
 
@@ -605,7 +605,7 @@ async function renderDashboard(){
     </div>
     <div class="stats">
       ${statCard('💰','#39D98A','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Value', d.trends?.pipelineValue, "showPage('pipeline')")}
-      ${statCard('👥','#3B82F6',d.newProspects||0,'New Prospects', d.trends?.newProspects, "showPage('companies')")}
+      ${statCard('👥','#3B82F6',d.newProspects||0,'New Prospects', d.trends?.newProspects, "showPage('companies',null,null,null,null,'thisMonth')")}
       ${statCard('📅','#A78BFA',d.followUpsToday||0,'Follow-ups Today', d.trends?.followUps, "showPage('tasks',null,null,null,{types:'Call,Meeting',when:'today'})")}
       ${statCard('🖥️','#22D3EE',d.demosThisWeek||0,'Demos This Week', d.trends?.demos, "showPage('tasks',null,null,null,{types:'Demo',when:'week'})")}
       ${statCard('📄','#F59E0B',d.openProposals||0,'Open Proposals', d.trends?.openProposals, "showPage('pipeline',null,null,'Proposal')")}
@@ -730,7 +730,7 @@ function timeAgo(iso){
 async function renderMyDay(){
   const [d, settingsRes] = await Promise.all([ api('getMyDay'), api('getSettings') ]);
   const main = document.getElementById('main');
-  if(!d.success){ main.innerHTML='<div class="empty">Failed to load</div>'; return; }
+  if(!d.success){ main.innerHTML='<div class="empty">Unable to load data.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderMyDay()">↻ Retry</span></div>'; return; }
   const targets = settingsRes.success ? (settingsRes.dailyTargets||{}) : {};
 
   function taskRow(t, color){
@@ -788,7 +788,7 @@ async function renderMyDay(){
 async function renderAnalytics(){
   const d = await api('getAnalytics');
   const main = document.getElementById('main');
-  if(!d.success){ main.innerHTML='<div class="empty">Failed to load</div>'; return; }
+  if(!d.success){ main.innerHTML='<div class="empty">Unable to load data.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderAnalytics()">↻ Retry</span></div>'; return; }
 
   const donutColors = ['#39D98A','#22D3EE','#3B82F6','#A78BFA','#F59E0B'];
   const sourcesWithData = d.sourcePerformance.filter(s=>s.total>0);
@@ -848,7 +848,7 @@ async function renderAnalytics(){
 async function renderSettings(){
   const d = await api('getSettings');
   const main = document.getElementById('main');
-  if(!d.success){ main.innerHTML='<div class="empty">Failed to load</div>'; return; }
+  if(!d.success){ main.innerHTML='<div class="empty">Unable to load data.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderSettings()">↻ Retry</span></div>'; return; }
   const t = d.dailyTargets || {};
   const targetFields = [
     ['calls','📞 Calls'], ['emails','📧 Emails'], ['linkedin','💼 LinkedIn Messages'],
@@ -907,14 +907,16 @@ async function saveDailyTargets(){
 // ══════════════════════════════════════════════
 // ŞİRKETLER
 // ══════════════════════════════════════════════
-async function renderCompanies(searchQuery, sourceFilter){
+async function renderCompanies(searchQuery, sourceFilter, periodFilter){
   const params = {};
   if(searchQuery) params.search = searchQuery;
   if(sourceFilter) params.filterSource = sourceFilter;
+  if(periodFilter) params.filterPeriod = periodFilter;
   const d = await api('getCompanies', params);
-  companies = d.companies || [];
   const main = document.getElementById('main');
-  const filterLabel = searchQuery ? `"${esc(searchQuery)}"` : (sourceFilter ? `source: ${esc(sourceFilter)}` : '');
+  if(!d.success){ main.innerHTML='<div class="empty">Unable to load data.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderCompanies()">↻ Retry</span></div>'; return; }
+  companies = d.companies || [];
+  const filterLabel = searchQuery ? `"${esc(searchQuery)}"` : (sourceFilter ? `source: ${esc(sourceFilter)}` : (periodFilter==='thisMonth' ? 'new this month' : ''));
   main.innerHTML = `
     <div class="page-head">
       <div><h1>Companies</h1><p>${companies.length} prospects/customers${filterLabel?` · ${filterLabel} <span style="color:var(--primary);cursor:pointer" onclick="showPage('companies')">✕ clear</span>`:''}</p></div>
@@ -1531,8 +1533,9 @@ async function deleteCompanyConfirm(companyId){
 // ══════════════════════════════════════════════
 async function renderPipeline(highlightStage){
   const d = await api('getOpportunities');
-  opportunities = d.opportunities || [];
   const main = document.getElementById('main');
+  if(!d.success){ main.innerHTML='<div class="empty">Unable to load data.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderPipeline()">↻ Retry</span></div>'; return; }
+  opportunities = d.opportunities || [];
   main.innerHTML = `
     <div class="page-head"><div><h1>Pipeline</h1><p>Drag and drop cards to change stage.</p></div></div>
     <div class="board">
@@ -1586,6 +1589,8 @@ async function onDropCard(e, newStage){
 // ══════════════════════════════════════════════
 async function renderTasks(filter){
   const d = await api('getTasks');
+  const main = document.getElementById('main');
+  if(!d.success){ main.innerHTML='<div class="empty">Unable to load data.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderTasks()">↻ Retry</span></div>'; return; }
   let tasksAll = d.tasks || [];
   const today = new Date().toISOString().slice(0,10);
 
