@@ -6,19 +6,20 @@
 <title>Ahoraclario — Sales CRM</title>
 <style>
 :root{
-  /* Midnight Navy — lacivert temelli, mavi/camgöbeği/yeşil vurgulu premium tema */
-  --bg:#0A0E1A; --bg-raised:#070A13; --surface:#111827; --surface-2:#182036;
-  --border:#232C47; --border-subtle:#171E33;
-  --text:#E9EDF7; --muted:#8C96B8; --faint:#5E6889;
-  --primary:#22E5A0; --primary-dark:#14B885; --primary-bg:rgba(34,229,160,.14);
-  --blue:#4C8DFF; --blue-bg:rgba(76,141,255,.14);
+  /* Ahoraclario Design System — Part 13 spec'indeki birebir hex değerleri */
+  --bg:#070B14; --bg-raised:#080D18; --surface:#0D1421; --surface-2:#111B2B;
+  --surface-secondary:#0A101C; --opp-card:#0F1826;
+  --border:#1B2A3A; --border-subtle:#172435; --border-hover:#29415A;
+  --text:#F0F6FC; --muted:#8B9AAF; --faint:#596579;
+  --primary:#39D98A; --primary-dark:#2BC27A; --primary-bg:rgba(57,217,138,.14);
+  --blue:#3B82F6; --blue-bg:rgba(59,130,246,.14);
   --cyan:#22D3EE; --cyan-bg:rgba(34,211,238,.14);
-  --green:#22E5A0; --green-bg:rgba(34,229,160,.14);
-  --amber:#F0A93A; --amber-bg:rgba(240,169,58,.14);
-  --red:#F5556C; --red-bg:rgba(245,85,108,.14);
-  --purple:#9F7AEA; --purple-bg:rgba(159,122,234,.14);
-  --glow-primary:0 0 0 1px rgba(34,229,160,.15), 0 8px 24px rgba(34,229,160,.10);
-  --glow-blue:0 0 0 1px rgba(76,141,255,.15), 0 8px 24px rgba(76,141,255,.10);
+  --green:#39D98A; --green-bg:rgba(57,217,138,.14);
+  --amber:#F59E0B; --amber-bg:rgba(245,158,11,.14);
+  --red:#F87171; --red-bg:rgba(248,113,113,.14);
+  --purple:#A78BFA; --purple-bg:rgba(167,139,250,.14);
+  --glow-primary:0 0 0 1px rgba(57,217,138,.15), 0 8px 24px rgba(57,217,138,.10);
+  --glow-blue:0 0 0 1px rgba(59,130,246,.15), 0 8px 24px rgba(59,130,246,.10);
   /* eski isimlerle geriye dönük uyum */
   --ink:var(--text); --line:var(--border); --card:var(--surface);
 }
@@ -81,6 +82,17 @@ a{color:var(--blue);text-decoration:none}
 .search-box input{border:none;background:none;outline:none;color:var(--text);font-size:13px;flex:1;padding:0}
 .search-box input::placeholder{color:var(--faint)}
 .search-box kbd{font-size:10.5px;color:var(--faint);background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:2px 6px;font-family:inherit}
+.search-dropdown{position:absolute;top:calc(100% + 8px);left:0;width:100%;min-width:320px;max-height:400px;overflow-y:auto;background:var(--surface);border:1px solid var(--border-hover);border-radius:10px;box-shadow:0 16px 40px -12px rgba(0,0,0,.6);z-index:50;padding:6px}
+.search-group-label{font-size:10px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;padding:8px 10px 4px}
+.search-result-row{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:7px;cursor:pointer;font-size:12.5px}
+.search-result-row:hover{background:var(--surface-2)}
+.search-result-row b{color:var(--text)}
+.search-result-row .meta{color:var(--muted);font-size:11px}
+.search-empty{padding:14px 10px;color:var(--muted);font-size:12px;text-align:center}
+.notif-dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--red);border:1.5px solid var(--bg-raised)}
+.notif-item{display:flex;gap:9px;padding:10px;border-radius:7px;cursor:pointer;font-size:12px}
+.notif-item:hover{background:var(--surface-2)}
+.notif-item .nd{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0}
 .topbar-right{display:flex;align-items:center;gap:14px;flex-shrink:0}
 .icon-btn{width:34px;height:34px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:15px}
 .icon-btn:hover{background:var(--surface-2);color:var(--text)}
@@ -157,7 +169,7 @@ tr.row-click:hover{background:var(--surface-2)}
 .activity-item .ai-time{color:var(--faint);font-size:10px;margin-left:auto;flex-shrink:0;padding-left:8px}
 
 /* ---- Buttons ---- */
-.btn-add{background:var(--primary);color:#04170F;border:none;border-radius:8px;padding:10px 18px;font-size:13.5px;font-weight:700}
+.btn-add{background:var(--primary);color:#07110C;border:none;border-radius:8px;height:36px;padding:0 18px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
 .btn-add:hover{background:var(--primary-dark)}
 .btn-ghost{background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:9px 15px;font-size:12.5px;font-weight:700}
 .btn-ghost:hover{border-color:var(--faint)}
@@ -191,8 +203,9 @@ tr.row-click:hover{background:var(--surface-2)}
 .fi-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
 .fi{margin-bottom:10px}
 .fi label{display:block;font-size:10.5px;font-weight:700;color:var(--muted);margin-bottom:4px}
-.fi input,.fi select,.fi textarea{width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:12.5px;background:var(--surface-2);color:var(--text)}
-.fi input:focus,.fi select:focus,.fi textarea:focus{outline:none;border-color:var(--primary)}
+.fi input,.fi select,.fi textarea{width:100%;min-height:38px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:12.5px;background:var(--surface-secondary);color:var(--text)}
+.fi textarea{min-height:auto}
+.fi input:focus,.fi select:focus,.fi textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(59,130,246,.15)}
 .mini-list{display:flex;flex-direction:column;gap:7px}
 .mini-item{border:1px solid var(--border-subtle);border-radius:8px;padding:9px 11px;font-size:12px;background:var(--bg-raised);color:var(--text)}
 .mini-item b{font-size:12.5px}
@@ -250,11 +263,15 @@ tr.row-click:hover{background:var(--surface-2)}
   </div>
   <div class="content-area">
     <div class="topbar">
-      <div class="search-box">
-        🔍 <input id="globalSearch" placeholder="Search companies, contacts..." onkeydown="if(event.key==='Enter')runGlobalSearch()"> <kbd>Enter</kbd>
+      <div class="search-box" style="position:relative">
+        🔍 <input id="globalSearch" placeholder="Search companies, contacts, deals..." oninput="onGlobalSearchInput()" onfocus="onGlobalSearchInput()" autocomplete="off"> <kbd>Esc</kbd>
+        <div id="searchResults" class="search-dropdown hidden"></div>
       </div>
       <div class="topbar-right">
-        <button class="icon-btn" title="Bildirimler" onclick="showPage('myday')">🔔</button>
+        <div style="position:relative">
+          <button class="icon-btn" title="Notifications" onclick="toggleNotifications()">🔔<span id="notifDot" class="notif-dot hidden"></span></button>
+          <div id="notifDropdown" class="search-dropdown hidden" style="right:0;left:auto;width:320px"></div>
+        </div>
         <div class="user-chip" onclick="doLogout()" title="Log out">
           <div class="avatar" id="topbarAvatar" style="background:var(--primary-bg);color:var(--primary)"></div>
           <div><b id="sbUserName"></b><span>Founder · Logout</span></div>
@@ -327,9 +344,9 @@ tr.row-click:hover{background:var(--surface-2)}
 const EDGE_FUNCTION_URL = 'https://tuozgfnjxxwrcuyfrwxq.supabase.co/functions/v1/rapid-service';
 
 const STAGES = ["Prospect","Researched","Contacted","Replied","Discovery Call","Demo","Proposal","Negotiation","Won"];
-const STAGE_COLORS = {Prospect:"#64748B",Researched:"#4C8DFF",Contacted:"#38BDF8",Replied:"#9F7AEA",
-  "Discovery Call":"#C026D3","Demo":"#2DD4BF","Proposal":"#F0A93A","Negotiation":"#FB923C","Won":"#22E5A0"};
-const OUTCOME_COLORS = {Lost:"#F5556C","No Response":"#5E6889","Not a Fit":"#5E6889"};
+const STAGE_COLORS = {Prospect:"#64748B",Researched:"#3B82F6",Contacted:"#22D3EE",Replied:"#38BDF8",
+  "Discovery Call":"#818CF8","Demo":"#A78BFA","Proposal":"#C084FC","Negotiation":"#F59E0B","Won":"#39D98A"};
+const OUTCOME_COLORS = {Lost:"#F87171","No Response":"#596579","Not a Fit":"#596579"};
 
 let CU = null; // { token, name, username }
 let companies = [], opportunities = [], tasks = [];
@@ -394,10 +411,77 @@ async function refreshNavBadges(){
   setBadge('nbMyDay', (d.followUpsToday||0) + (d.tasksOverdue||0));
   setBadge('nbCompanies', d.totalCompanies||0);
   setBadge('nbTasks', d.openTasksCount||0);
+  // Bildirim kırmızı noktası — geciken görev veya yaklaşan toplantı varsa göster.
+  const hasAlerts = (d.tasksOverdue||0) > 0 || (d.upcomingMeetings && d.upcomingMeetings.length > 0);
+  document.getElementById('notifDot')?.classList.toggle('hidden', !hasAlerts);
 }
-function runGlobalSearch(){
+// ── Global Arama (Şirket + Kişi + Fırsat, canlı dropdown) ──
+let searchDebounce = null;
+function onGlobalSearchInput(){
+  clearTimeout(searchDebounce);
   const q = document.getElementById('globalSearch').value.trim();
-  showPage('companies', q);
+  const box = document.getElementById('searchResults');
+  if(q.length < 2){ box.classList.add('hidden'); return; }
+  searchDebounce = setTimeout(async () => {
+    const d = await api('globalSearch', { query: q });
+    if(!d.success) return;
+    renderSearchResults(d);
+  }, 280);
+}
+function renderSearchResults(d){
+  const box = document.getElementById('searchResults');
+  const total = d.companies.length + d.contacts.length + d.opportunities.length;
+  if(total === 0){ box.innerHTML = '<div class="search-empty">No results found</div>'; box.classList.remove('hidden'); return; }
+  let html = '';
+  if(d.companies.length){
+    html += '<div class="search-group-label">Companies</div>';
+    html += d.companies.map(c=>`<div class="search-result-row" onclick="closeSearchAndOpen('${c.id}')"><b>${esc(c.name)}</b><span class="meta">${esc(c.industry||c.country||'Company')}</span></div>`).join('');
+  }
+  if(d.contacts.length){
+    html += '<div class="search-group-label">Contacts</div>';
+    html += d.contacts.map(c=>`<div class="search-result-row" onclick="closeSearchAndOpen('${c.company_id}')"><b>${esc(c.full_name)}</b><span class="meta">${esc(c.companies?.name||c.position||'Contact')}</span></div>`).join('');
+  }
+  if(d.opportunities.length){
+    html += '<div class="search-group-label">Opportunities</div>';
+    html += d.opportunities.map(o=>`<div class="search-result-row" onclick="closeSearchAndOpen('${o.company_id}')"><b>${esc(o.companies?.name||'—')}</b><span class="meta">${esc(o.stage)}${o.estimated_mrr?' · ₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span></div>`).join('');
+  }
+  box.innerHTML = html;
+  box.classList.remove('hidden');
+}
+function closeSearchAndOpen(companyId){
+  document.getElementById('searchResults').classList.add('hidden');
+  document.getElementById('globalSearch').value = '';
+  openCompanyPanel(companyId);
+}
+document.addEventListener('click', e => {
+  if(!e.target.closest('.search-box')) document.getElementById('searchResults')?.classList.add('hidden');
+  if(!e.target.closest('.topbar-right')) document.getElementById('notifDropdown')?.classList.add('hidden');
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){ document.getElementById('searchResults')?.classList.add('hidden'); document.getElementById('globalSearch')?.blur(); }
+});
+
+// ── Bildirimler (gerçek CRM olaylarından: geciken görev, yaklaşan toplantı, bekleyen teklif) ──
+async function toggleNotifications(){
+  const dd = document.getElementById('notifDropdown');
+  if(!dd.classList.contains('hidden')){ dd.classList.add('hidden'); return; }
+  dd.innerHTML = '<div class="search-empty">Loading...</div>';
+  dd.classList.remove('hidden');
+  const [myDayRes, dashRes] = await Promise.all([ api('getMyDay'), api('getDashboard') ]);
+  const items = [];
+  if(myDayRes.success){
+    myDayRes.overdueTasks.forEach(t => items.push({ color:'var(--red)', text:`Overdue: ${t.title}`, sub:t.companies?.name, companyId:t.company_id }));
+    myDayRes.openProposals.forEach(o => items.push({ color:'var(--purple)', text:`Proposal awaiting response`, sub:o.companies?.name, companyId:o.company_id }));
+  }
+  if(dashRes.success){
+    (dashRes.upcomingMeetings||[]).slice(0,3).forEach(m => items.push({ color:'var(--blue)', text:`${m.type} meeting · ${m.meeting_date}${m.start_time?' '+m.start_time:''}`, sub:m.companies?.name, companyId:m.company_id }));
+  }
+  document.getElementById('notifDot').classList.toggle('hidden', items.length===0);
+  dd.innerHTML = items.length ? items.map(i=>`
+    <div class="notif-item" onclick="closeSearchAndOpen('${i.companyId}');document.getElementById('notifDropdown').classList.add('hidden')">
+      <div class="nd" style="background:${i.color}"></div>
+      <div><div>${esc(i.text)}</div><div style="color:var(--muted);font-size:10.5px">${esc(i.sub||'')}</div></div>
+    </div>`).join('') : '<div class="search-empty">You\'re all caught up 🎉</div>';
 }
 (function tryRestoreSession(){
   try{
@@ -462,7 +546,7 @@ async function renderDashboard(){
   </div>`;
 
   // ── Lead Sources donut (gerçek veri, CSS conic-gradient — kütüphane yok) ──
-  const donutColors = ['#4C8DFF','#22D3EE','#9F7AEA','#22E5A0','#F0A93A','#FB923C','#F5556C','#64748B'];
+  const donutColors = ['#3B82F6','#22D3EE','#A78BFA','#39D98A','#F59E0B','#FB923C','#F87171','#64748B'];
   const sources = (analytics?.sourcePerformance || []).filter(s=>s.total>0);
   const donutHtml = sources.length ? donutChart(sources.map((s,i)=>({label:s.source, value:s.total, color:donutColors[i%donutColors.length]}))) : '<div class="empty" style="padding:20px">No source data yet</div>';
   const donutLegend = sources.map((s,i)=>`<div class="donut-legend-row"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
@@ -480,12 +564,12 @@ async function renderDashboard(){
       </div>
     </div>
     <div class="stats">
-      ${statCard('💰','#22E5A0','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Value', d.trends?.pipelineValue)}
-      ${statCard('👥','#4C8DFF',d.newProspects||0,'New Prospects', d.trends?.newProspects)}
-      ${statCard('📅','#9F7AEA',d.followUpsToday||0,'Follow-ups Today', d.trends?.followUps)}
+      ${statCard('💰','#39D98A','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Value', d.trends?.pipelineValue)}
+      ${statCard('👥','#3B82F6',d.newProspects||0,'New Prospects', d.trends?.newProspects)}
+      ${statCard('📅','#A78BFA',d.followUpsToday||0,'Follow-ups Today', d.trends?.followUps)}
       ${statCard('🖥️','#22D3EE',d.demosThisWeek||0,'Demos This Week', d.trends?.demos)}
-      ${statCard('📄','#F0A93A',d.openProposals||0,'Open Proposals', d.trends?.openProposals)}
-      ${statCard('🏆','#22E5A0',d.wonThisMonth||0,'Won This Month', d.trends?.wonRevenue)}
+      ${statCard('📄','#F59E0B',d.openProposals||0,'Open Proposals', d.trends?.openProposals)}
+      ${statCard('🏆','#39D98A',d.wonThisMonth||0,'Won This Month', d.trends?.wonRevenue)}
     </div>
 
     <div class="dash-grid">
@@ -626,10 +710,10 @@ async function renderMyDay(){
   main.innerHTML = `
     <div class="page-head"><div><h1>☀️ My Day</h1><p>Everything you need to focus on today.</p></div></div>
 
-    ${d.overdueTasks.length ? section('🔴 Overdue Follow-up\'lar', 'var(--red)', d.overdueTasks.map(t=>taskRow(t,'#F5556C')).join(''), d.overdueTasks.length) : ''}
-    ${section('📩 Follow-ups Today\'lar', 'var(--amber)', d.todayTasks.length?d.todayTasks.map(t=>taskRow(t,'#F0A93A')).join(''):'<div style="color:var(--muted);font-size:12px">No tasks for today.</div>', d.todayTasks.length)}
+    ${d.overdueTasks.length ? section('🔴 Overdue Follow-up\'lar', 'var(--red)', d.overdueTasks.map(t=>taskRow(t,'#F87171')).join(''), d.overdueTasks.length) : ''}
+    ${section('📩 Follow-ups Today\'lar', 'var(--amber)', d.todayTasks.length?d.todayTasks.map(t=>taskRow(t,'#F59E0B')).join(''):'<div style="color:var(--muted);font-size:12px">No tasks for today.</div>', d.todayTasks.length)}
 
-    ${d.demosToday.length ? section('🖥️ Today\'s Demos', 'var(--purple)', d.demosToday.map(t=>taskRow(t,'#9F7AEA')).join(''), d.demosToday.length) : ''}
+    ${d.demosToday.length ? section('🖥️ Today\'s Demos', 'var(--purple)', d.demosToday.map(t=>taskRow(t,'#A78BFA')).join(''), d.demosToday.length) : ''}
 
     ${section('🎯 Not Yet Contacted Prospects', 'var(--blue)',
       d.notContacted.length?d.notContacted.map(c=>`<div class="mini-item" style="cursor:pointer" onclick="openCompanyPanel('${c.companyId}')"><b>${esc(c.companyName||'—')}</b> <span style="color:var(--muted)">— no contact logged yet</span></div>`).join(''):'<div style="color:var(--muted);font-size:12px">Great, everyone has been contacted!</div>',
@@ -639,7 +723,7 @@ async function renderMyDay(){
       d.openProposals.length?d.openProposals.map(o=>`<div class="mini-item" style="cursor:pointer" onclick="openCompanyPanel('${o.company_id}')"><b>${esc(o.companies?.name||'—')}</b> <span style="color:var(--green);font-weight:700">₺${o.estimated_mrr?Number(o.estimated_mrr).toLocaleString('tr-TR'):'—'}</span></div>`).join(''):'<div style="color:var(--muted);font-size:12px">No pending proposals.</div>',
       d.openProposals.length)}
 
-    ${d.upcomingTasks.length ? section('🟢 Upcoming (7 days)', 'var(--green)', d.upcomingTasks.map(t=>taskRow(t,'#22E5A0')).join(''), d.upcomingTasks.length) : ''}
+    ${d.upcomingTasks.length ? section('🟢 Upcoming (7 days)', 'var(--green)', d.upcomingTasks.map(t=>taskRow(t,'#39D98A')).join(''), d.upcomingTasks.length) : ''}
 
     <div class="ps"><div class="ps-head">📊 Today's Activity</div><div class="ps-body">${activitySummary}</div></div>
   `;
@@ -653,7 +737,7 @@ async function renderAnalytics(){
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Failed to load</div>'; return; }
 
-  const donutColors = ['#4C8DFF','#22D3EE','#9F7AEA','#22E5A0','#F0A93A','#FB923C','#F5556C','#64748B'];
+  const donutColors = ['#3B82F6','#22D3EE','#A78BFA','#39D98A','#F59E0B','#FB923C','#F87171','#64748B'];
   const sourcesWithData = d.sourcePerformance.filter(s=>s.total>0);
   const donutHtml = sourcesWithData.length ? donutChart(sourcesWithData.map((s,i)=>({label:s.source, value:s.total, color:donutColors[i%donutColors.length]}))) : '<div class="empty" style="padding:20px">No data yet</div>';
   const donutLegend = sourcesWithData.map((s,i)=>`<div class="donut-legend-row"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
@@ -671,10 +755,10 @@ async function renderAnalytics(){
   main.innerHTML = `
     <div class="page-head"><div><h1>📈 Reports</h1><p>Funnel conversion, source performance, and loss analysis.</p></div></div>
     <div class="stats">
-      <div class="stat" style="--stat-color:#4C8DFF"><div class="icon" style="background:#4C8DFF22;color:#4C8DFF">📊</div><div><div class="n">${d.totalOpportunities}</div><div class="l">Total Opportunities</div></div></div>
-      <div class="stat" style="--stat-color:#22E5A0"><div class="icon" style="background:#22E5A022;color:#22E5A0">🎉</div><div><div class="n">${d.wonCount}</div><div class="l">Won</div></div></div>
-      <div class="stat" style="--stat-color:#F5556C"><div class="icon" style="background:#F5556C22;color:#F5556C">📉</div><div><div class="n">${d.lostCount}</div><div class="l">Lost</div></div></div>
-      <div class="stat" style="--stat-color:#22E5A0"><div class="icon" style="background:#22E5A022;color:#22E5A0">💰</div><div><div class="n">₺${Math.round(d.avgDealValue).toLocaleString('tr-TR')}</div><div class="l">Avg. Deal Value</div></div></div>
+      <div class="stat" style="--stat-color:#3B82F6"><div class="icon" style="background:#3B82F622;color:#3B82F6">📊</div><div><div class="n">${d.totalOpportunities}</div><div class="l">Total Opportunities</div></div></div>
+      <div class="stat" style="--stat-color:#39D98A"><div class="icon" style="background:#39D98A22;color:#39D98A">🎉</div><div><div class="n">${d.wonCount}</div><div class="l">Won</div></div></div>
+      <div class="stat" style="--stat-color:#F87171"><div class="icon" style="background:#F8717122;color:#F87171">📉</div><div><div class="n">${d.lostCount}</div><div class="l">Lost</div></div></div>
+      <div class="stat" style="--stat-color:#39D98A"><div class="icon" style="background:#39D98A22;color:#39D98A">💰</div><div><div class="n">₺${Math.round(d.avgDealValue).toLocaleString('tr-TR')}</div><div class="l">Avg. Deal Value</div></div></div>
     </div>
 
     <div class="ps"><div class="ps-head">Funnel Conversion — Opportunities that reached this stage</div><div class="ps-body">${renderFunnelChevron(d.funnel)}</div></div>
@@ -1205,8 +1289,8 @@ function initials(name){
   return (first+last).toUpperCase();
 }
 function leadScoreColor(score){
-  if(score>=70) return '#22E5A0';   // yüksek — yeşil
-  if(score>=40) return '#F0A93A';   // orta — amber
+  if(score>=70) return '#39D98A';   // yüksek — yeşil
+  if(score>=40) return '#F59E0B';   // orta — amber
   return '#8B949E';                 // düşük — gri
 }
 </script>
