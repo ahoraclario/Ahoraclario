@@ -6,16 +6,20 @@
 <title>Ahoraclario — Sales CRM</title>
 <style>
 :root{
-  --bg:#0D1117; --bg-raised:#010409; --surface:#161B22; --surface-2:#1C2128;
-  --border:#30363D; --border-subtle:#21262D;
-  --text:#E6EDF3; --muted:#8B949E; --faint:#6E7681;
-  --primary:#3ECF8E; --primary-dark:#2EBE7E; --primary-bg:rgba(62,207,142,.14);
-  --blue:#58A6FF; --blue-bg:rgba(88,166,255,.14);
-  --green:#3FB950; --green-bg:rgba(63,185,80,.15);
-  --amber:#D29922; --amber-bg:rgba(210,153,34,.15);
-  --red:#F85149; --red-bg:rgba(248,81,73,.15);
-  --purple:#A371F7; --purple-bg:rgba(163,113,247,.15);
-  /* eski isimlerle geriye dönük uyum (kod içinde var(--ink) vb. çağrılıyor olabilir) */
+  /* Midnight Navy — lacivert temelli, mavi/camgöbeği/yeşil vurgulu premium tema */
+  --bg:#0A0E1A; --bg-raised:#070A13; --surface:#111827; --surface-2:#182036;
+  --border:#232C47; --border-subtle:#171E33;
+  --text:#E9EDF7; --muted:#8C96B8; --faint:#5E6889;
+  --primary:#22E5A0; --primary-dark:#14B885; --primary-bg:rgba(34,229,160,.14);
+  --blue:#4C8DFF; --blue-bg:rgba(76,141,255,.14);
+  --cyan:#22D3EE; --cyan-bg:rgba(34,211,238,.14);
+  --green:#22E5A0; --green-bg:rgba(34,229,160,.14);
+  --amber:#F0A93A; --amber-bg:rgba(240,169,58,.14);
+  --red:#F5556C; --red-bg:rgba(245,85,108,.14);
+  --purple:#9F7AEA; --purple-bg:rgba(159,122,234,.14);
+  --glow-primary:0 0 0 1px rgba(34,229,160,.15), 0 8px 24px rgba(34,229,160,.10);
+  --glow-blue:0 0 0 1px rgba(76,141,255,.15), 0 8px 24px rgba(76,141,255,.10);
+  /* eski isimlerle geriye dönük uyum */
   --ink:var(--text); --line:var(--border); --card:var(--surface);
 }
 *{box-sizing:border-box}
@@ -59,28 +63,43 @@ a{color:var(--blue);text-decoration:none}
 /* ---- App shell ---- */
 #app{display:none}
 #app.open{display:flex;min-height:100vh}
-.sidebar{width:230px;flex-shrink:0;background:var(--bg-raised);border-right:1px solid var(--border-subtle);padding:20px 14px;display:flex;flex-direction:column}
-.sb-logo{display:flex;align-items:center;gap:10px;padding:0 8px 22px}
-.sb-logo .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--primary),#22946A);color:#04170F;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+.sidebar{width:236px;flex-shrink:0;background:var(--bg-raised);border-right:1px solid var(--border-subtle);padding:18px 14px;display:flex;flex-direction:column}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:4px 8px 22px}
+.sb-logo .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--cyan));color:#04170F;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;box-shadow:var(--glow-primary)}
 .sb-logo b{font-size:14.5px;color:var(--text);letter-spacing:-.1px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:var(--muted);font-size:13.5px;font-weight:600;cursor:pointer;margin-bottom:2px;border:none;background:none;width:100%;text-align:left;transition:background .12s,color .12s}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;color:var(--muted);font-size:13.5px;font-weight:600;cursor:pointer;margin-bottom:2px;border:none;border-left:3px solid transparent;background:none;width:100%;text-align:left;transition:background .12s,color .12s,border-color .12s}
 .nav-item:hover{background:var(--surface);color:var(--text)}
-.nav-item.active{background:var(--primary-bg);color:var(--primary)}
+.nav-item.active{background:linear-gradient(90deg, var(--primary-bg), transparent);color:var(--primary);border-left-color:var(--primary)}
+.nav-item .nb{margin-left:auto;font-size:10px;font-weight:700;background:var(--surface-2);color:var(--muted);border-radius:20px;padding:1px 7px}
+.nav-item.active .nb{background:var(--primary-bg);color:var(--primary)}
 .sb-bottom{margin-top:auto;padding-top:14px;border-top:1px solid var(--border-subtle)}
-.sb-user{font-size:12.5px;color:var(--muted);padding:0 8px}
-.sb-user b{color:var(--text);display:block;font-size:13.5px}
-.sb-logout{font-size:12px;color:var(--red);cursor:pointer;margin-top:6px;display:inline-block}
+.sb-tagline{font-size:11.5px;color:var(--faint);padding:0 8px;line-height:1.5}
 
-.main{flex:1;padding:26px 32px;overflow-x:hidden}
+.content-area{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:58px;flex-shrink:0;border-bottom:1px solid var(--border-subtle);background:var(--bg-raised);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:16px}
+.search-box{flex:1;max-width:420px;display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:8px 12px;color:var(--faint);font-size:13px}
+.search-box input{border:none;background:none;outline:none;color:var(--text);font-size:13px;flex:1;padding:0}
+.search-box input::placeholder{color:var(--faint)}
+.search-box kbd{font-size:10.5px;color:var(--faint);background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:2px 6px;font-family:inherit}
+.topbar-right{display:flex;align-items:center;gap:14px;flex-shrink:0}
+.icon-btn{width:34px;height:34px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--muted);display:flex;align-items:center;justify-content:center;font-size:15px}
+.icon-btn:hover{background:var(--surface-2);color:var(--text)}
+.user-chip{display:flex;align-items:center;gap:9px;cursor:pointer;padding:4px 6px;border-radius:9px}
+.user-chip:hover{background:var(--surface)}
+.user-chip .avatar{width:32px;height:32px;font-size:12.5px}
+.user-chip b{font-size:12.5px;color:var(--text);display:block;line-height:1.3}
+.user-chip span{font-size:10.5px;color:var(--muted)}
+
+.main{flex:1;padding:26px 32px;overflow-x:hidden;overflow-y:auto}
 .page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
 .page-head h1{font-size:21px;margin:0 0 4px;color:var(--text);letter-spacing:-.2px}
 .page-head p{color:var(--muted);font-size:13px;margin:0}
 
 /* ---- Stat cards ---- */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:24px}
-.stat{background:var(--surface);border:1px solid var(--border-subtle);border-radius:10px;padding:16px;transition:border-color .12s,transform .12s;position:relative;overflow:hidden;display:flex;align-items:center;gap:13px}
-.stat:hover{border-color:var(--border);transform:translateY(-1px)}
-.stat::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--stat-color,var(--primary))}
+.stat{background:linear-gradient(160deg, var(--surface) 0%, var(--bg-raised) 130%);border:1px solid var(--border-subtle);border-radius:12px;padding:16px;transition:border-color .15s,transform .15s,box-shadow .15s;position:relative;overflow:hidden;display:flex;align-items:center;gap:13px}
+.stat:hover{border-color:var(--border);border-color:color-mix(in srgb, var(--stat-color, var(--primary)) 45%, var(--border));transform:translateY(-2px);box-shadow:0 10px 30px -10px rgba(0,0,0,.5)}
+.stat::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--stat-color,var(--primary));box-shadow:0 0 12px var(--stat-color,var(--primary))}
 .stat .icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .stat .n{font-size:21px;font-weight:800;color:var(--stat-color,var(--primary));letter-spacing:-.3px;line-height:1.1}
 .stat .l{font-size:11px;color:var(--muted);margin-top:3px}
@@ -106,11 +125,12 @@ tr.row-click:hover{background:var(--surface-2)}
 /* ---- Kanban ---- */
 .board{display:flex;gap:12px;overflow-x:auto;padding-bottom:14px}
 .col{flex:0 0 240px;display:flex;flex-direction:column}
-.col-head{padding:9px 12px;border-radius:9px 9px 0 0;font-size:12px;font-weight:700;display:flex;justify-content:space-between}
-.col-body{background:var(--bg-raised);border:1px solid var(--border-subtle);border-top:none;border-radius:0 0 9px 9px;flex:1;min-height:100px;padding:8px;display:flex;flex-direction:column;gap:7px}
+.col-head{padding:10px 13px;border-radius:10px 10px 0 0;font-size:12px;font-weight:700;display:flex;justify-content:space-between;color:#0A0E1A;letter-spacing:.01em}
+.col-head .count{background:rgba(10,14,26,.22);border-radius:20px;padding:1px 8px;font-size:10.5px}
+.col-body{background:var(--surface);border:1px solid var(--border-subtle);border-top:none;border-radius:0 0 10px 10px;flex:1;min-height:100px;padding:9px;display:flex;flex-direction:column;gap:8px}
 .col-body.dragover{background:var(--primary-bg)}
-.kcard{background:var(--surface);border:1px solid var(--border-subtle);border-radius:8px;padding:10px 11px;cursor:grab;font-size:12.5px;transition:border-color .12s}
-.kcard:hover{border-color:var(--border)}
+.kcard{background:var(--bg-raised);border:1px solid var(--border-subtle);border-left:3px solid var(--stat-color,var(--border));border-radius:8px;padding:10px 11px;cursor:grab;font-size:12.5px;transition:border-color .12s,transform .1s}
+.kcard:hover{border-color:var(--border);transform:translateY(-1px)}
 .kcard:active{cursor:grabbing}
 .kcard b{display:block;font-size:12.5px;margin-bottom:3px;color:var(--text)}
 .kcard .meta{color:var(--muted);font-size:10.5px;display:flex;justify-content:space-between;margin-top:5px}
@@ -178,17 +198,30 @@ tr.row-click:hover{background:var(--surface-2)}
   <div class="sidebar">
     <div class="sb-logo"><div class="mark">A</div><b>Ahoraclario</b></div>
     <button class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">📊 Dashboard</button>
-    <button class="nav-item" data-page="myday" onclick="showPage('myday')">☀️ My Day</button>
+    <button class="nav-item" data-page="myday" onclick="showPage('myday')">☀️ My Day<span class="nb hidden" id="nbMyDay"></span></button>
     <button class="nav-item" data-page="pipeline" onclick="showPage('pipeline')">🧭 Pipeline</button>
-    <button class="nav-item" data-page="companies" onclick="showPage('companies')">🏢 Şirketler</button>
-    <button class="nav-item" data-page="tasks" onclick="showPage('tasks')">✅ Görevler</button>
+    <button class="nav-item" data-page="companies" onclick="showPage('companies')">🏢 Şirketler<span class="nb hidden" id="nbCompanies"></span></button>
+    <button class="nav-item" data-page="tasks" onclick="showPage('tasks')">✅ Görevler<span class="nb hidden" id="nbTasks"></span></button>
     <button class="nav-item" data-page="analytics" onclick="showPage('analytics')">📈 Raporlar</button>
     <div class="sb-bottom">
-      <div class="sb-user"><b id="sbUserName"></b>Founder</div>
-      <span class="sb-logout" onclick="doLogout()">Çıkış Yap</span>
+      <div class="sb-tagline">Ahoraclario<br>Doğru araçlarla daha güçlü müşteri ilişkileri.</div>
     </div>
   </div>
-  <div class="main" id="main"></div>
+  <div class="content-area">
+    <div class="topbar">
+      <div class="search-box">
+        🔍 <input id="globalSearch" placeholder="Şirket, kişi ara..." onkeydown="if(event.key==='Enter')runGlobalSearch()"> <kbd>Enter</kbd>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" title="Bildirimler" onclick="showPage('myday')">🔔</button>
+        <div class="user-chip" onclick="doLogout()" title="Çıkış Yap">
+          <div class="avatar" id="topbarAvatar" style="background:var(--primary-bg);color:var(--primary)"></div>
+          <div><b id="sbUserName"></b><span>Founder · Çıkış</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="main" id="main"></div>
+  </div>
 </div>
 
 <!-- Şirket Detay Paneli -->
@@ -239,9 +272,9 @@ tr.row-click:hover{background:var(--surface-2)}
 const EDGE_FUNCTION_URL = 'https://tuozgfnjxxwrcuyfrwxq.supabase.co/functions/v1/rapid-service';
 
 const STAGES = ["Prospect","Researched","Contacted","Replied","Discovery Call","Demo","Proposal","Negotiation","Won"];
-const STAGE_COLORS = {Prospect:"#8B949E",Researched:"#58A6FF",Contacted:"#79C0FF",Replied:"#A371F7",
-  "Discovery Call":"#DB61A2","Demo":"#D29922","Proposal":"#3ECF8E","Negotiation":"#F0883E","Won":"#3FB950"};
-const OUTCOME_COLORS = {Lost:"#F85149","No Response":"#6E7681","Not a Fit":"#6E7681"};
+const STAGE_COLORS = {Prospect:"#64748B",Researched:"#4C8DFF",Contacted:"#38BDF8",Replied:"#9F7AEA",
+  "Discovery Call":"#C026D3","Demo":"#2DD4BF","Proposal":"#F0A93A","Negotiation":"#FB923C","Won":"#22E5A0"};
+const OUTCOME_COLORS = {Lost:"#F5556C","No Response":"#5E6889","Not a Fit":"#5E6889"};
 
 let CU = null; // { token, name, username }
 let companies = [], opportunities = [], tasks = [];
@@ -292,7 +325,24 @@ function enterApp(){
   document.getElementById('login-screen').style.display='none';
   document.getElementById('app').classList.add('open');
   document.getElementById('sbUserName').textContent = CU.name;
+  document.getElementById('topbarAvatar').textContent = initials(CU.name);
   showPage('dashboard');
+  refreshNavBadges();
+}
+async function refreshNavBadges(){
+  const d = await api('getDashboard');
+  if(!d.success) return;
+  const setBadge = (id, n) => {
+    const el = document.getElementById(id);
+    if(n>0){ el.textContent = n; el.classList.remove('hidden'); } else { el.classList.add('hidden'); }
+  };
+  setBadge('nbMyDay', (d.tasksToday||0) + (d.tasksOverdue||0));
+  setBadge('nbCompanies', d.totalCompanies||0);
+  setBadge('nbTasks', d.openTasksCount||0);
+}
+function runGlobalSearch(){
+  const q = document.getElementById('globalSearch').value.trim();
+  showPage('companies', q);
 }
 (function tryRestoreSession(){
   try{
@@ -302,7 +352,7 @@ function enterApp(){
 })();
 
 // ── SAYFA YÖNLENDİRME ──
-async function showPage(page){
+async function showPage(page, searchQuery){
   currentPage = page;
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.page===page));
   const main = document.getElementById('main');
@@ -310,7 +360,7 @@ async function showPage(page){
   if(page==='dashboard') await renderDashboard();
   else if(page==='myday') await renderMyDay();
   else if(page==='pipeline') await renderPipeline();
-  else if(page==='companies') await renderCompanies();
+  else if(page==='companies') await renderCompanies(searchQuery);
   else if(page==='tasks') await renderTasks();
   else if(page==='analytics') await renderAnalytics();
 }
@@ -339,12 +389,12 @@ async function renderDashboard(){
       </div>
     </div>
     <div class="stats">
-      ${statCard('💰','#3ECF8E','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Değeri')}
-      ${statCard('🏢','#58A6FF',d.totalCompanies||0,'Toplam Şirket')}
-      ${statCard('📅','#D29922',d.tasksToday||0,'Bugünkü Follow-up')}
-      ${statCard('⏰','#F85149',d.tasksOverdue||0,'Geciken Görev')}
-      ${statCard('🎉','#3FB950',d.wonCount||0,'Kazanılan Anlaşma')}
-      ${statCard('⭐','#A371F7',d.totalCustomers||0,'Müşteriye Dönüşen')}
+      ${statCard('💰','#22E5A0','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Değeri')}
+      ${statCard('🏢','#4C8DFF',d.totalCompanies||0,'Toplam Şirket')}
+      ${statCard('📅','#F0A93A',d.tasksToday||0,'Bugünkü Follow-up')}
+      ${statCard('⏰','#F5556C',d.tasksOverdue||0,'Geciken Görev')}
+      ${statCard('🎉','#22E5A0',d.wonCount||0,'Kazanılan Anlaşma')}
+      ${statCard('⭐','#9F7AEA',d.totalCustomers||0,'Müşteriye Dönüşen')}
     </div>
     <div class="ps">
       <div class="ps-head">Pipeline Dağılımı<span style="cursor:pointer" onclick="showPage('pipeline')">Tümünü Gör →</span></div>
@@ -383,10 +433,10 @@ async function renderMyDay(){
   main.innerHTML = `
     <div class="page-head"><div><h1>☀️ My Day</h1><p>Bugün odaklanman gereken her şey burada.</p></div></div>
 
-    ${d.overdueTasks.length ? section('🔴 Geciken Follow-up\'lar', 'var(--red)', d.overdueTasks.map(t=>taskRow(t,'#F85149')).join(''), d.overdueTasks.length) : ''}
-    ${section('📩 Bugünkü Follow-up\'lar', 'var(--amber)', d.todayTasks.length?d.todayTasks.map(t=>taskRow(t,'#D29922')).join(''):'<div style="color:var(--muted);font-size:12px">Bugün için görev yok.</div>', d.todayTasks.length)}
+    ${d.overdueTasks.length ? section('🔴 Geciken Follow-up\'lar', 'var(--red)', d.overdueTasks.map(t=>taskRow(t,'#F5556C')).join(''), d.overdueTasks.length) : ''}
+    ${section('📩 Bugünkü Follow-up\'lar', 'var(--amber)', d.todayTasks.length?d.todayTasks.map(t=>taskRow(t,'#F0A93A')).join(''):'<div style="color:var(--muted);font-size:12px">Bugün için görev yok.</div>', d.todayTasks.length)}
 
-    ${d.demosToday.length ? section('🖥️ Bugünkü Demolar', 'var(--purple)', d.demosToday.map(t=>taskRow(t,'#A371F7')).join(''), d.demosToday.length) : ''}
+    ${d.demosToday.length ? section('🖥️ Bugünkü Demolar', 'var(--purple)', d.demosToday.map(t=>taskRow(t,'#9F7AEA')).join(''), d.demosToday.length) : ''}
 
     ${section('🎯 Henüz İletişime Geçilmemiş Adaylar', 'var(--blue)',
       d.notContacted.length?d.notContacted.map(c=>`<div class="mini-item" style="cursor:pointer" onclick="openCompanyPanel('${c.companyId}')"><b>${esc(c.companyName||'—')}</b> <span style="color:var(--muted)">— hiç iletişim kaydı yok</span></div>`).join(''):'<div style="color:var(--muted);font-size:12px">Harika, hepsiyle iletişime geçilmiş!</div>',
@@ -396,7 +446,7 @@ async function renderMyDay(){
       d.openProposals.length?d.openProposals.map(o=>`<div class="mini-item" style="cursor:pointer" onclick="openCompanyPanel('${o.company_id}')"><b>${esc(o.companies?.name||'—')}</b> <span style="color:var(--green);font-weight:700">₺${o.estimated_mrr?Number(o.estimated_mrr).toLocaleString('tr-TR'):'—'}</span></div>`).join(''):'<div style="color:var(--muted);font-size:12px">Bekleyen teklif yok.</div>',
       d.openProposals.length)}
 
-    ${d.upcomingTasks.length ? section('🟢 Yaklaşan (7 gün)', 'var(--green)', d.upcomingTasks.map(t=>taskRow(t,'#3FB950')).join(''), d.upcomingTasks.length) : ''}
+    ${d.upcomingTasks.length ? section('🟢 Yaklaşan (7 gün)', 'var(--green)', d.upcomingTasks.map(t=>taskRow(t,'#22E5A0')).join(''), d.upcomingTasks.length) : ''}
 
     <div class="ps"><div class="ps-head">📊 Bugünkü Aktivite</div><div class="ps-body">${activitySummary}</div></div>
   `;
@@ -411,14 +461,21 @@ async function renderAnalytics(){
   if(!d.success){ main.innerHTML='<div class="empty">Yüklenemedi</div>'; return; }
 
   const maxReached = Math.max(1, ...d.funnel.map(f=>f.reached));
-  const funnelHtml = d.funnel.map((f,i)=>{
-    const pct = Math.round((f.reached/maxReached)*100);
-    const color = STAGE_COLORS[f.stage] || '#8B949E';
-    return `<div style="margin-bottom:10px">
-      <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px"><span>${f.stage}</span><b style="color:${color}">${f.reached}</b></div>
-      <div style="background:var(--bg-raised);border-radius:6px;height:10px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${color}"></div></div>
-    </div>`;
-  }).join('');
+  const funnelHtml = `<div style="display:flex;overflow-x:auto;padding:14px 6px 4px">
+    ${d.funnel.map((f,i)=>{
+      const color = STAGE_COLORS[f.stage] || '#64748B';
+      const nextColor = STAGE_COLORS[d.funnel[i+1]?.stage] || color;
+      const isFirst = i===0;
+      const pctOfFirst = maxReached>0 ? Math.round((f.reached/(d.funnel[0].reached||1))*100) : 0;
+      return `<div style="flex:1;min-width:92px;position:relative">
+        <div style="height:62px;background:linear-gradient(100deg, ${color}, ${nextColor});clip-path:polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%${isFirst?'':', 16px 50%'});display:flex;flex-direction:column;align-items:center;justify-content:center;color:#06090F;margin-left:${isFirst?'0':'-16px'};box-shadow:0 6px 18px -6px ${color}88">
+          <b style="font-size:17px;line-height:1">${f.reached}</b>
+          <span style="font-size:9.5px;font-weight:700;opacity:.75">${i===0?'':'%'+pctOfFirst}</span>
+        </div>
+        <div style="text-align:center;font-size:10px;color:var(--muted);margin-top:7px;padding:0 4px">${f.stage}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
 
   const sourceRows = d.sourcePerformance.map(s=>`
     <tr><td><b>${esc(s.source)}</b></td><td>${s.total}</td><td>${s.won}</td>
@@ -433,10 +490,10 @@ async function renderAnalytics(){
   main.innerHTML = `
     <div class="page-head"><div><h1>📈 Raporlar</h1><p>Huni dönüşümü, kaynak performansı ve kayıp analizleri.</p></div></div>
     <div class="stats">
-      <div class="stat" style="--stat-color:#58A6FF"><div class="icon" style="background:#58A6FF22;color:#58A6FF">📊</div><div><div class="n">${d.totalOpportunities}</div><div class="l">Toplam Fırsat</div></div></div>
-      <div class="stat" style="--stat-color:#3FB950"><div class="icon" style="background:#3FB95022;color:#3FB950">🎉</div><div><div class="n">${d.wonCount}</div><div class="l">Kazanılan</div></div></div>
-      <div class="stat" style="--stat-color:#F85149"><div class="icon" style="background:#F8514922;color:#F85149">📉</div><div><div class="n">${d.lostCount}</div><div class="l">Kaybedilen</div></div></div>
-      <div class="stat" style="--stat-color:#3ECF8E"><div class="icon" style="background:#3ECF8E22;color:#3ECF8E">💰</div><div><div class="n">₺${Math.round(d.avgDealValue).toLocaleString('tr-TR')}</div><div class="l">Ortalama Anlaşma</div></div></div>
+      <div class="stat" style="--stat-color:#4C8DFF"><div class="icon" style="background:#4C8DFF22;color:#4C8DFF">📊</div><div><div class="n">${d.totalOpportunities}</div><div class="l">Toplam Fırsat</div></div></div>
+      <div class="stat" style="--stat-color:#22E5A0"><div class="icon" style="background:#22E5A022;color:#22E5A0">🎉</div><div><div class="n">${d.wonCount}</div><div class="l">Kazanılan</div></div></div>
+      <div class="stat" style="--stat-color:#F5556C"><div class="icon" style="background:#F5556C22;color:#F5556C">📉</div><div><div class="n">${d.lostCount}</div><div class="l">Kaybedilen</div></div></div>
+      <div class="stat" style="--stat-color:#22E5A0"><div class="icon" style="background:#22E5A022;color:#22E5A0">💰</div><div><div class="n">₺${Math.round(d.avgDealValue).toLocaleString('tr-TR')}</div><div class="l">Ortalama Anlaşma</div></div></div>
     </div>
 
     <div class="ps"><div class="ps-head">Huni Dönüşümü — Bu aşamaya kadar ulaşan fırsat sayısı</div><div class="ps-body">${funnelHtml}</div></div>
@@ -455,19 +512,19 @@ async function renderAnalytics(){
 // ══════════════════════════════════════════════
 // ŞİRKETLER
 // ══════════════════════════════════════════════
-async function renderCompanies(){
-  const d = await api('getCompanies');
+async function renderCompanies(searchQuery){
+  const d = await api('getCompanies', searchQuery ? { search: searchQuery } : {});
   companies = d.companies || [];
   const main = document.getElementById('main');
   main.innerHTML = `
     <div class="page-head">
-      <div><h1>Şirketler</h1><p>${companies.length} potansiyel/mevcut şirket</p></div>
+      <div><h1>Şirketler</h1><p>${companies.length} potansiyel/mevcut şirket${searchQuery?` · "${esc(searchQuery)}" için sonuçlar`:''}</p></div>
       <button class="btn-add" onclick="openAddCompanyModal()">+ Yeni Şirket</button>
     </div>
     <div class="tbl-wrap">
       <table>
         <thead><tr><th>Şirket</th><th>Sektör</th><th>Ülke</th><th>Kaynak</th><th>Aşama</th><th>Lead Score</th><th>Tahmini MRR</th><th>Durum</th></tr></thead>
-        <tbody>${companies.length===0?'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">Henüz şirket yok</td></tr>':companies.map(c=>`
+        <tbody>${companies.length===0?`<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">${searchQuery?'Sonuç bulunamadı':'Henüz şirket yok'}</td></tr>`:companies.map(c=>`
           <tr class="row-click" onclick="openCompanyPanel('${c.id}')">
             <td><b>${esc(c.name)}</b>${c.priority==='High'?' 🔥':''}</td>
             <td>${esc(c.industry||'—')}</td>
@@ -717,10 +774,10 @@ async function renderPipeline(){
       ${STAGES.map(s=>{
         const items = opportunities.filter(o=>o.stage===s);
         return `<div class="col">
-          <div class="col-head" style="background:${STAGE_COLORS[s]}18;color:${STAGE_COLORS[s]}">${s}<span>${items.length}</span></div>
+          <div class="col-head" style="background:linear-gradient(135deg, ${STAGE_COLORS[s]}, ${STAGE_COLORS[s]}CC)">${s}<span class="count">${items.length}</span></div>
           <div class="col-body" data-stage="${s}" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="onDropCard(event,'${s}')">
             ${items.map(o=>`
-              <div class="kcard" draggable="true" ondragstart="onDragStart(event,'${o.id}')" onclick="openCompanyPanel('${o.company_id}')">
+              <div class="kcard" style="--stat-color:${STAGE_COLORS[s]}" draggable="true" ondragstart="onDragStart(event,'${o.id}')" onclick="openCompanyPanel('${o.company_id}')">
                 <b>${esc(o.companies?.name||'—')}</b>
                 <div style="color:var(--muted)">${esc(o.companies?.country||'')}</div>
                 <div class="meta"><span class="mrr">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span><span>${daysSince(o.stage_changed_at)}g</span></div>
@@ -791,8 +848,8 @@ function initials(name){
   return (first+last).toUpperCase();
 }
 function leadScoreColor(score){
-  if(score>=70) return '#3FB950';   // yüksek — yeşil
-  if(score>=40) return '#D29922';   // orta — amber
+  if(score>=70) return '#22E5A0';   // yüksek — yeşil
+  if(score>=40) return '#F0A93A';   // orta — amber
   return '#8B949E';                 // düşük — gri
 }
 </script>
