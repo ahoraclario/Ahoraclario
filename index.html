@@ -77,13 +77,13 @@ a{color:var(--blue);text-decoration:none}
 .page-head p{color:var(--muted);font-size:13px;margin:0}
 
 /* ---- Stat cards ---- */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
-.stat{background:var(--surface);border:1px solid var(--border-subtle);border-radius:10px;padding:16px;transition:border-color .12s}
-.stat:hover{border-color:var(--border)}
-.stat .n{font-size:23px;font-weight:800;color:var(--primary);letter-spacing:-.3px}
-.stat[data-c="green"] .n{color:var(--green)}
-.stat[data-c="amber"] .n{color:var(--amber)}
-.stat .l{font-size:11.5px;color:var(--muted);margin-top:4px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:24px}
+.stat{background:var(--surface);border:1px solid var(--border-subtle);border-radius:10px;padding:16px;transition:border-color .12s,transform .12s;position:relative;overflow:hidden;display:flex;align-items:center;gap:13px}
+.stat:hover{border-color:var(--border);transform:translateY(-1px)}
+.stat::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--stat-color,var(--primary))}
+.stat .icon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.stat .n{font-size:21px;font-weight:800;color:var(--stat-color,var(--primary));letter-spacing:-.3px;line-height:1.1}
+.stat .l{font-size:11px;color:var(--muted);margin-top:3px}
 
 /* ---- Table ---- */
 .tbl-wrap{background:var(--surface);border:1px solid var(--border-subtle);border-radius:10px;overflow:hidden}
@@ -178,9 +178,11 @@ tr.row-click:hover{background:var(--surface-2)}
   <div class="sidebar">
     <div class="sb-logo"><div class="mark">A</div><b>Ahoraclario</b></div>
     <button class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">📊 Dashboard</button>
+    <button class="nav-item" data-page="myday" onclick="showPage('myday')">☀️ My Day</button>
     <button class="nav-item" data-page="pipeline" onclick="showPage('pipeline')">🧭 Pipeline</button>
     <button class="nav-item" data-page="companies" onclick="showPage('companies')">🏢 Şirketler</button>
     <button class="nav-item" data-page="tasks" onclick="showPage('tasks')">✅ Görevler</button>
+    <button class="nav-item" data-page="analytics" onclick="showPage('analytics')">📈 Raporlar</button>
     <div class="sb-bottom">
       <div class="sb-user"><b id="sbUserName"></b>Founder</div>
       <span class="sb-logout" onclick="doLogout()">Çıkış Yap</span>
@@ -214,6 +216,13 @@ tr.row-click:hover{background:var(--surface-2)}
           <option>AIESEC</option><option>Other</option>
         </select>
       </div>
+    </div>
+    <div class="fi"><label>Öncelik</label>
+      <select id="nc-priority">
+        <option value="Normal" selected>Normal</option>
+        <option value="High">Yüksek 🔥</option>
+        <option value="Low">Düşük</option>
+      </select>
     </div>
     <div class="fi"><label>Not</label><textarea id="nc-notes" rows="2"></textarea></div>
     <div class="modal-actions">
@@ -299,9 +308,11 @@ async function showPage(page){
   const main = document.getElementById('main');
   main.innerHTML = '<div class="empty">Yükleniyor...</div>';
   if(page==='dashboard') await renderDashboard();
+  else if(page==='myday') await renderMyDay();
   else if(page==='pipeline') await renderPipeline();
   else if(page==='companies') await renderCompanies();
   else if(page==='tasks') await renderTasks();
+  else if(page==='analytics') await renderAnalytics();
 }
 
 // ══════════════════════════════════════════════
@@ -311,25 +322,134 @@ async function renderDashboard(){
   const d = await api('getDashboard');
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Yüklenemedi</div>'; return; }
+
+  function statCard(icon, color, value, label){
+    return `<div class="stat" style="--stat-color:${color}">
+      <div class="icon" style="background:${color}22;color:${color}">${icon}</div>
+      <div><div class="n">${value}</div><div class="l">${label}</div></div>
+    </div>`;
+  }
+
   main.innerHTML = `
-    <div class="page-head"><div><h1>Günaydın, ${esc(CU.name)} 👋</h1><p>İşte satış operasyonunun bugünkü özeti.</p></div></div>
+    <div class="page-head">
+      <div><h1>Günaydın, ${esc(CU.name)} 👋</h1><p>İşte satış operasyonunun bugünkü özeti.</p></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-ghost" onclick="showPage('myday')">☀️ My Day'e Git</button>
+        <button class="btn-add" onclick="showPage('companies');setTimeout(openAddCompanyModal,80)">+ Yeni Şirket</button>
+      </div>
+    </div>
     <div class="stats">
-      <div class="stat"><div class="n">₺${(d.pipelineValue||0).toLocaleString('tr-TR')}</div><div class="l">Pipeline Değeri</div></div>
-      <div class="stat"><div class="n">${d.totalCompanies||0}</div><div class="l">Toplam Şirket</div></div>
-      <div class="stat" data-c="amber"><div class="n">${d.tasksToday||0}</div><div class="l">Bugünkü Follow-up</div></div>
-      <div class="stat" data-c="amber"><div class="n">${d.tasksOverdue||0}</div><div class="l">Geciken Görev</div></div>
-      <div class="stat" data-c="green"><div class="n">${d.wonCount||0}</div><div class="l">Kazanılan Anlaşma</div></div>
-      <div class="stat" data-c="green"><div class="n">${d.totalCustomers||0}</div><div class="l">Müşteriye Dönüşen</div></div>
+      ${statCard('💰','#3ECF8E','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Değeri')}
+      ${statCard('🏢','#58A6FF',d.totalCompanies||0,'Toplam Şirket')}
+      ${statCard('📅','#D29922',d.tasksToday||0,'Bugünkü Follow-up')}
+      ${statCard('⏰','#F85149',d.tasksOverdue||0,'Geciken Görev')}
+      ${statCard('🎉','#3FB950',d.wonCount||0,'Kazanılan Anlaşma')}
+      ${statCard('⭐','#A371F7',d.totalCustomers||0,'Müşteriye Dönüşen')}
     </div>
     <div class="ps">
-      <div class="ps-head">Pipeline Dağılımı</div>
+      <div class="ps-head">Pipeline Dağılımı<span style="cursor:pointer" onclick="showPage('pipeline')">Tümünü Gör →</span></div>
       <div class="ps-body" style="display:flex;flex-wrap:wrap;gap:10px">
-        ${STAGES.map(s=>`<div style="flex:1;min-width:100px;text-align:center;padding:10px;border-radius:9px;background:${STAGE_COLORS[s]}18">
-          <div style="font-size:18px;font-weight:800;color:${STAGE_COLORS[s]}">${(d.stageCounts&&d.stageCounts[s])||0}</div>
-          <div style="font-size:10.5px;color:var(--muted);margin-top:2px">${s}</div>
+        ${STAGES.map(s=>`<div style="flex:1;min-width:100px;text-align:center;padding:12px 10px;border-radius:9px;background:${STAGE_COLORS[s]}18;border:1px solid ${STAGE_COLORS[s]}33">
+          <div style="font-size:19px;font-weight:800;color:${STAGE_COLORS[s]}">${(d.stageCounts&&d.stageCounts[s])||0}</div>
+          <div style="font-size:10.5px;color:var(--text);margin-top:3px;font-weight:600">${s}</div>
         </div>`).join('')}
       </div>
     </div>`;
+}
+
+// ══════════════════════════════════════════════
+// MY DAY
+// ══════════════════════════════════════════════
+async function renderMyDay(){
+  const d = await api('getMyDay');
+  const main = document.getElementById('main');
+  if(!d.success){ main.innerHTML='<div class="empty">Yüklenemedi</div>'; return; }
+
+  function taskRow(t, color){
+    return `<div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;border-left:3px solid ${color}">
+      <span onclick="openCompanyPanel('${t.company_id}')" style="cursor:pointer"><b>${esc(t.companies?.name||'')}</b> — ${esc(t.title)} ${t.due_date?`<span style="color:var(--muted)">· ${t.due_date}</span>`:''}</span>
+      <span style="cursor:pointer;color:var(--green);font-size:11px;flex-shrink:0;margin-left:10px" onclick="completeTaskFromList('${t.id}')">Tamamla</span>
+    </div>`;
+  }
+  function section(title, color, bodyHtml, count){
+    return `<div class="ps"><div class="ps-head" style="color:${color}">${title}${count!==undefined?` (${count})`:''}</div><div class="ps-body mini-list">${bodyHtml}</div></div>`;
+  }
+
+  const activitySummary = [
+    ['email_sent','📧 Email'], ['linkedin_message','💼 LinkedIn'], ['call','📞 Arama'],
+    ['reply_received','↩️ Cevap'], ['demo_completed','🖥️ Demo'], ['proposal_sent','📄 Teklif'],
+  ].map(([type,label]) => `<span class="badge" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);margin-right:6px">${label}: <b>${d.activityCounts?.[type]||0}</b></span>`).join('');
+
+  main.innerHTML = `
+    <div class="page-head"><div><h1>☀️ My Day</h1><p>Bugün odaklanman gereken her şey burada.</p></div></div>
+
+    ${d.overdueTasks.length ? section('🔴 Geciken Follow-up\'lar', 'var(--red)', d.overdueTasks.map(t=>taskRow(t,'#F85149')).join(''), d.overdueTasks.length) : ''}
+    ${section('📩 Bugünkü Follow-up\'lar', 'var(--amber)', d.todayTasks.length?d.todayTasks.map(t=>taskRow(t,'#D29922')).join(''):'<div style="color:var(--muted);font-size:12px">Bugün için görev yok.</div>', d.todayTasks.length)}
+
+    ${d.demosToday.length ? section('🖥️ Bugünkü Demolar', 'var(--purple)', d.demosToday.map(t=>taskRow(t,'#A371F7')).join(''), d.demosToday.length) : ''}
+
+    ${section('🎯 Henüz İletişime Geçilmemiş Adaylar', 'var(--blue)',
+      d.notContacted.length?d.notContacted.map(c=>`<div class="mini-item" style="cursor:pointer" onclick="openCompanyPanel('${c.companyId}')"><b>${esc(c.companyName||'—')}</b> <span style="color:var(--muted)">— hiç iletişim kaydı yok</span></div>`).join(''):'<div style="color:var(--muted);font-size:12px">Harika, hepsiyle iletişime geçilmiş!</div>',
+      d.notContacted.length)}
+
+    ${section('💰 Cevap Bekleyen Teklifler', 'var(--green)',
+      d.openProposals.length?d.openProposals.map(o=>`<div class="mini-item" style="cursor:pointer" onclick="openCompanyPanel('${o.company_id}')"><b>${esc(o.companies?.name||'—')}</b> <span style="color:var(--green);font-weight:700">₺${o.estimated_mrr?Number(o.estimated_mrr).toLocaleString('tr-TR'):'—'}</span></div>`).join(''):'<div style="color:var(--muted);font-size:12px">Bekleyen teklif yok.</div>',
+      d.openProposals.length)}
+
+    ${d.upcomingTasks.length ? section('🟢 Yaklaşan (7 gün)', 'var(--green)', d.upcomingTasks.map(t=>taskRow(t,'#3FB950')).join(''), d.upcomingTasks.length) : ''}
+
+    <div class="ps"><div class="ps-head">📊 Bugünkü Aktivite</div><div class="ps-body">${activitySummary}</div></div>
+  `;
+}
+
+// ══════════════════════════════════════════════
+// RAPORLAR / ANALİTİK
+// ══════════════════════════════════════════════
+async function renderAnalytics(){
+  const d = await api('getAnalytics');
+  const main = document.getElementById('main');
+  if(!d.success){ main.innerHTML='<div class="empty">Yüklenemedi</div>'; return; }
+
+  const maxReached = Math.max(1, ...d.funnel.map(f=>f.reached));
+  const funnelHtml = d.funnel.map((f,i)=>{
+    const pct = Math.round((f.reached/maxReached)*100);
+    const color = STAGE_COLORS[f.stage] || '#8B949E';
+    return `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:11.5px;margin-bottom:4px"><span>${f.stage}</span><b style="color:${color}">${f.reached}</b></div>
+      <div style="background:var(--bg-raised);border-radius:6px;height:10px;overflow:hidden"><div style="width:${pct}%;height:100%;background:${color}"></div></div>
+    </div>`;
+  }).join('');
+
+  const sourceRows = d.sourcePerformance.map(s=>`
+    <tr><td><b>${esc(s.source)}</b></td><td>${s.total}</td><td>${s.won}</td>
+      <td><span style="color:${s.conversionRate>=20?'var(--green)':'var(--muted)'};font-weight:700">%${s.conversionRate}</span></td>
+      <td style="color:var(--green);font-weight:700">₺${s.wonMrr.toLocaleString('tr-TR')}</td></tr>`).join('');
+
+  const lostRows = Object.entries(d.lostReasons).sort((a,b)=>b[1]-a[1]).map(([reason,count])=>`
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border-subtle);font-size:12.5px">
+      <span>${esc(reason)}</span><b style="color:var(--red)">${count}</b>
+    </div>`).join('') || '<div style="color:var(--muted);font-size:12px">Henüz kayıp fırsat yok.</div>';
+
+  main.innerHTML = `
+    <div class="page-head"><div><h1>📈 Raporlar</h1><p>Huni dönüşümü, kaynak performansı ve kayıp analizleri.</p></div></div>
+    <div class="stats">
+      <div class="stat" style="--stat-color:#58A6FF"><div class="icon" style="background:#58A6FF22;color:#58A6FF">📊</div><div><div class="n">${d.totalOpportunities}</div><div class="l">Toplam Fırsat</div></div></div>
+      <div class="stat" style="--stat-color:#3FB950"><div class="icon" style="background:#3FB95022;color:#3FB950">🎉</div><div><div class="n">${d.wonCount}</div><div class="l">Kazanılan</div></div></div>
+      <div class="stat" style="--stat-color:#F85149"><div class="icon" style="background:#F8514922;color:#F85149">📉</div><div><div class="n">${d.lostCount}</div><div class="l">Kaybedilen</div></div></div>
+      <div class="stat" style="--stat-color:#3ECF8E"><div class="icon" style="background:#3ECF8E22;color:#3ECF8E">💰</div><div><div class="n">₺${Math.round(d.avgDealValue).toLocaleString('tr-TR')}</div><div class="l">Ortalama Anlaşma</div></div></div>
+    </div>
+
+    <div class="ps"><div class="ps-head">Huni Dönüşümü — Bu aşamaya kadar ulaşan fırsat sayısı</div><div class="ps-body">${funnelHtml}</div></div>
+
+    <div class="ps"><div class="ps-head">Kaynak Bazlı Performans</div>
+      <div class="ps-body" style="padding:0">
+        <table><thead><tr><th>Kaynak</th><th>Toplam</th><th>Kazanılan</th><th>Dönüşüm</th><th>Kazanılan MRR</th></tr></thead>
+        <tbody>${sourceRows || '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">Henüz veri yok</td></tr>'}</tbody></table>
+      </div>
+    </div>
+
+    <div class="ps"><div class="ps-head" style="color:var(--red)">Kayıp Sebep Dağılımı</div><div class="ps-body">${lostRows}</div></div>
+  `;
 }
 
 // ══════════════════════════════════════════════
@@ -346,14 +466,15 @@ async function renderCompanies(){
     </div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>Şirket</th><th>Sektör</th><th>Ülke</th><th>Kaynak</th><th>Aşama</th><th>Tahmini MRR</th><th>Durum</th></tr></thead>
-        <tbody>${companies.length===0?'<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--muted)">Henüz şirket yok</td></tr>':companies.map(c=>`
+        <thead><tr><th>Şirket</th><th>Sektör</th><th>Ülke</th><th>Kaynak</th><th>Aşama</th><th>Lead Score</th><th>Tahmini MRR</th><th>Durum</th></tr></thead>
+        <tbody>${companies.length===0?'<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">Henüz şirket yok</td></tr>':companies.map(c=>`
           <tr class="row-click" onclick="openCompanyPanel('${c.id}')">
-            <td><b>${esc(c.name)}</b></td>
+            <td><b>${esc(c.name)}</b>${c.priority==='High'?' 🔥':''}</td>
             <td>${esc(c.industry||'—')}</td>
             <td>${esc(c.country||'—')}</td>
             <td>${c.lead_source?`<span class="badge badge-source">${esc(c.lead_source)}</span>`:'—'}</td>
             <td>${c.current_stage?`<span style="color:${STAGE_COLORS[c.current_stage]||'#666'};font-weight:700;font-size:11.5px">${esc(c.current_stage)}</span>`:'—'}</td>
+            <td><span style="color:${leadScoreColor(c.lead_score||0)};font-weight:700">${c.lead_score||0}</span></td>
             <td>${c.current_mrr?'₺'+Number(c.current_mrr).toLocaleString('tr-TR'):'—'}</td>
             <td>${c.is_customer?'<span class="badge" style="background:var(--green-bg);color:var(--green)">Müşteri</span>':'<span class="badge" style="background:var(--surface-2);border:1px solid var(--border);color:var(--muted)">Aday</span>'}</td>
           </tr>`).join('')}
@@ -367,6 +488,7 @@ function closeAddCompanyModal(){
   document.getElementById('addCompanyModal').classList.remove('open');
   ['name','industry','country','website','notes'].forEach(k=>document.getElementById('nc-'+k).value='');
   document.getElementById('nc-source').value='';
+  document.getElementById('nc-priority').value='Normal';
 }
 async function submitAddCompany(){
   const name = document.getElementById('nc-name').value.trim();
@@ -376,6 +498,7 @@ async function submitAddCompany(){
     country: document.getElementById('nc-country').value.trim(),
     website: document.getElementById('nc-website').value.trim(),
     lead_source: document.getElementById('nc-source').value,
+    priority: document.getElementById('nc-priority').value,
     research_notes: document.getElementById('nc-notes').value.trim(),
   };
   const d = await api('addCompany', { company });
@@ -399,7 +522,12 @@ async function openCompanyPanel(companyId){
       <div style="display:flex;gap:12px;align-items:flex-start">
         <div class="avatar" style="width:40px;height:40px;font-size:14px;background:var(--primary-bg);color:var(--primary);flex-shrink:0">${initials(c.name)}</div>
         <div><h2 style="margin:0 0 4px">${esc(c.name)}</h2>
-          <div style="font-size:12px;color:var(--muted)">${esc(c.industry||'—')} · ${esc(c.country||'—')}</div></div>
+          <div style="font-size:12px;color:var(--muted)">${esc(c.industry||'—')} · ${esc(c.country||'—')}</div>
+          <div style="margin-top:6px;display:flex;gap:6px;align-items:center">
+            <span class="badge" style="background:${leadScoreColor(d.leadScore)}22;color:${leadScoreColor(d.leadScore)}">🎯 Lead Score: ${d.leadScore}/100</span>
+            ${c.priority==='High'?'<span class="badge" style="background:var(--red-bg);color:var(--red)">🔥 Yüksek Öncelik</span>':''}
+          </div>
+        </div>
       </div>
       <button class="panel-close" onclick="closeCompanyPanel()">✕</button>
     </div>
@@ -429,6 +557,13 @@ async function openCompanyPanel(companyId){
           </div>
         </div>
         <div class="fi"><label>Ağrı Noktası (Pain Point)</label><input id="ec-pain" value="${escAttr(c.pain_point)}"></div>
+        <div class="fi"><label>Öncelik</label>
+          <select id="ec-priority">
+            <option value="Normal" ${c.priority==='Normal'||!c.priority?'selected':''}>Normal</option>
+            <option value="High" ${c.priority==='High'?'selected':''}>Yüksek 🔥</option>
+            <option value="Low" ${c.priority==='Low'?'selected':''}>Düşük</option>
+          </select>
+        </div>
         <div class="fi"><label>Araştırma Notları</label><textarea id="ec-notes" rows="3">${esc(c.research_notes)}</textarea></div>
         <button class="btn-add" style="width:100%" onclick="saveCompanyProfile('${c.id}')">Kaydet</button>
       </div>
@@ -460,9 +595,9 @@ async function openCompanyPanel(companyId){
       <div class="ps-body mini-list" id="contactsList">
         ${d.contacts.length===0?'<div style="color:var(--muted);font-size:12px">Henüz kişi yok.</div>':d.contacts.map(p=>`
           <div class="contact-row">
-            <div class="avatar">${initials(p.full_name)}</div>
+            <div class="avatar" style="${p.is_decision_maker?'background:var(--amber-bg);color:var(--amber)':''}">${initials(p.full_name)}</div>
             <div style="flex:1;min-width:0">
-              <b>${esc(p.full_name)}</b> <span style="color:var(--muted)">— ${esc(p.position||'—')}</span><br>
+              <b>${esc(p.full_name)}</b> <span style="color:var(--muted)">— ${esc(p.position||'—')}</span>${p.is_decision_maker?' <span class="badge" style="background:var(--amber-bg);color:var(--amber)">👑 Karar Verici</span>':''}<br>
               <span style="color:var(--muted);font-size:11px">${esc(p.email||'')}${p.phone?' · '+esc(p.phone):''}${p.linkedin?' · <a href="'+escAttr(p.linkedin)+'" target="_blank">LinkedIn</a>':''}</span>
             </div>
           </div>`).join('')}
@@ -470,6 +605,9 @@ async function openCompanyPanel(companyId){
           <div class="fi-row"><div class="fi"><input id="nct-name" placeholder="Ad Soyad"></div><div class="fi"><input id="nct-pos" placeholder="Pozisyon"></div></div>
           <div class="fi-row"><div class="fi"><input id="nct-email" placeholder="E-posta"></div><div class="fi"><input id="nct-phone" placeholder="Telefon"></div></div>
           <div class="fi"><input id="nct-linkedin" placeholder="LinkedIn (isteğe bağlı)"></div>
+          <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text);margin-bottom:10px;cursor:pointer">
+            <input type="checkbox" id="nct-decision" style="width:auto"> 👑 Bu kişi karar verici (Founder/CEO vb.)
+          </label>
           <button class="btn-add" style="width:100%" onclick="submitAddContact('${c.id}')">Kişiyi Kaydet</button>
         </div>
       </div>
@@ -516,6 +654,7 @@ async function saveCompanyProfile(companyId){
     current_crm: document.getElementById('ec-crm').value.trim(),
     lead_source: document.getElementById('ec-source').value,
     pain_point: document.getElementById('ec-pain').value.trim(),
+    priority: document.getElementById('ec-priority').value,
     research_notes: document.getElementById('ec-notes').value.trim(),
   };
   const d = await api('updateCompany', { companyId, company });
@@ -540,6 +679,8 @@ async function submitAddContact(companyId){
     position: document.getElementById('nct-pos').value.trim(),
     email: document.getElementById('nct-email').value.trim(),
     phone: document.getElementById('nct-phone').value.trim(),
+    linkedin: document.getElementById('nct-linkedin').value.trim(),
+    is_decision_maker: document.getElementById('nct-decision').checked,
   };
   if(!contact.full_name){ toast('İsim zorunludur'); return; }
   const d = await api('addContact', { companyId, contact });
@@ -648,6 +789,11 @@ function initials(name){
   const first = parts[0]?.[0] || '';
   const last = parts.length>1 ? parts[parts.length-1][0] : '';
   return (first+last).toUpperCase();
+}
+function leadScoreColor(score){
+  if(score>=70) return '#3FB950';   // yüksek — yeşil
+  if(score>=40) return '#D29922';   // orta — amber
+  return '#8B949E';                 // düşük — gri
 }
 </script>
 </body>
