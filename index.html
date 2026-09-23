@@ -481,6 +481,13 @@ async function toggleNotifications(){
   }
   if(dashRes.success){
     (dashRes.upcomingMeetings||[]).slice(0,3).forEach(m => items.push({ color:'var(--blue)', text:`${m.type} meeting · ${m.meeting_date}${m.start_time?' '+m.start_time:''}`, sub:m.companies?.name, companyId:m.company_id }));
+    // Deal Won/Lost bildirimleri — son 48 saat içindeki gerçek aktivitelerden (spec Part 28).
+    const recentCutoff = Date.now() - 48*3600*1000;
+    (dashRes.recentActivities||[]).forEach(a => {
+      if(new Date(a.created_at).getTime() < recentCutoff) return;
+      if(a.type === 'won') items.push({ color:'var(--green)', text:'🎉 Deal won', sub:a.companies?.name, companyId:a.company_id });
+      else if(a.type === 'stage_changed' && /→ Lost/.test(a.description||'')) items.push({ color:'var(--red)', text:'📉 Deal lost', sub:a.companies?.name, companyId:a.company_id });
+    });
   }
   document.getElementById('notifDot').classList.toggle('hidden', items.length===0);
   dd.innerHTML = items.length ? items.map(i=>`
@@ -1091,7 +1098,8 @@ async function openCompanyPanel(companyId){
             ${m.status==='Scheduled'?`<span style="display:flex;gap:6px">
               <span style="cursor:pointer;color:var(--green);font-size:11px" onclick="updateMeeting('${m.id}','Completed','${c.id}')">Done</span>
               <span style="cursor:pointer;color:var(--red);font-size:11px" onclick="updateMeeting('${m.id}','Cancelled','${c.id}')">Cancel</span>
-            </span>`:`<span style="font-size:10.5px;color:var(--muted)">${esc(m.status)}</span>`}
+              <span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="deleteMeetingConfirm('${m.id}','${c.id}')" title="Delete">🗑</span>
+            </span>`:`<span style="display:flex;align-items:center;gap:8px"><span style="font-size:10.5px;color:var(--muted)">${esc(m.status)}</span><span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="deleteMeetingConfirm('${m.id}','${c.id}')" title="Delete">🗑</span></span>`}
           </div>`).join('')}
         <div id="addMeetingForm-${c.id}" class="hidden" style="margin-top:6px">
           <div class="fi"><input id="nmt-title" placeholder="Meeting title — e.g. Discovery call"></div>
@@ -1126,6 +1134,7 @@ async function openCompanyPanel(companyId){
               <select onchange="updateProposal('${p.id}',this.value,'${c.id}')" style="width:auto;padding:3px 8px;font-size:11px">
                 ${['Draft','Sent','Viewed','Negotiating','Accepted','Rejected','Expired'].map(s=>`<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}
               </select>
+              <span style="cursor:pointer;color:var(--faint);font-size:11px;margin-left:6px" onclick="deleteProposalConfirm('${p.id}','${c.id}')" title="Delete">🗑</span>
             </div>
             <div style="font-size:10.5px;color:var(--muted);margin-top:3px">Sent ${p.sent_at||'—'}</div>
           </div>`).join('')}
@@ -1459,6 +1468,16 @@ async function submitAddProposal(companyId){
 async function updateProposal(proposalId, status, companyId){
   const d = await api('updateProposalStatus', { proposalId, status });
   if(d.success){ toast('✓ Proposal updated: ' + status); openCompanyPanel(companyId); }
+}
+async function deleteMeetingConfirm(meetingId, companyId){
+  if(!confirm('Delete this meeting?')) return;
+  const d = await api('deleteMeeting', { meetingId });
+  if(d.success){ toast('🗑 Meeting deleted'); openCompanyPanel(companyId); }
+}
+async function deleteProposalConfirm(proposalId, companyId){
+  if(!confirm('Delete this proposal?')) return;
+  const d = await api('deleteProposal', { proposalId });
+  if(d.success){ toast('🗑 Proposal deleted'); openCompanyPanel(companyId); }
 }
 
 async function deleteCompanyConfirm(companyId){
