@@ -287,6 +287,11 @@ tr.row-click:hover{background:var(--surface-2)}
   <div class="panel" id="companyPanel"></div>
 </div>
 
+<!-- Opportunity Detail Paneli -->
+<div class="overlay" id="oppOverlay">
+  <div class="panel" id="oppPanel"></div>
+</div>
+
 <!-- New Company Modal -->
 <div class="modal-overlay" id="addCompanyModal">
   <div class="modal">
@@ -539,7 +544,7 @@ async function renderDashboard(){
       return `<div class="mini-col">
         <div class="mini-col-head" style="background:${STAGE_COLORS[s]}">${s} · ${opps.filter(o=>o.stage===s).length}</div>
         <div class="mini-col-body">
-          ${items.length?items.map(o=>`<div class="mini-card" onclick="openCompanyPanel('${o.company_id}')"><b>${esc(o.companies?.name||'—')}</b><span style="color:var(--green)">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span></div>`).join(''):'<div style="font-size:10px;color:var(--faint);text-align:center;padding:6px 0">Empty</div>'}
+          ${items.length?items.map(o=>`<div class="mini-card" onclick="openOpportunityDetail('${o.id}')"><b>${esc(o.companies?.name||'—')}</b><span style="color:var(--green)">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span></div>`).join(''):'<div style="font-size:10px;color:var(--faint);text-align:center;padding:6px 0">Empty</div>'}
         </div>
       </div>`;
     }).join('')}
@@ -1044,6 +1049,148 @@ async function openCompanyPanel(companyId){
 }
 function closeCompanyPanel(){ document.getElementById('companyOverlay').classList.remove('open'); }
 
+// ══════════════════════════════════════════════
+// OPPORTUNITY DETAIL
+// ══════════════════════════════════════════════
+async function openOpportunityDetail(opportunityId){
+  const d = await api('getOpportunityDetail', { opportunityId });
+  if(!d.success) return;
+  const o = d.opportunity, co = d.company, pc = d.primaryContact;
+  const panel = document.getElementById('oppPanel');
+  panel.innerHTML = `
+    <div class="panel-top">
+      <div>
+        <div style="font-size:11px;color:var(--muted);cursor:pointer" onclick="closeOppPanel();openCompanyPanel('${co.id}')">← ${esc(co.name)}</div>
+        <h2 style="margin:6px 0 4px">${esc(o.name || co.name + ' — ' + o.stage)}</h2>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px">
+          <span class="badge" style="background:${STAGE_COLORS[o.stage]||OUTCOME_COLORS[o.stage]}22;color:${STAGE_COLORS[o.stage]||OUTCOME_COLORS[o.stage]}">${esc(o.stage)}</span>
+          <span class="badge" style="background:${leadScoreColor(d.leadScore)}22;color:${leadScoreColor(d.leadScore)}">🎯 ${d.leadScore}/100</span>
+          ${o.estimated_mrr?`<span class="badge" style="background:var(--green-bg);color:var(--green)">₺${Number(o.estimated_mrr).toLocaleString('tr-TR')}/mo</span>`:''}
+        </div>
+      </div>
+      <button class="panel-close" onclick="closeOppPanel()">✕</button>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">Deal Info</div>
+      <div class="ps-body">
+        <div class="fi-row">
+          <div class="fi"><label>Plan</label><input id="od-plan" value="${escAttr(o.plan)}"></div>
+          <div class="fi"><label>Expected MRR (₺)</label><input id="od-mrr" type="number" value="${o.estimated_mrr||''}"></div>
+        </div>
+        <div class="fi"><label>Expected Close Date</label><input id="od-close" type="date" value="${o.expected_close_date||''}"></div>
+        <div class="fi"><label>Notes</label><textarea id="od-notes" rows="3">${esc(o.notes)}</textarea></div>
+        <button class="btn-add" style="width:100%" onclick="saveOppDetailFields('${o.id}')">Save</button>
+      </div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">Contact</div>
+      <div class="ps-body">
+        ${pc?`<div class="contact-row"><div class="avatar" style="${pc.is_decision_maker?'background:var(--amber-bg);color:var(--amber)':''}">${initials(pc.full_name)}</div>
+          <div><b>${esc(pc.full_name)}</b> ${pc.is_decision_maker?'<span class="badge" style="background:var(--amber-bg);color:var(--amber)">👑 Decision Maker</span>':''}<br>
+          <span style="color:var(--muted);font-size:11px">${esc(pc.email||'')}${pc.phone?' · '+esc(pc.phone):''}${pc.linkedin?' · <a href="'+escAttr(pc.linkedin)+'" target="_blank">LinkedIn</a>':''}</span></div></div>`
+          :'<div style="color:var(--muted);font-size:12px">No primary contact set.</div>'}
+        ${d.contacts.length>1?`<div class="fi" style="margin-top:10px"><label>Set primary contact</label>
+          <select onchange="setPrimaryContact('${o.id}',this.value)">
+            <option value="">—</option>
+            ${d.contacts.map(c=>`<option value="${c.id}" ${o.primary_contact_id===c.id?'selected':''}>${esc(c.full_name)}</option>`).join('')}
+          </select></div>`:''}
+      </div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">Next Action</div>
+      <div class="ps-body">
+        ${d.nextTask?`<div class="mini-item"><b>${esc(d.nextTask.title)}</b> <span style="color:var(--muted)">· ${d.nextTask.due_date||'no date'}</span>
+          <span style="cursor:pointer;color:var(--green);font-size:11px;float:right" onclick="completeOppTask('${d.nextTask.id}','${o.id}')">Complete</span></div>`
+          :'<div style="color:var(--muted);font-size:12px">No open task. All caught up.</div>'}
+        <div class="fi" style="margin-top:8px"><input id="od-task-title" placeholder="New task — e.g. Send follow-up email"></div>
+        <div class="fi-row">
+          <div class="fi"><input id="od-task-date" type="date"></div>
+          <button class="btn-add" onclick="addOppTask('${o.id}','${co.id}')">Add Task</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">Meetings (${d.meetings.length})</div>
+      <div class="ps-body mini-list">
+        ${d.meetings.length===0?'<div style="color:var(--muted);font-size:12px">No meetings scheduled.</div>':d.meetings.map(m=>`
+          <div class="mini-item"><span class="badge" style="background:var(--purple-bg);color:var(--purple);margin-right:5px">${esc(m.type)}</span>${esc(m.title)} <span style="color:var(--muted)">· ${m.meeting_date}</span></div>`).join('')}
+      </div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">Proposals (${d.proposals.length})<span style="cursor:pointer;color:var(--primary)" onclick="quickAddProposalFromOpp('${o.id}','${co.id}')">+ Add</span></div>
+      <div class="ps-body mini-list">
+        ${d.proposals.length===0?'<div style="color:var(--muted);font-size:12px">No proposals yet.</div>':d.proposals.map(p=>`
+          <div class="mini-item"><span style="color:var(--green);font-weight:700">${p.mrr?'₺'+Number(p.mrr).toLocaleString('tr-TR')+'/mo':'—'}</span>
+          <span class="badge" style="background:var(--surface-2);color:var(--muted);margin-left:6px">${esc(p.status)}</span></div>`).join('')}
+      </div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">Timeline</div>
+      <div class="ps-body">
+        ${d.activities.length===0?'<div style="color:var(--muted);font-size:12px">No activity yet.</div>':d.activities.map(a=>`
+          <div class="timeline-item"><div>${esc(a.description)}</div><div class="t">${fmtDT(a.created_at)} · ${esc(a.created_by||'')}</div></div>`).join('')}
+      </div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">Change Stage</div>
+      <div class="ps-body">
+        <div class="stage-track">
+          ${STAGES.concat(['Lost','No Response','Not a Fit']).map(s=>`<span class="stage-pill" onclick="moveOppFromDetail('${o.id}','${s}','${co.id}')" style="background:${o.stage===s?(STAGE_COLORS[s]||OUTCOME_COLORS[s]||'#666'):'var(--surface-2)'};color:${o.stage===s?'#04170F':'var(--muted)'};border-color:${o.stage===s?'transparent':'var(--border)'}">${s}</span>`).join('')}
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button class="btn-add" style="flex:1;background:var(--green)" onclick="moveOppFromDetail('${o.id}','Won','${co.id}')">Mark Won</button>
+          <button class="btn-danger" style="flex:1" onclick="moveOppFromDetail('${o.id}','Lost','${co.id}')">Mark Lost</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.getElementById('oppOverlay').classList.add('open');
+}
+function closeOppPanel(){ document.getElementById('oppOverlay').classList.remove('open'); }
+
+async function saveOppDetailFields(opportunityId){
+  const opportunity = {
+    plan: document.getElementById('od-plan').value.trim() || null,
+    estimated_mrr: document.getElementById('od-mrr').value || null,
+    expected_close_date: document.getElementById('od-close').value || null,
+    notes: document.getElementById('od-notes').value.trim() || null,
+  };
+  const d = await api('updateOpportunity', { opportunityId, opportunity });
+  if(d.success){ toast('✓ Saved'); }
+}
+async function setPrimaryContact(opportunityId, contactId){
+  const d = await api('updateOpportunity', { opportunityId, opportunity:{ primary_contact_id: contactId || null } });
+  if(d.success){ toast('✓ Primary contact updated'); openOpportunityDetail(opportunityId); }
+}
+async function completeOppTask(taskId, opportunityId){
+  const d = await api('completeTask', { taskId });
+  if(d.success){ toast('✓ Task completed'); openOpportunityDetail(opportunityId); }
+}
+async function addOppTask(opportunityId, companyId){
+  const title = document.getElementById('od-task-title').value.trim();
+  const due_date = document.getElementById('od-task-date').value || null;
+  if(!title){ toast('Task title is required'); return; }
+  const d = await api('addTask', { companyId, opportunityId, task:{ title, due_date, task_type:'Follow-up' } });
+  if(d.success){ toast('✓ Task added'); openOpportunityDetail(opportunityId); }
+}
+async function moveOppFromDetail(opportunityId, newStage, companyId){
+  let lostReason = null;
+  if(newStage === 'Lost'){ lostReason = prompt('Loss reason (optional): Too expensive, No need, No budget, Using another CRM, Bad timing, No response, Not decision maker, Competitor, Other') || ''; }
+  const d = await api('updateOpportunityStage', { opportunityId, stage:newStage, lostReason });
+  if(d.success){ toast('✓ Stage updated: ' + newStage); openOpportunityDetail(opportunityId); }
+}
+async function quickAddProposalFromOpp(opportunityId, companyId){
+  const d = await api('addProposal', { companyId, opportunityId, proposal:{} });
+  if(d.success){ toast('✓ Proposal added — set its value in Company view'); openOpportunityDetail(opportunityId); }
+}
+
 async function saveCompanyProfile(companyId){
   const company = {
     industry: document.getElementById('ec-industry').value.trim(),
@@ -1200,7 +1347,7 @@ async function renderPipeline(){
           <div class="col-head" style="background:linear-gradient(135deg, ${STAGE_COLORS[s]}, ${STAGE_COLORS[s]}CC)">${s}<span class="count">${items.length}</span></div>
           <div class="col-body" data-stage="${s}" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="onDropCard(event,'${s}')">
             ${items.map(o=>`
-              <div class="kcard" style="--stat-color:${STAGE_COLORS[s]}" draggable="true" ondragstart="onDragStart(event,'${o.id}')" onclick="openCompanyPanel('${o.company_id}')">
+              <div class="kcard" style="--stat-color:${STAGE_COLORS[s]}" draggable="true" ondragstart="onDragStart(event,'${o.id}')" onclick="openOpportunityDetail('${o.id}')">
                 <b>${esc(o.companies?.name||'—')}</b>
                 <div style="color:var(--muted)">${esc(o.companies?.country||'')}</div>
                 <div class="meta"><span class="mrr">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span><span>${daysSince(o.stage_changed_at)}g</span></div>
