@@ -6,20 +6,31 @@
 <title>Ahoraclario — Sales CRM</title>
 <style>
 :root{
-  /* Ahoraclario Design System — Part 13 spec'indeki birebir hex değerleri */
-  --bg:#070B14; --bg-raised:#080D18; --surface:#0D1421; --surface-2:#111B2B;
-  --surface-secondary:#0A101C; --opp-card:#0F1826;
+  /* AHORACLARIO — DARK TECHNICAL SAAS COLOR SYSTEM — source of truth, birebir */
+  --bg:#070B14; --bg-raised:#080D18;
+  --surface-secondary:#0A101C; --surface:#0D1421; --surface-2:#111B2B;
+  --opp-card:#0F1826;
   --border:#1B2A3A; --border-subtle:#172435; --border-hover:#29415A;
-  --text:#F0F6FC; --muted:#8B9AAF; --faint:#596579;
-  --primary:#39D98A; --primary-dark:#2BC27A; --primary-bg:rgba(57,217,138,.14);
-  --blue:#3B82F6; --blue-bg:rgba(59,130,246,.14);
-  --cyan:#22D3EE; --cyan-bg:rgba(34,211,238,.14);
-  --green:#39D98A; --green-bg:rgba(57,217,138,.14);
-  --amber:#F59E0B; --amber-bg:rgba(245,158,11,.14);
-  --red:#F87171; --red-bg:rgba(248,113,113,.14);
-  --purple:#A78BFA; --purple-bg:rgba(167,139,250,.14);
-  --glow-primary:0 0 0 1px rgba(57,217,138,.15), 0 8px 24px rgba(57,217,138,.10);
-  --glow-blue:0 0 0 1px rgba(59,130,246,.15), 0 8px 24px rgba(59,130,246,.10);
+  --border-soft:rgba(139,154,175,0.08);
+  --text:#F0F6FC; --text-primary:#F0F6FC;
+  --muted:#8B9AAF; --text-secondary:#8B9AAF;
+  --faint:#596579; --text-muted:#596579;
+  --text-disabled:#3F4B5C;
+  --primary:#39D98A; --primary-dark:#2BC27A; --primary-bg:rgba(57,217,138,0.14);
+  --green:#39D98A; --green-bg:rgba(57,217,138,0.14); --green-glow:rgba(57,217,138,0.10);
+  --blue:#3B82F6; --blue-bg:rgba(59,130,246,0.14); --blue-glow:rgba(59,130,246,0.10);
+  --cyan:#22D3EE; --cyan-bg:rgba(34,211,238,0.14); --cyan-glow:rgba(34,211,238,0.10);
+  --purple:#A78BFA; --purple-bg:rgba(167,139,250,0.14); --purple-glow:rgba(167,139,250,0.10);
+  --amber:#F59E0B; --amber-bg:rgba(245,158,11,0.14); --amber-glow:rgba(245,158,11,0.10);
+  --red:#F87171; --red-bg:rgba(248,113,113,0.14); --red-glow:rgba(248,113,113,0.10);
+  --glow-primary:0 0 0 1px rgba(57,217,138,0.15), 0 8px 24px rgba(57,217,138,0.10);
+  --glow-blue:0 0 0 1px rgba(59,130,246,0.15), 0 8px 24px rgba(59,130,246,0.10);
+  /* Pipeline stage colors */
+  --stage-prospect:#64748B; --stage-researched:#3B82F6; --stage-contacted:#22D3EE;
+  --stage-replied:#38BDF8; --stage-discovery:#818CF8; --stage-demo:#A78BFA;
+  --stage-proposal:#C084FC; --stage-negotiation:#F59E0B; --stage-won:#39D98A; --stage-lost:#F87171;
+  /* Chart colors */
+  --chart-green:#39D98A; --chart-cyan:#22D3EE; --chart-blue:#3B82F6; --chart-purple:#A78BFA; --chart-amber:#F59E0B;
   /* eski isimlerle geriye dönük uyum */
   --ink:var(--text); --line:var(--border); --card:var(--surface);
 }
@@ -350,8 +361,8 @@ tr.row-click:hover{background:var(--surface-2)}
 const EDGE_FUNCTION_URL = 'https://tuozgfnjxxwrcuyfrwxq.supabase.co/functions/v1/rapid-service';
 
 const STAGES = ["Prospect","Researched","Contacted","Replied","Discovery Call","Demo","Proposal","Negotiation","Won"];
-const STAGE_COLORS = {Prospect:"#64748B",Researched:"#22D3EE",Contacted:"#3B82F6",Replied:"#A855F7",
-  "Discovery Call":"#818CF8","Demo":"#10B981","Proposal":"#F59E0B","Negotiation":"#FB923C","Won":"#39D98A"};
+const STAGE_COLORS = {Prospect:"#64748B",Researched:"#3B82F6",Contacted:"#22D3EE",Replied:"#38BDF8",
+  "Discovery Call":"#818CF8","Demo":"#A78BFA","Proposal":"#C084FC","Negotiation":"#F59E0B","Won":"#39D98A"};
 const OUTCOME_COLORS = {Lost:"#F87171","No Response":"#596579","Not a Fit":"#596579"};
 
 let CU = null; // { token, name, username }
@@ -565,9 +576,24 @@ async function renderDashboard(){
   const donutHtml = sources.length ? donutChart(sources.map((s,i)=>({label:s.source, value:s.total, color:donutColors[i%donutColors.length]}))) : '<div class="empty" style="padding:20px">No source data yet</div>';
   const donutLegend = sources.map((s,i)=>`<div class="donut-legend-row"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
 
-  // ── Sağ panel: Today's Actions ──
+  // ── Sağ panel: Today's Actions — kaynak dokümandaki action-call/email/followup/demo/overdue renk şemasına göre ──
   const myDay = await api('getMyDay');
-  const actionList = myDay.success ? [...myDay.overdueTasks.map(t=>({...t,tag:'Overdue',tagColor:'var(--red)'})), ...myDay.todayTasks.map(t=>({...t,tag:'Today',tagColor:'var(--amber)'}))].slice(0,6) : [];
+  const TASK_TYPE_TAG = {
+    Call: { tag:'Call', color:'#3B82F6' },
+    Meeting: { tag:'Meeting', color:'#3B82F6' },
+    Demo: { tag:'Demo', color:'#A78BFA' },
+    Proposal: { tag:'Proposal', color:'#F59E0B' },
+    Research: { tag:'Research', color:'#22D3EE' },
+    'Follow-up': { tag:'Follow-up', color:'#39D98A' },
+  };
+  function tagFor(t, overdue){
+    if(overdue) return { tag:'Overdue', color:'#F87171' };
+    return TASK_TYPE_TAG[t.task_type] || { tag:'Today', color:'#39D98A' };
+  }
+  const actionList = myDay.success ? [
+    ...myDay.overdueTasks.map(t=>({...t, ...tagFor(t,true)})),
+    ...myDay.todayTasks.map(t=>({...t, ...tagFor(t,false)})),
+  ].slice(0,6) : [];
 
   main.innerHTML = `
     <div class="page-head">
@@ -611,7 +637,7 @@ async function renderDashboard(){
             <div class="action-item" onclick="openCompanyPanel('${t.company_id}')">
               <div class="chk"></div>
               <div class="at-body"><b>${esc(t.title)}</b><div class="at-time">${esc(t.companies?.name||'')}${t.due_date?' · '+t.due_date:''}</div></div>
-              <span class="action-tag" style="background:${t.tagColor}22;color:${t.tagColor}">${t.tag}</span>
+              <span class="action-tag" style="background:${t.color}22;color:${t.color}">${t.tag}</span>
             </div>`).join('') : '<div class="empty" style="padding:16px 0">No actions for today 🎉</div>'}
         </div>
 
