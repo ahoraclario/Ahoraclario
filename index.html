@@ -60,7 +60,7 @@ a{color:var(--blue);text-decoration:none}
   background-size:42px 42px;opacity:.35;mask-image:radial-gradient(circle at 50% 40%, black, transparent 70%);pointer-events:none;
 }
 .login-box{position:relative;z-index:1;background:var(--surface);border:1px solid var(--border);border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.5);padding:40px;width:100%;max-width:380px}
-.login-logo{width:46px;height:46px;border-radius:11px;background:linear-gradient(135deg,var(--primary),#22946A);display:flex;align-items:center;justify-content:center;color:#04170F;font-weight:800;font-size:19px;margin-bottom:20px;box-shadow:0 0 0 1px rgba(62,207,142,.3),0 8px 24px rgba(62,207,142,.25)}
+.login-logo{width:46px;height:46px;border-radius:11px;background:linear-gradient(135deg,var(--primary),var(--primary-dark));display:flex;align-items:center;justify-content:center;color:#07110C;font-weight:800;font-size:19px;margin-bottom:20px;box-shadow:var(--glow-primary)}
 .login-box h1{font-size:20px;margin:0 0 4px;color:var(--text);letter-spacing:-.2px}
 .login-box p{color:var(--muted);font-size:13px;margin:0 0 26px}
 .field{margin-bottom:14px}
@@ -68,7 +68,7 @@ a{color:var(--blue);text-decoration:none}
 .field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface-2);color:var(--text)}
 .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-bg)}
 .btn{border:none;border-radius:8px;padding:11px 18px;font-size:14px;font-weight:700;cursor:pointer}
-.btn-primary{background:var(--primary);color:#04170F;width:100%}
+.btn-primary{background:var(--primary);color:#07110C;width:100%}
 .btn-primary:hover{background:var(--primary-dark)}
 .login-err{color:var(--red);background:var(--red-bg);border:1px solid rgba(248,81,73,.3);padding:9px 12px;border-radius:8px;font-size:12.5px;margin-bottom:14px;display:none}
 
@@ -77,7 +77,7 @@ a{color:var(--blue);text-decoration:none}
 #app.open{display:flex;min-height:100vh}
 .sidebar{width:236px;flex-shrink:0;background:var(--bg-raised);border-right:1px solid var(--border-subtle);padding:18px 14px;display:flex;flex-direction:column}
 .sb-logo{display:flex;align-items:center;gap:10px;padding:4px 8px 22px}
-.sb-logo .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--cyan));color:#04170F;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;box-shadow:var(--glow-primary)}
+.sb-logo .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--cyan));color:#07110C;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;box-shadow:var(--glow-primary)}
 .sb-logo b{font-size:14.5px;color:var(--text);letter-spacing:-.1px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:8px;color:var(--muted);font-size:13.5px;font-weight:600;cursor:pointer;margin-bottom:2px;border:none;border-left:3px solid transparent;background:none;width:100%;text-align:left;transition:background .12s,color .12s,border-color .12s}
 .nav-item:hover{background:var(--surface);color:var(--text)}
@@ -159,7 +159,7 @@ tr.row-click:hover{background:var(--surface-2)}
 
 .mini-kanban{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
 .mini-col{flex:0 0 148px}
-.mini-col-head{font-size:10.5px;font-weight:700;padding:6px 9px;border-radius:7px 7px 0 0;color:#06090F}
+.mini-col-head{font-size:10.5px;font-weight:700;padding:6px 9px;border-radius:7px 7px 0 0;color:#07110C}
 .mini-col-body{background:var(--bg-raised);border:1px solid var(--border-subtle);border-top:none;border-radius:0 0 7px 7px;min-height:50px;padding:6px;display:flex;flex-direction:column;gap:6px}
 .mini-card{background:var(--surface);border:1px solid var(--border-subtle);border-radius:6px;padding:7px 8px;font-size:10.5px;cursor:pointer}
 .mini-card:hover{border-color:var(--border)}
@@ -189,7 +189,7 @@ tr.row-click:hover{background:var(--surface-2)}
 /* ---- Kanban ---- */
 .board{display:flex;gap:12px;overflow-x:auto;padding-bottom:14px}
 .col{flex:0 0 240px;display:flex;flex-direction:column}
-.col-head{padding:10px 13px;border-radius:10px 10px 0 0;font-size:12px;font-weight:700;display:flex;justify-content:space-between;color:#0A0E1A;letter-spacing:.01em}
+.col-head{padding:10px 13px;border-radius:10px 10px 0 0;font-size:12px;font-weight:700;display:flex;justify-content:space-between;color:#07110C;letter-spacing:.01em}
 .col-head .count{background:rgba(10,14,26,.22);border-radius:20px;padding:1px 8px;font-size:10.5px}
 .col-body{background:var(--surface);border:1px solid var(--border-subtle);border-top:none;border-radius:0 0 10px 10px;flex:1;min-height:100px;padding:9px;display:flex;flex-direction:column;gap:8px}
 .col-body.dragover{background:var(--primary-bg)}
@@ -515,16 +515,16 @@ async function toggleNotifications(){
 })();
 
 // ── SAYFA YÖNLENDİRME ──
-async function showPage(page, searchQuery, sourceFilter){
+async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter){
   currentPage = page;
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.page===page));
   const main = document.getElementById('main');
   main.innerHTML = '<div class="empty">Loading...</div>';
   if(page==='dashboard') await renderDashboard();
   else if(page==='myday') await renderMyDay();
-  else if(page==='pipeline') await renderPipeline();
+  else if(page==='pipeline') await renderPipeline(stageFilter);
   else if(page==='companies') await renderCompanies(searchQuery, sourceFilter);
-  else if(page==='tasks') await renderTasks();
+  else if(page==='tasks') await renderTasks(taskFilter);
   else if(page==='analytics') await renderAnalytics();
   else if(page==='settings') await renderSettings();
 }
@@ -546,10 +546,10 @@ async function renderDashboard(){
     if(firstHalf===0) return secondHalf>0 ? 100 : 0;
     return Math.round(((secondHalf-firstHalf)/firstHalf)*100);
   }
-  function statCard(icon, color, value, label, trendArr){
+  function statCard(icon, color, value, label, trendArr, onClick){
     const pct = trendPct(trendArr);
     const trendHtml = trendArr ? `<span class="trend ${pct>0?'up':'flat'}">${pct>0?'↑'+pct+'%':'—'}</span>` : '';
-    return `<div class="stat" style="--stat-color:${color}">
+    return `<div class="stat" style="--stat-color:${color};${onClick?'cursor:pointer':''}" ${onClick?`onclick="${onClick}"`:''}>
       <div class="icon" style="background:${color}30;color:${color}">${icon}</div>
       <div class="l">${label}</div>
       <div class="value-row"><span class="n">${value}</span>${trendHtml}</div>
@@ -562,7 +562,7 @@ async function renderDashboard(){
     ${STAGES.slice(0,6).map(s=>{
       const items = opps.filter(o=>o.stage===s).slice(0,3);
       return `<div class="mini-col">
-        <div class="mini-col-head" style="background:${STAGE_COLORS[s]}">${s} · ${opps.filter(o=>o.stage===s).length}</div>
+        <div class="mini-col-head" style="background:${STAGE_COLORS[s]};cursor:pointer" onclick="showPage('pipeline',null,null,'${s}')">${s} · ${opps.filter(o=>o.stage===s).length}</div>
         <div class="mini-col-body">
           ${items.length?items.map(o=>`<div class="mini-card" onclick="openOpportunityDetail('${o.id}')"><b>${esc(o.companies?.name||'—')}</b><span style="color:var(--green)">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span></div>`).join(''):'<div style="font-size:10px;color:var(--faint);text-align:center;padding:6px 0">Empty</div>'}
         </div>
@@ -571,10 +571,10 @@ async function renderDashboard(){
   </div>`;
 
   // ── Lead Sources donut (gerçek veri, CSS conic-gradient — kütüphane yok) ──
-  const donutColors = ['#3B82F6','#22D3EE','#A78BFA','#39D98A','#F59E0B','#FB923C','#F87171','#64748B'];
+  const donutColors = ['#39D98A','#22D3EE','#3B82F6','#A78BFA','#F59E0B'];
   const sources = (analytics?.sourcePerformance || []).filter(s=>s.total>0);
   const donutHtml = sources.length ? donutChart(sources.map((s,i)=>({label:s.source, value:s.total, color:donutColors[i%donutColors.length]}))) : '<div class="empty" style="padding:20px">No source data yet</div>';
-  const donutLegend = sources.map((s,i)=>`<div class="donut-legend-row"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
+  const donutLegend = sources.map((s,i)=>`<div class="donut-legend-row" style="cursor:pointer" onclick="showPage('companies',null,'${escAttr(s.source)}')"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
 
   // ── Sağ panel: Today's Actions — kaynak dokümandaki action-call/email/followup/demo/overdue renk şemasına göre ──
   const myDay = await api('getMyDay');
@@ -604,12 +604,12 @@ async function renderDashboard(){
       </div>
     </div>
     <div class="stats">
-      ${statCard('💰','#39D98A','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Value', d.trends?.pipelineValue)}
-      ${statCard('👥','#3B82F6',d.newProspects||0,'New Prospects', d.trends?.newProspects)}
-      ${statCard('📅','#A78BFA',d.followUpsToday||0,'Follow-ups Today', d.trends?.followUps)}
-      ${statCard('🖥️','#22D3EE',d.demosThisWeek||0,'Demos This Week', d.trends?.demos)}
-      ${statCard('📄','#F59E0B',d.openProposals||0,'Open Proposals', d.trends?.openProposals)}
-      ${statCard('🏆','#39D98A',d.wonThisMonth||0,'Won This Month', d.trends?.wonRevenue)}
+      ${statCard('💰','#39D98A','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Value', d.trends?.pipelineValue, "showPage('pipeline')")}
+      ${statCard('👥','#3B82F6',d.newProspects||0,'New Prospects', d.trends?.newProspects, "showPage('companies')")}
+      ${statCard('📅','#A78BFA',d.followUpsToday||0,'Follow-ups Today', d.trends?.followUps, "showPage('tasks',null,null,null,{types:'Call,Meeting',when:'today'})")}
+      ${statCard('🖥️','#22D3EE',d.demosThisWeek||0,'Demos This Week', d.trends?.demos, "showPage('tasks',null,null,null,{types:'Demo',when:'week'})")}
+      ${statCard('📄','#F59E0B',d.openProposals||0,'Open Proposals', d.trends?.openProposals, "showPage('pipeline',null,null,'Proposal')")}
+      ${statCard('🏆','#39D98A',d.wonThisMonth||0,'Won This Month', d.trends?.wonRevenue, "showPage('pipeline',null,null,'Won')")}
     </div>
 
     <div class="dash-grid">
@@ -667,7 +667,7 @@ function sparkline(data, color){
   const w=100,h=32;   // viewBox koordinat sistemi — CSS ile %100 genişliğe esner (preserveAspectRatio="none")
   const max = Math.max(1, ...data);
   const hasSignal = data.some(v=>v>0);
-  const c = hasSignal ? color : '#3A4363';   // hiç veri yoksa soluk gri çizgi, göz yormasın
+  const c = hasSignal ? color : '#596579';   // hiç veri yoksa soluk gri çizgi (var(--faint) ile birebir), göz yormasın
   const pts = data.map((v,i)=>{
     const x = data.length>1 ? (i/(data.length-1))*w : w/2;
     const y = h - (v/max)*h*0.78 - 3;
@@ -702,8 +702,8 @@ function renderFunnelChevron(funnel){
       const nextColor = STAGE_COLORS[funnel[i+1]?.stage] || color;
       const isFirst = i===0;
       const pctOfFirst = funnel[0].reached>0 ? Math.round((f.reached/funnel[0].reached)*100) : 0;
-      return `<div style="flex:1;min-width:80px;position:relative">
-        <div style="height:52px;background:linear-gradient(100deg, ${color}, ${nextColor});clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%${isFirst?'':', 14px 50%'});display:flex;flex-direction:column;align-items:center;justify-content:center;color:#06090F;margin-left:${isFirst?'0':'-14px'}">
+      return `<div style="flex:1;min-width:80px;position:relative;cursor:pointer" onclick="showPage('pipeline',null,null,'${f.stage}')">
+        <div style="height:52px;background:linear-gradient(100deg, ${color}, ${nextColor});clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%${isFirst?'':', 14px 50%'});display:flex;flex-direction:column;align-items:center;justify-content:center;color:#07110C;margin-left:${isFirst?'0':'-14px'}">
           <b style="font-size:14px;line-height:1">${f.reached}</b>
           <span style="font-size:8.5px;font-weight:700;opacity:.75">${i===0?'':'%'+pctOfFirst}</span>
         </div>
@@ -790,10 +790,10 @@ async function renderAnalytics(){
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Failed to load</div>'; return; }
 
-  const donutColors = ['#3B82F6','#22D3EE','#A78BFA','#39D98A','#F59E0B','#FB923C','#F87171','#64748B'];
+  const donutColors = ['#39D98A','#22D3EE','#3B82F6','#A78BFA','#F59E0B'];
   const sourcesWithData = d.sourcePerformance.filter(s=>s.total>0);
   const donutHtml = sourcesWithData.length ? donutChart(sourcesWithData.map((s,i)=>({label:s.source, value:s.total, color:donutColors[i%donutColors.length]}))) : '<div class="empty" style="padding:20px">No data yet</div>';
-  const donutLegend = sourcesWithData.map((s,i)=>`<div class="donut-legend-row"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
+  const donutLegend = sourcesWithData.map((s,i)=>`<div class="donut-legend-row" style="cursor:pointer" onclick="showPage('companies',null,'${escAttr(s.source)}')"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
 
   const sourceRows = d.sourcePerformance.map(s=>`
     <tr class="row-click" onclick="showPage('companies', null, '${escAttr(s.source)}')"><td><b>${esc(s.source)}</b></td><td>${s.total}</td><td>${s.won}</td>
@@ -931,7 +931,10 @@ async function renderCompanies(searchQuery, sourceFilter){
             <td>${c.lead_source?`<span class="badge badge-source">${esc(c.lead_source)}</span>`:'—'}</td>
             <td>${c.current_stage?`<span style="color:${STAGE_COLORS[c.current_stage]||'#666'};font-weight:700;font-size:11.5px">${esc(c.current_stage)}</span>`:'—'}</td>
             <td><span style="color:${leadScoreColor(c.lead_score||0)};font-weight:700">${c.lead_score||0}</span></td>
-            <td>${c.current_mrr?'₺'+Number(c.current_mrr).toLocaleString('tr-TR'):'—'}</td>
+            <td>
+              <span>${c.current_mrr?'₺'+Number(c.current_mrr).toLocaleString('tr-TR'):'—'}</span>
+              <span onclick="event.stopPropagation();quickSetPrice('${c.id}','${c.current_opportunity_id||''}')" style="cursor:pointer;color:var(--primary);margin-left:6px;font-size:11px" title="Set price">💰</span>
+            </td>
             <td>${c.is_customer?'<span class="badge" style="background:var(--green-bg);color:var(--green)">Customer</span>':'<span class="badge" style="background:var(--surface-2);border:1px solid var(--border);color:var(--muted)">Prospect</span>'}</td>
           </tr>`).join('')}
         </tbody>
@@ -1058,7 +1061,7 @@ async function openCompanyPanel(companyId){
             </div>
             ${o.plan || o.expected_close_date ? `<div style="font-size:10.5px;color:var(--muted);margin-top:3px">${o.plan?esc(o.plan):''}${o.plan && o.expected_close_date?' · ':''}${o.expected_close_date?'Closes '+o.expected_close_date:''}</div>` : ''}
             <div class="stage-track">
-              ${STAGES.concat(['Lost','No Response','Not a Fit']).map(s=>`<span class="stage-pill" onclick="moveOpportunityStage('${o.id}','${s}','${c.id}')" style="background:${o.stage===s?(STAGE_COLORS[s]||OUTCOME_COLORS[s]||'#666'):'var(--surface-2)'};color:${o.stage===s?'#04170F':'var(--muted)'};border-color:${o.stage===s?'transparent':'var(--border)'}">${s}</span>`).join('')}
+              ${STAGES.concat(['Lost','No Response','Not a Fit']).map(s=>`<span class="stage-pill" onclick="moveOpportunityStage('${o.id}','${s}','${c.id}')" style="background:${o.stage===s?(STAGE_COLORS[s]||OUTCOME_COLORS[s]||'#666'):'var(--surface-2)'};color:${o.stage===s?'#07110C':'var(--muted)'};border-color:${o.stage===s?'transparent':'var(--border)'}">${s}</span>`).join('')}
             </div>
           </div>`).join('')}
       </div>
@@ -1296,7 +1299,7 @@ async function openOpportunityDetail(opportunityId){
       <div class="ps-head">Change Stage</div>
       <div class="ps-body">
         <div class="stage-track">
-          ${STAGES.concat(['Lost','No Response','Not a Fit']).map(s=>`<span class="stage-pill" onclick="moveOppFromDetail('${o.id}','${s}','${co.id}')" style="background:${o.stage===s?(STAGE_COLORS[s]||OUTCOME_COLORS[s]||'#666'):'var(--surface-2)'};color:${o.stage===s?'#04170F':'var(--muted)'};border-color:${o.stage===s?'transparent':'var(--border)'}">${s}</span>`).join('')}
+          ${STAGES.concat(['Lost','No Response','Not a Fit']).map(s=>`<span class="stage-pill" onclick="moveOppFromDetail('${o.id}','${s}','${co.id}')" style="background:${o.stage===s?(STAGE_COLORS[s]||OUTCOME_COLORS[s]||'#666'):'var(--surface-2)'};color:${o.stage===s?'#07110C':'var(--muted)'};border-color:${o.stage===s?'transparent':'var(--border)'}">${s}</span>`).join('')}
         </div>
         <div style="display:flex;gap:8px;margin-top:12px">
           <button class="btn-add" style="flex:1;background:var(--green)" onclick="moveOppFromDetail('${o.id}','Won','${co.id}')">Mark Won</button>
@@ -1393,6 +1396,16 @@ async function moveOpportunityStage(opportunityId, newStage, companyId){
   if(d.success){ toast('✓ Stage updated: ' + newStage); openCompanyPanel(companyId); if(currentPage==='pipeline') renderPipeline(); }
 }
 
+// Companies listesinden tek tıkla fiyat girişi — fırsat yoksa önce sessizce oluşturur.
+async function quickSetPrice(companyId, opportunityId){
+  if(!opportunityId){
+    const d = await api('addOpportunity', { companyId, opportunity:{stage:'Prospect'} });
+    if(!d.success) return;
+    opportunityId = d.opportunity.id;
+  }
+  openEditOpportunityModal(opportunityId, companyId);
+}
+
 async function openEditOpportunityModal(opportunityId, companyId){
   editingOppId = opportunityId; editingOppCompanyId = companyId;
   // Mevcut değerleri panelden değil, taze veriden çekelim (şirket detayını tekrar okuyup ilgili fırsatı bulalım)
@@ -1419,7 +1432,8 @@ async function saveOpportunityDetails(){
     toast('✓ Deal details saved');
     const cid = editingOppCompanyId;
     closeEditOppModal();
-    openCompanyPanel(cid);
+    if(currentPage==='companies') renderCompanies();
+    else openCompanyPanel(cid);
     if(currentPage==='pipeline') renderPipeline();
   }
 }
@@ -1515,7 +1529,7 @@ async function deleteCompanyConfirm(companyId){
 // ══════════════════════════════════════════════
 // PIPELINE (Kanban, sürükle-bırak)
 // ══════════════════════════════════════════════
-async function renderPipeline(){
+async function renderPipeline(highlightStage){
   const d = await api('getOpportunities');
   opportunities = d.opportunities || [];
   const main = document.getElementById('main');
@@ -1524,7 +1538,8 @@ async function renderPipeline(){
     <div class="board">
       ${STAGES.map(s=>{
         const items = opportunities.filter(o=>o.stage===s);
-        return `<div class="col">
+        const isTarget = highlightStage && s===highlightStage;
+        return `<div class="col" id="${isTarget?'pipeline-target-col':''}" style="${isTarget?'box-shadow:0 0 0 2px '+STAGE_COLORS[s]+';border-radius:11px':''}">
           <div class="col-head" style="background:linear-gradient(135deg, ${STAGE_COLORS[s]}, ${STAGE_COLORS[s]}CC)">${s}<span class="count">${items.length}</span></div>
           <div class="col-body" data-stage="${s}" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="onDropCard(event,'${s}')">
             ${items.map(o=>`
@@ -1548,6 +1563,10 @@ async function renderPipeline(){
         </div>`;
       }).join('')}
     </div>`;
+  if(highlightStage){
+    const el = document.getElementById('pipeline-target-col');
+    if(el) el.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+  }
 }
 let draggedOppId = null;
 function onDragStart(e, oppId){ draggedOppId = oppId; }
@@ -1630,7 +1649,7 @@ function initials(name){
 function leadScoreColor(score){
   if(score>=70) return '#39D98A';   // yüksek — yeşil
   if(score>=40) return '#F59E0B';   // orta — amber
-  return '#8B949E';                 // düşük — gri
+  return '#8B9AAF';                 // düşük — var(--muted) ile birebir
 }
 </script>
 </body>
