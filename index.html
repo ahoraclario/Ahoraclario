@@ -306,6 +306,20 @@ tr.row-click:hover{background:var(--surface-2)}
   </div>
 </div>
 
+<!-- Fırsat Düzenle Modal (tutar / plan / kapanış tarihi) -->
+<div class="modal-overlay" id="editOppModal">
+  <div class="modal">
+    <h3>Deal Details</h3>
+    <div class="fi"><label>Estimated Deal Value (₺)</label><input id="eo-mrr" type="number" placeholder="0"></div>
+    <div class="fi"><label>Plan</label><input id="eo-plan" type="text" placeholder="e.g. Starter, Growth"></div>
+    <div class="fi"><label>Expected Close Date</label><input id="eo-close" type="date"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeEditOppModal()">Cancel</button>
+      <button class="btn-add" onclick="saveOpportunityDetails()">Save</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -807,8 +821,12 @@ async function openCompanyPanel(companyId){
           <div class="mini-item">
             <div style="display:flex;justify-content:space-between;align-items:center">
               <b style="color:${STAGE_COLORS[o.stage]||'#666'}">${esc(o.stage)}</b>
-              <span style="color:var(--green);font-weight:700">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span>
+              <span style="display:flex;align-items:center;gap:7px">
+                <span style="color:${o.estimated_mrr?'var(--green)':'var(--faint)'};font-weight:700">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):'No value set'}</span>
+                <span style="cursor:pointer;color:var(--muted);font-size:12px" onclick="openEditOpportunityModal('${o.id}','${c.id}')" title="Edit deal value">✎</span>
+              </span>
             </div>
+            ${o.plan || o.expected_close_date ? `<div style="font-size:10.5px;color:var(--muted);margin-top:3px">${o.plan?esc(o.plan):''}${o.plan && o.expected_close_date?' · ':''}${o.expected_close_date?'Closes '+o.expected_close_date:''}</div>` : ''}
             <div class="stage-track">
               ${STAGES.concat(['Lost','No Response','Not a Fit']).map(s=>`<span class="stage-pill" onclick="moveOpportunityStage('${o.id}','${s}','${c.id}')" style="background:${o.stage===s?(STAGE_COLORS[s]||OUTCOME_COLORS[s]||'#666'):'var(--surface-2)'};color:${o.stage===s?'#04170F':'var(--muted)'};border-color:${o.stage===s?'transparent':'var(--border)'}">${s}</span>`).join('')}
             </div>
@@ -899,15 +917,52 @@ async function saveCompanyProfile(companyId){
   if(d.success){ toast('✓ Saved'); }
 }
 
+let editingOppId = null, editingOppCompanyId = null;
+
 async function quickAddOpportunity(companyId){
   const d = await api('addOpportunity', { companyId, opportunity:{stage:'Prospect'} });
-  if(d.success){ toast('✓ Opportunity added'); openCompanyPanel(companyId); }
+  if(d.success){
+    toast('✓ Opportunity added');
+    openCompanyPanel(companyId);
+    openEditOpportunityModal(d.opportunity.id, companyId);   // hemen tutar/plan girmesi için modal açılıyor
+  }
 }
 async function moveOpportunityStage(opportunityId, newStage, companyId){
   let lostReason = null;
-  if(newStage === 'Lost'){ lostReason = prompt('Loss reason (optional): Too expensive, No need, No budget, Using another CRM, Bad timing, No response, Note decision maker, Competitor, Other') || ''; }
+  if(newStage === 'Lost'){ lostReason = prompt('Loss reason (optional): Too expensive, No need, No budget, Using another CRM, Bad timing, No response, Not decision maker, Competitor, Other') || ''; }
   const d = await api('updateOpportunityStage', { opportunityId, stage:newStage, lostReason });
   if(d.success){ toast('✓ Stage updated: ' + newStage); openCompanyPanel(companyId); if(currentPage==='pipeline') renderPipeline(); }
+}
+
+async function openEditOpportunityModal(opportunityId, companyId){
+  editingOppId = opportunityId; editingOppCompanyId = companyId;
+  // Mevcut değerleri panelden değil, taze veriden çekelim (şirket detayını tekrar okuyup ilgili fırsatı bulalım)
+  const d = await api('getCompanyDetail', { companyId });
+  const opp = d.success ? d.opportunities.find(o => o.id === opportunityId) : null;
+  document.getElementById('eo-mrr').value = opp?.estimated_mrr || '';
+  document.getElementById('eo-plan').value = opp?.plan || '';
+  document.getElementById('eo-close').value = opp?.expected_close_date || '';
+  document.getElementById('editOppModal').classList.add('open');
+}
+function closeEditOppModal(){
+  document.getElementById('editOppModal').classList.remove('open');
+  editingOppId = null; editingOppCompanyId = null;
+}
+async function saveOpportunityDetails(){
+  if(!editingOppId) return;
+  const opportunity = {
+    estimated_mrr: document.getElementById('eo-mrr').value || null,
+    plan: document.getElementById('eo-plan').value.trim() || null,
+    expected_close_date: document.getElementById('eo-close').value || null,
+  };
+  const d = await api('updateOpportunity', { opportunityId: editingOppId, opportunity });
+  if(d.success){
+    toast('✓ Deal details saved');
+    const cid = editingOppCompanyId;
+    closeEditOppModal();
+    openCompanyPanel(cid);
+    if(currentPage==='pipeline') renderPipeline();
+  }
 }
 
 function showAddContactForm(companyId){ document.getElementById('addContactForm-'+companyId).classList.remove('hidden'); }
