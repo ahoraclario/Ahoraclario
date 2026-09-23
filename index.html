@@ -64,7 +64,7 @@ a{color:var(--blue);text-decoration:none}
 /* ---- App shell ---- */
 #app{display:none}
 #app.open{display:flex;min-height:100vh}
-.sidebar{width:240px;flex-shrink:0;background:var(--bg-raised);border-right:1px solid var(--border-subtle);padding:18px 14px;display:flex;flex-direction:column}
+.sidebar{width:236px;flex-shrink:0;background:var(--bg-raised);border-right:1px solid var(--border-subtle);padding:18px 14px;display:flex;flex-direction:column}
 .sb-logo{display:flex;align-items:center;gap:10px;padding:4px 8px 22px}
 .sb-logo .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--cyan));color:#04170F;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;box-shadow:var(--glow-primary)}
 .sb-logo b{font-size:14.5px;color:var(--text);letter-spacing:-.1px}
@@ -77,7 +77,7 @@ a{color:var(--blue);text-decoration:none}
 .sb-tagline{font-size:11.5px;color:var(--faint);padding:0 8px;line-height:1.5}
 
 .content-area{flex:1;display:flex;flex-direction:column;min-width:0}
-.topbar{height:64px;flex-shrink:0;border-bottom:1px solid var(--border-subtle);background:var(--bg-raised);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:16px}
+.topbar{height:58px;flex-shrink:0;border-bottom:1px solid var(--border-subtle);background:var(--bg-raised);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:16px}
 .search-box{flex:1;max-width:420px;display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:8px 12px;color:var(--faint);font-size:13px}
 .search-box input{border:none;background:none;outline:none;color:var(--text);font-size:13px;flex:1;padding:0}
 .search-box input::placeholder{color:var(--faint)}
@@ -102,20 +102,20 @@ a{color:var(--blue);text-decoration:none}
 .user-chip b{font-size:12.5px;color:var(--text);display:block;line-height:1.3}
 .user-chip span{font-size:10.5px;color:var(--muted)}
 
-.main{flex:1;padding:24px 24px;overflow-x:hidden;overflow-y:auto}
+.main{flex:1;padding:26px 32px;overflow-x:hidden;overflow-y:auto}
 .page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
 .page-head h1{font-size:21px;margin:0 0 4px;color:var(--text);letter-spacing:-.2px}
 .page-head p{color:var(--muted);font-size:13px;margin:0}
 
 /* ---- Stat cards ---- */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:11px;margin-bottom:22px}
-.stat{height:116px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;transition:border-color .15s,transform .15s,box-shadow .15s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:7px}
+.stat{background:linear-gradient(165deg, var(--surface) 0%, var(--bg-raised) 100%);border:1px solid var(--border-subtle);border-radius:11px;padding:13px 14px 11px;transition:border-color .15s,transform .15s,box-shadow .15s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:7px}
 .stat:hover{border-color:var(--border);border-color:color-mix(in srgb, var(--stat-color, var(--primary)) 45%, var(--border));transform:translateY(-2px);box-shadow:0 10px 30px -10px rgba(0,0,0,.5)}
 .stat::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--stat-color,var(--primary));box-shadow:0 0 10px var(--stat-color,var(--primary))}
 .stat .icon{width:29px;height:29px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px}
 .stat .l{font-size:11px;color:var(--muted);font-weight:500}
 .stat .value-row{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
-.stat .n{font-size:28px;font-weight:800;color:var(--text);letter-spacing:-.3px;line-height:1}
+.stat .n{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.3px;line-height:1}
 .stat .trend{font-size:10px;font-weight:700}
 .stat .trend.up{color:var(--green)} .stat .trend.flat{color:var(--faint)}
 .stat .spark-wrap{margin-top:1px;line-height:0}
@@ -133,7 +133,7 @@ tr.row-click:hover{background:var(--surface-2)}
 .badge-source{background:var(--blue-bg);color:var(--blue)}
 
 /* ---- Dashboard: 2 sütunlu layout, sparkline, donut, yan panel ---- */
-.dash-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(300px,1fr);gap:18px;align-items:start}
+.dash-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
 @media (max-width:1100px){.dash-grid{grid-template-columns:1fr}}
 .dash-main{min-width:0}
 .dash-side{display:flex;flex-direction:column;gap:14px}
@@ -177,7 +177,7 @@ tr.row-click:hover{background:var(--surface-2)}
 
 /* ---- Kanban ---- */
 .board{display:flex;gap:12px;overflow-x:auto;padding-bottom:14px}
-.col{flex:0 0 180px;display:flex;flex-direction:column}
+.col{flex:0 0 240px;display:flex;flex-direction:column}
 .col-head{padding:10px 13px;border-radius:10px 10px 0 0;font-size:12px;font-weight:700;display:flex;justify-content:space-between;color:#0A0E1A;letter-spacing:.01em}
 .col-head .count{background:rgba(10,14,26,.22);border-radius:20px;padding:1px 8px;font-size:10.5px}
 .col-body{background:var(--surface);border:1px solid var(--border-subtle);border-top:none;border-radius:0 0 10px 10px;flex:1;min-height:100px;padding:9px;display:flex;flex-direction:column;gap:8px}
@@ -230,36 +230,6 @@ tr.row-click:hover{background:var(--surface-2)}
 .toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:12px 18px;border-radius:9px;font-size:13px;z-index:400;display:none;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 .toast.show{display:block}
 .empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:13px}
-/* ---- Ahoraclario responsive + visual precision ---- */
-.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;min-height:300px}
-.dashboard-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
-.kpi-label{text-transform:uppercase;letter-spacing:.04em}
-@media (max-width:1100px){
-  .sidebar{width:220px}
-  .dashboard-bottom-grid{grid-template-columns:1fr}
-}
-@media (max-width:800px){
-  #app.open{display:block}
-  .sidebar{width:100%;height:auto;min-height:0;border-right:none;border-bottom:1px solid var(--border-subtle);padding:10px;display:block}
-  .sb-logo{padding:4px 8px 10px}
-  .nav-item{display:inline-flex;width:auto;margin:2px;padding:8px 10px}
-  .sb-bottom{display:none}
-  .content-area{min-width:0}
-  .topbar{padding:0 14px;height:58px}
-  .search-box{max-width:none}
-  .user-chip b,.user-chip span{display:none}
-  .main{padding:18px 14px}
-  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .dash-grid{grid-template-columns:1fr}
-  .board{gap:8px}
-  .col{flex-basis:210px}
-}
-@media (max-width:520px){
-  .stats{grid-template-columns:1fr}
-  .stat{height:108px}
-  .fi-row{grid-template-columns:1fr}
-  .panel{max-width:100%;padding:18px}
-}
 </style>
 </head>
 <body>
@@ -287,6 +257,7 @@ tr.row-click:hover{background:var(--surface-2)}
     <button class="nav-item" data-page="companies" onclick="showPage('companies')">🏢 Companies<span class="nb hidden" id="nbCompanies"></span></button>
     <button class="nav-item" data-page="tasks" onclick="showPage('tasks')">✅ Tasks<span class="nb hidden" id="nbTasks"></span></button>
     <button class="nav-item" data-page="analytics" onclick="showPage('analytics')">📈 Reports</button>
+    <button class="nav-item" data-page="settings" onclick="showPage('settings')">⚙️ Settings</button>
     <div class="sb-bottom">
       <div class="sb-tagline">Ahoraclario<br>Build stronger customer relationships with the right tools.</div>
     </div>
@@ -526,7 +497,7 @@ async function toggleNotifications(){
 })();
 
 // ── SAYFA YÖNLENDİRME ──
-async function showPage(page, searchQuery){
+async function showPage(page, searchQuery, sourceFilter){
   currentPage = page;
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.page===page));
   const main = document.getElementById('main');
@@ -534,9 +505,10 @@ async function showPage(page, searchQuery){
   if(page==='dashboard') await renderDashboard();
   else if(page==='myday') await renderMyDay();
   else if(page==='pipeline') await renderPipeline();
-  else if(page==='companies') await renderCompanies(searchQuery);
+  else if(page==='companies') await renderCompanies(searchQuery, sourceFilter);
   else if(page==='tasks') await renderTasks();
   else if(page==='analytics') await renderAnalytics();
+  else if(page==='settings') await renderSettings();
 }
 
 // ══════════════════════════════════════════════
@@ -723,9 +695,10 @@ function timeAgo(iso){
 // MY DAY
 // ══════════════════════════════════════════════
 async function renderMyDay(){
-  const d = await api('getMyDay');
+  const [d, settingsRes] = await Promise.all([ api('getMyDay'), api('getSettings') ]);
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Failed to load</div>'; return; }
+  const targets = settingsRes.success ? (settingsRes.dailyTargets||{}) : {};
 
   function taskRow(t, color){
     return `<div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;border-left:3px solid ${color}">
@@ -743,10 +716,16 @@ async function renderMyDay(){
     return `<div class="ps"><div class="ps-head" style="color:${color}">${title}${count!==undefined?` (${count})`:''}</div><div class="ps-body mini-list">${bodyHtml}</div></div>`;
   }
 
+  // Aktivite sayaçları artık Settings'te tanımlı GERÇEK hedeflere göre ilerleme gösteriyor (hardcoded değil).
   const activitySummary = [
-    ['email_sent','📧 Email'], ['linkedin_message','💼 LinkedIn'], ['call','📞 Calls'],
-    ['reply_received','↩️ Replies'], ['demo_completed','🖥️ Demos'], ['proposal_sent','📄 Proposals'],
-  ].map(([type,label]) => `<span class="badge" style="background:var(--surface-2);border:1px solid var(--border);color:var(--text);margin-right:6px">${label}: <b>${d.activityCounts?.[type]||0}</b></span>`).join('');
+    ['email_sent','📧 Emails','emails'], ['linkedin_message','💼 LinkedIn','linkedin'], ['call','📞 Calls','calls'],
+    ['reply_received','↩️ Replies',null], ['demo_completed','🖥️ Demos','demos'], ['proposal_sent','📄 Proposals',null],
+  ].map(([type,label,targetKey]) => {
+    const n = d.activityCounts?.[type]||0;
+    const target = targetKey ? targets[targetKey] : null;
+    const hit = target && n >= target;
+    return `<span class="badge" style="background:${hit?'var(--green-bg)':'var(--surface-2)'};border:1px solid var(--border);color:${hit?'var(--green)':'var(--text)'};margin-right:6px">${label}: <b>${n}${target?'/'+target:''}</b></span>`;
+  }).join('') + `<span style="cursor:pointer;color:var(--primary);font-size:11px;margin-left:6px" onclick="showPage('settings')">Edit targets →</span>`;
 
   main.innerHTML = `
     <div class="page-head"><div><h1>☀️ My Day</h1><p>Everything you need to focus on today.</p></div></div>
@@ -784,7 +763,7 @@ async function renderAnalytics(){
   const donutLegend = sourcesWithData.map((s,i)=>`<div class="donut-legend-row"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
 
   const sourceRows = d.sourcePerformance.map(s=>`
-    <tr><td><b>${esc(s.source)}</b></td><td>${s.total}</td><td>${s.won}</td>
+    <tr class="row-click" onclick="showPage('companies', null, '${escAttr(s.source)}')"><td><b>${esc(s.source)}</b></td><td>${s.total}</td><td>${s.won}</td>
       <td><span style="color:${s.conversionRate>=20?'var(--green)':'var(--muted)'};font-weight:700">%${s.conversionRate}</span></td>
       <td style="color:var(--green);font-weight:700">₺${s.wonMrr.toLocaleString('tr-TR')}</td></tr>`).join('');
 
@@ -804,6 +783,19 @@ async function renderAnalytics(){
 
     <div class="ps"><div class="ps-head">Funnel Conversion — Opportunities that reached this stage</div><div class="ps-body">${renderFunnelChevron(d.funnel)}</div></div>
 
+    <div class="ps"><div class="ps-head">Stage-to-Stage Conversion</div>
+      <div class="ps-body" style="display:flex;flex-wrap:wrap;gap:12px">
+        ${(d.stepConversion||[]).map(s=>{
+          const color = s.rate>=40?'#39D98A':(s.rate>=15?'#F59E0B':'#F87171');
+          return `<div style="flex:1;min-width:150px;background:var(--surface-secondary);border:1px solid var(--border-subtle);border-radius:10px;padding:12px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px">${esc(s.label)}</div>
+            <div style="font-size:20px;font-weight:800;color:${color}">%${s.rate}</div>
+            <div style="font-size:10px;color:var(--faint);margin-top:3px">${s.toCount} of ${s.fromCount}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+
     <div class="ps"><div class="ps-head">Lead Sources</div><div class="ps-body"><div class="donut-wrap">${donutHtml}<div class="donut-legend">${donutLegend||'<div style="color:var(--muted)">No data yet</div>'}</div></div></div></div>
 
     <div class="ps"><div class="ps-head">Source Performance</div>
@@ -818,21 +810,87 @@ async function renderAnalytics(){
 }
 
 // ══════════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════════
+async function renderSettings(){
+  const d = await api('getSettings');
+  const main = document.getElementById('main');
+  if(!d.success){ main.innerHTML='<div class="empty">Failed to load</div>'; return; }
+  const t = d.dailyTargets || {};
+  const targetFields = [
+    ['calls','📞 Calls'], ['emails','📧 Emails'], ['linkedin','💼 LinkedIn Messages'],
+    ['followUps','📩 Follow-ups'], ['meetings','📅 Meetings'], ['demos','🖥️ Demos'],
+  ];
+  main.innerHTML = `
+    <div class="page-head"><div><h1>⚙️ Settings</h1><p>Your profile and daily activity targets.</p></div></div>
+
+    <div class="ps">
+      <div class="ps-head">Profile</div>
+      <div class="ps-body">
+        <div class="fi-row">
+          <div class="fi"><label>Name</label><input value="${escAttr(d.user.name)}" disabled></div>
+          <div class="fi"><label>Username</label><input value="${escAttr(d.user.username)}" disabled></div>
+        </div>
+        <div class="fi"><label>Email</label><input value="${escAttr(d.user.email||'')}" disabled></div>
+      </div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">Change Password</div>
+      <div class="ps-body">
+        <div class="fi"><label>Current Password</label><input id="st-cur-pw" type="password"></div>
+        <div class="fi"><label>New Password</label><input id="st-new-pw" type="password"></div>
+        <button class="btn-add" onclick="submitChangePassword()">Update Password</button>
+      </div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">Daily Activity Targets</div>
+      <div class="ps-body">
+        <div class="fi-row" style="flex-wrap:wrap">
+          ${targetFields.map(([key,label])=>`
+            <div class="fi" style="min-width:140px;flex:1"><label>${label}</label><input id="st-target-${key}" type="number" min="0" value="${t[key]??0}"></div>`).join('')}
+        </div>
+        <button class="btn-add" onclick="saveDailyTargets()">Save Targets</button>
+      </div>
+    </div>
+  `;
+}
+async function submitChangePassword(){
+  const currentPassword = document.getElementById('st-cur-pw').value;
+  const newPassword = document.getElementById('st-new-pw').value;
+  if(!currentPassword || !newPassword){ toast('Both fields are required'); return; }
+  const d = await api('changePassword', { currentPassword, newPassword });
+  if(d.success){ toast('✓ Password updated'); document.getElementById('st-cur-pw').value=''; document.getElementById('st-new-pw').value=''; }
+}
+async function saveDailyTargets(){
+  const keys = ['calls','emails','linkedin','followUps','meetings','demos'];
+  const dailyTargets = {};
+  keys.forEach(k => { dailyTargets[k] = Number(document.getElementById('st-target-'+k).value) || 0; });
+  const d = await api('updateDailyTargets', { dailyTargets });
+  if(d.success){ toast('✓ Targets saved'); }
+}
+
+// ══════════════════════════════════════════════
 // ŞİRKETLER
 // ══════════════════════════════════════════════
-async function renderCompanies(searchQuery){
-  const d = await api('getCompanies', searchQuery ? { search: searchQuery } : {});
+async function renderCompanies(searchQuery, sourceFilter){
+  const params = {};
+  if(searchQuery) params.search = searchQuery;
+  if(sourceFilter) params.filterSource = sourceFilter;
+  const d = await api('getCompanies', params);
   companies = d.companies || [];
   const main = document.getElementById('main');
+  const filterLabel = searchQuery ? `"${esc(searchQuery)}"` : (sourceFilter ? `source: ${esc(sourceFilter)}` : '');
   main.innerHTML = `
     <div class="page-head">
-      <div><h1>Companies</h1><p>${companies.length} prospects/customers${searchQuery?` · "${esc(searchQuery)}" results for`:''}</p></div>
+      <div><h1>Companies</h1><p>${companies.length} prospects/customers${filterLabel?` · ${filterLabel} <span style="color:var(--primary);cursor:pointer" onclick="showPage('companies')">✕ clear</span>`:''}</p></div>
       <button class="btn-add" onclick="openAddCompanyModal()">+ New Company</button>
     </div>
     <div class="tbl-wrap">
       <table>
         <thead><tr><th>Company</th><th>Industry</th><th>Country</th><th>Source</th><th>Stage</th><th>Lead Score</th><th>Est. MRR</th><th>Status</th></tr></thead>
-        <tbody>${companies.length===0?`<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">${searchQuery?'No results found':'No companies yet'}</td></tr>`:companies.map(c=>`
+        <tbody>${companies.length===0?`<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">${filterLabel?'No results found':'No companies yet'}</td></tr>`:companies.map(c=>`
           <tr class="row-click" onclick="openCompanyPanel('${c.id}')">
             <td><b>${esc(c.name)}</b>${c.priority==='High'?' 🔥':''}</td>
             <td>${esc(c.industry||'—')}</td>
@@ -873,7 +931,6 @@ async function submitAddCompany(){
     if(currentPage==='companies') renderCompanies(); else if(currentPage==='pipeline') renderPipeline();
     // ilk fırsatı da otomatik oluşturalım ki hemen pipeline'da görünsün
     await api('addOpportunity', { companyId: d.company.id, opportunity:{stage:'Prospect'} });
-    refreshNavBadges();
   }
 }
 
@@ -935,9 +992,23 @@ async function openCompanyPanel(companyId){
       </div>
     </div>
 
-    ${c.is_customer ? `<div class="ps"><div class="ps-head" style="background:var(--green-bg);color:var(--green)">✓ Customer</div>
-      <div class="ps-body" style="font-size:12.5px">
-        Customer Oldu: <b>${c.customer_since||'—'}</b> · Plan: <b>${esc(c.plan||'—')}</b> · MRR: <b>₺${c.mrr?Number(c.mrr).toLocaleString('tr-TR'):'0'}</b>
+    ${d.customer ? `<div class="ps"><div class="ps-head" style="background:var(--green-bg);color:var(--green)">✓ Customer</div>
+      <div class="ps-body">
+        <div style="font-size:12.5px;margin-bottom:10px">
+          Customer since <b>${d.customer.customer_since||'—'}</b> · Plan: <b>${esc(d.customer.plan||'—')}</b> · MRR: <b>₺${d.customer.mrr?Number(d.customer.mrr).toLocaleString('tr-TR'):'0'}</b> · ARR: <b>₺${d.customer.arr?Number(d.customer.arr).toLocaleString('tr-TR'):'0'}</b>
+        </div>
+        <div class="fi-row">
+          <div class="fi"><label>Onboarding</label>
+            <select onchange="updateCustomerField('${c.id}','onboarding_status',this.value)">
+              ${['Pending','In Progress','Done'].map(s=>`<option value="${s}" ${d.customer.onboarding_status===s?'selected':''}>${s}</option>`).join('')}
+            </select>
+          </div>
+          <div class="fi"><label>Status</label>
+            <select onchange="updateCustomerField('${c.id}','status',this.value)">
+              ${['Active','Inactive'].map(s=>`<option value="${s}" ${d.customer.status===s?'selected':''}>${s}</option>`).join('')}
+            </select>
+          </div>
+        </div>
       </div></div>` : ''}
 
     <div class="ps">
@@ -984,7 +1055,7 @@ async function openCompanyPanel(companyId){
     </div>
 
     <div class="ps">
-      <div class="ps-head">Tasks (${d.tasks.filter(t=>t.status==='Open').length} open)<span style="display:flex;gap:10px"><span style="cursor:pointer;color:var(--cyan)" onclick="startFollowUpSequence('${c.id}')">⚡ Sequence</span><span style="cursor:pointer;color:var(--primary)" onclick="showAddTaskForm('${c.id}')">+ Add</span></span></div>
+      <div class="ps-head">Tasks (${d.tasks.filter(t=>t.status==='Open').length} open)<span style="cursor:pointer;color:var(--primary)" onclick="showAddTaskForm('${c.id}')">+ Add</span></div>
       <div class="ps-body mini-list" id="tasksList">
         ${d.tasks.length===0?'<div style="color:var(--muted);font-size:12px">No tasks.</div>':d.tasks.map(t=>`
           <div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;${t.status==='Completed'?'opacity:.5':''}">
@@ -1070,6 +1141,17 @@ async function openCompanyPanel(companyId){
           <button class="btn-add" style="width:100%" onclick="submitAddProposal('${c.id}')">Save Proposal</button>`}
         </div>
       </div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">Log Activity</div>
+      <div class="ps-body" style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-ghost" onclick="logQuickActivity('${c.id}','email_sent')">📧 Email Sent</button>
+        <button class="btn-ghost" onclick="logQuickActivity('${c.id}','linkedin_message')">💼 LinkedIn Message</button>
+        <button class="btn-ghost" onclick="logQuickActivity('${c.id}','call')">📞 Call</button>
+        <button class="btn-ghost" onclick="logQuickActivity('${c.id}','reply_received')">↩️ Reply Received</button>
+      </div>
+      <div style="padding:0 15px 12px;font-size:10.5px;color:var(--faint)">Logging "Email Sent" automatically schedules 3 follow-up tasks (+3 / +5 / +7 days).</div>
     </div>
 
     <div class="ps">
@@ -1208,7 +1290,7 @@ async function setPrimaryContact(opportunityId, contactId){
 }
 async function completeOppTask(taskId, opportunityId){
   const d = await api('completeTask', { taskId });
-  if(d.success){ toast('✓ Task completed'); openOpportunityDetail(opportunityId); refreshNavBadges(); }
+  if(d.success){ toast('✓ Task completed'); openOpportunityDetail(opportunityId); }
 }
 async function addOppTask(opportunityId, companyId){
   const title = document.getElementById('od-task-title').value.trim();
@@ -1226,6 +1308,19 @@ async function moveOppFromDetail(opportunityId, newStage, companyId){
 async function quickAddProposalFromOpp(opportunityId, companyId){
   const d = await api('addProposal', { companyId, opportunityId, proposal:{} });
   if(d.success){ toast('✓ Proposal added — set its value in Company view'); openOpportunityDetail(opportunityId); }
+}
+
+async function logQuickActivity(companyId, activityType){
+  const d = await api('addActivity', { companyId, activityType });
+  if(d.success){
+    toast(d.followUpsCreated ? `✓ Logged — ${d.followUpsCreated} follow-up tasks scheduled` : '✓ Activity logged');
+    openCompanyPanel(companyId);
+  }
+}
+
+async function updateCustomerField(companyId, field, value){
+  const d = await api('updateCustomer', { companyId, customer:{ [field]: value } });
+  if(d.success){ toast('✓ Saved'); }
 }
 
 async function saveCompanyProfile(companyId){
@@ -1322,34 +1417,7 @@ async function submitAddTask(companyId){
 }
 async function completeTaskQuick(taskId, companyId){
   const d = await api('completeTask', { taskId });
-  if(d.success){ toast('✓ Task completed'); openCompanyPanel(companyId); refreshNavBadges(); }
-}
-
-// ── Follow-up Sequence ──
-// Creates the agreed 3-step follow-up cadence: +3 days, then +5, then +7 days.
-// This uses the existing Task API, so each step is a real CRM task and appears in My Day/Tasks.
-async function startFollowUpSequence(companyId){
-  const start = new Date();
-  const offsets = [3, 8, 15];
-  const titles = [
-    'Follow-up #1 — Check if they received the message',
-    'Follow-up #2 — Second follow-up / value reminder',
-    'Follow-up #3 — Final follow-up / close the loop'
-  ];
-  if(!confirm('Create the 3-step follow-up sequence (+3 / +5 / +7 days)?')) return;
-  let created = 0;
-  for(let i=0;i<offsets.length;i++){
-    const d = new Date(start);
-    d.setDate(d.getDate()+offsets[i]);
-    const due_date = d.toISOString().slice(0,10);
-    const res = await api('addTask', { companyId, task:{title:titles[i], due_date, task_type:'Follow-up'} });
-    if(res.success) created++;
-  }
-  if(created){
-    toast(`✓ ${created}-step follow-up sequence created`);
-    await openCompanyPanel(companyId);
-    refreshNavBadges();
-  }
+  if(d.success){ toast('✓ Task completed'); openCompanyPanel(companyId); }
 }
 
 // ── Meetings ──
@@ -1499,7 +1567,7 @@ async function renderTasks(filter){
 }
 async function completeTaskFromList(taskId){
   const d = await api('completeTask', { taskId });
-  if(d.success){ toast('✓ Completed'); renderTasks(); refreshNavBadges(); }
+  if(d.success){ toast('✓ Completed'); renderTasks(); }
 }
 
 // ── Yardımcılar ──
