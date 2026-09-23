@@ -115,6 +115,45 @@ tr.row-click:hover{background:var(--surface-2)}
 .badge{display:inline-block;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px}
 .badge-source{background:var(--blue-bg);color:var(--blue)}
 
+/* ---- Dashboard: 2 sütunlu layout, sparkline, donut, yan panel ---- */
+.dash-grid{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start}
+@media (max-width:1100px){.dash-grid{grid-template-columns:1fr}}
+.dash-side{display:flex;flex-direction:column;gap:14px}
+.stat .spark{margin-left:auto;flex-shrink:0}
+.stat .stat-main{flex:1;min-width:0}
+.stat .trend{font-size:10px;font-weight:700;margin-top:2px}
+.trend.up{color:var(--green)} .trend.flat{color:var(--muted)}
+
+.donut-wrap{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.donut{width:128px;height:128px;border-radius:50%;flex-shrink:0;position:relative;display:flex;align-items:center;justify-content:center}
+.donut-center{position:absolute;inset:24px;background:var(--surface);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-legend{flex:1;min-width:160px;font-size:11.5px}
+.donut-legend-row{display:flex;align-items:center;gap:8px;padding:4px 0}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.donut-legend-row .val{margin-left:auto;font-weight:700;color:var(--text)}
+
+.mini-kanban{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.mini-col{flex:0 0 148px}
+.mini-col-head{font-size:10.5px;font-weight:700;padding:6px 9px;border-radius:7px 7px 0 0;color:#06090F}
+.mini-col-body{background:var(--bg-raised);border:1px solid var(--border-subtle);border-top:none;border-radius:0 0 7px 7px;min-height:50px;padding:6px;display:flex;flex-direction:column;gap:6px}
+.mini-card{background:var(--surface);border:1px solid var(--border-subtle);border-radius:6px;padding:7px 8px;font-size:10.5px;cursor:pointer}
+.mini-card:hover{border-color:var(--border)}
+.mini-card b{display:block;font-size:10.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.side-card{background:var(--surface);border:1px solid var(--border-subtle);border-radius:12px;padding:15px}
+.side-card-head{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:11px}
+.side-card-head a{font-size:11px;color:var(--primary);cursor:pointer;font-weight:600}
+.action-item{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid var(--border-subtle);font-size:12px;cursor:pointer}
+.action-item:last-child{border-bottom:none}
+.action-item .chk{width:15px;height:15px;border:1.5px solid var(--border);border-radius:5px;flex-shrink:0;margin-top:1px}
+.action-item .chk:hover{border-color:var(--primary)}
+.action-item .at-body{flex:1;min-width:0}
+.action-item .at-time{color:var(--muted);font-size:10.5px}
+.action-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:5px;flex-shrink:0;white-space:nowrap}
+.activity-item{display:flex;gap:9px;padding:7px 0;font-size:11.5px}
+.activity-dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.activity-item .ai-time{color:var(--faint);font-size:10px;margin-left:auto;flex-shrink:0;padding-left:8px}
+
 /* ---- Buttons ---- */
 .btn-add{background:var(--primary);color:#04170F;border:none;border-radius:8px;padding:10px 18px;font-size:13.5px;font-weight:700}
 .btn-add:hover{background:var(--primary-dark)}
@@ -369,16 +408,51 @@ async function showPage(page, searchQuery){
 // DASHBOARD
 // ══════════════════════════════════════════════
 async function renderDashboard(){
-  const d = await api('getDashboard');
+  const [d, oppsRes, anaRes] = await Promise.all([ api('getDashboard'), api('getOpportunities'), api('getAnalytics') ]);
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Yüklenemedi</div>'; return; }
+  const opps = oppsRes.success ? oppsRes.opportunities : [];
+  const analytics = anaRes.success ? anaRes : null;
 
-  function statCard(icon, color, value, label){
+  function trendPct(arr){
+    if(!arr || arr.length<2) return 0;
+    const firstHalf = arr.slice(0,Math.floor(arr.length/2)).reduce((a,b)=>a+b,0);
+    const secondHalf = arr.slice(Math.floor(arr.length/2)).reduce((a,b)=>a+b,0);
+    if(firstHalf===0) return secondHalf>0 ? 100 : 0;
+    return Math.round(((secondHalf-firstHalf)/firstHalf)*100);
+  }
+  function statCard(icon, color, value, label, trendArr){
+    const pct = trendPct(trendArr);
+    const trendHtml = trendArr ? `<div class="trend ${pct>0?'up':'flat'}">${pct>0?'↑':''}${pct!==0?pct+'%':'—'}</div>` : '';
     return `<div class="stat" style="--stat-color:${color}">
       <div class="icon" style="background:${color}22;color:${color}">${icon}</div>
-      <div><div class="n">${value}</div><div class="l">${label}</div></div>
+      <div class="stat-main"><div class="n">${value}</div><div class="l">${label}</div>${trendHtml}</div>
+      ${trendArr ? sparkline(trendArr, color) : ''}
     </div>`;
   }
+
+  // ── Mini Pipeline önizlemesi (ilk 5 aşama, her sütunda en fazla 3 kart) ──
+  const miniKanban = `<div class="mini-kanban">
+    ${STAGES.slice(0,6).map(s=>{
+      const items = opps.filter(o=>o.stage===s).slice(0,3);
+      return `<div class="mini-col">
+        <div class="mini-col-head" style="background:${STAGE_COLORS[s]}">${s} · ${opps.filter(o=>o.stage===s).length}</div>
+        <div class="mini-col-body">
+          ${items.length?items.map(o=>`<div class="mini-card" onclick="openCompanyPanel('${o.company_id}')"><b>${esc(o.companies?.name||'—')}</b><span style="color:var(--green)">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span></div>`).join(''):'<div style="font-size:10px;color:var(--faint);text-align:center;padding:6px 0">Boş</div>'}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  // ── Lead Sources donut (gerçek veri, CSS conic-gradient — kütüphane yok) ──
+  const donutColors = ['#4C8DFF','#22D3EE','#9F7AEA','#22E5A0','#F0A93A','#FB923C','#F5556C','#64748B'];
+  const sources = (analytics?.sourcePerformance || []).filter(s=>s.total>0);
+  const donutHtml = sources.length ? donutChart(sources.map((s,i)=>({label:s.source, value:s.total, color:donutColors[i%donutColors.length]}))) : '<div class="empty" style="padding:20px">Henüz kaynak verisi yok</div>';
+  const donutLegend = sources.map((s,i)=>`<div class="donut-legend-row"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
+
+  // ── Sağ panel: Bugünün Aksiyonları ──
+  const myDay = await api('getMyDay');
+  const actionList = myDay.success ? [...myDay.overdueTasks.map(t=>({...t,tag:'Geciken',tagColor:'var(--red)'})), ...myDay.todayTasks.map(t=>({...t,tag:'Bugün',tagColor:'var(--amber)'}))].slice(0,6) : [];
 
   main.innerHTML = `
     <div class="page-head">
@@ -389,22 +463,121 @@ async function renderDashboard(){
       </div>
     </div>
     <div class="stats">
-      ${statCard('💰','#22E5A0','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Değeri')}
-      ${statCard('🏢','#4C8DFF',d.totalCompanies||0,'Toplam Şirket')}
-      ${statCard('📅','#F0A93A',d.tasksToday||0,'Bugünkü Follow-up')}
-      ${statCard('⏰','#F5556C',d.tasksOverdue||0,'Geciken Görev')}
-      ${statCard('🎉','#22E5A0',d.wonCount||0,'Kazanılan Anlaşma')}
-      ${statCard('⭐','#9F7AEA',d.totalCustomers||0,'Müşteriye Dönüşen')}
+      ${statCard('💰','#22E5A0','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Değeri', null)}
+      ${statCard('🏢','#4C8DFF',d.totalCompanies||0,'Toplam Şirket', d.trends?.newProspects)}
+      ${statCard('📅','#F0A93A',d.tasksToday||0,'Bugünkü Follow-up', d.trends?.followUps)}
+      ${statCard('⏰','#F5556C',d.tasksOverdue||0,'Geciken Görev', null)}
+      ${statCard('🎉','#22E5A0',d.wonCount||0,'Kazanılan Anlaşma', d.trends?.wonDeals)}
+      ${statCard('⭐','#9F7AEA',d.totalCustomers||0,'Müşteriye Dönüşen', null)}
     </div>
-    <div class="ps">
-      <div class="ps-head">Pipeline Dağılımı<span style="cursor:pointer" onclick="showPage('pipeline')">Tümünü Gör →</span></div>
-      <div class="ps-body" style="display:flex;flex-wrap:wrap;gap:10px">
-        ${STAGES.map(s=>`<div style="flex:1;min-width:100px;text-align:center;padding:12px 10px;border-radius:9px;background:${STAGE_COLORS[s]}18;border:1px solid ${STAGE_COLORS[s]}33">
-          <div style="font-size:19px;font-weight:800;color:${STAGE_COLORS[s]}">${(d.stageCounts&&d.stageCounts[s])||0}</div>
-          <div style="font-size:10.5px;color:var(--text);margin-top:3px;font-weight:600">${s}</div>
-        </div>`).join('')}
+
+    <div class="dash-grid">
+      <div class="dash-main">
+        <div class="ps">
+          <div class="ps-head">Sales Pipeline<span style="cursor:pointer" onclick="showPage('pipeline')">Tümünü Gör →</span></div>
+          <div class="ps-body">${miniKanban}</div>
+        </div>
+
+        <div class="ps">
+          <div class="ps-head">Sales Funnel<span style="cursor:pointer" onclick="showPage('analytics')">Rapor →</span></div>
+          <div class="ps-body">${analytics ? renderFunnelChevron(analytics.funnel) : '<div class="empty">Yükleniyor...</div>'}</div>
+        </div>
+
+        <div class="ps">
+          <div class="ps-head">Lead Sources<span style="cursor:pointer" onclick="showPage('analytics')">Rapor →</span></div>
+          <div class="ps-body"><div class="donut-wrap">${donutHtml}<div class="donut-legend">${donutLegend || '<div style="color:var(--muted)">Henüz veri yok</div>'}</div></div></div>
+        </div>
+      </div>
+
+      <div class="dash-side">
+        <div class="side-card">
+          <div class="side-card-head">⚡ Bugünün Aksiyonları<a onclick="showPage('myday')">Tümü →</a></div>
+          ${actionList.length ? actionList.map(t=>`
+            <div class="action-item" onclick="openCompanyPanel('${t.company_id}')">
+              <div class="chk"></div>
+              <div class="at-body"><b>${esc(t.title)}</b><div class="at-time">${esc(t.companies?.name||'')}${t.due_date?' · '+t.due_date:''}</div></div>
+              <span class="action-tag" style="background:${t.tagColor}22;color:${t.tagColor}">${t.tag}</span>
+            </div>`).join('') : '<div class="empty" style="padding:16px 0">Bugün için aksiyon yok 🎉</div>'}
+        </div>
+
+        <div class="side-card">
+          <div class="side-card-head">📅 Yaklaşan Görevler<a onclick="showPage('tasks')">Tümü →</a></div>
+          ${(d.upcomingTasks&&d.upcomingTasks.length) ? d.upcomingTasks.map(t=>`
+            <div class="action-item" onclick="openCompanyPanel('${t.company_id}')">
+              <div class="chk"></div>
+              <div class="at-body"><b>${esc(t.companies?.name||'—')}</b><div class="at-time">${esc(t.title)} · ${t.due_date}</div></div>
+            </div>`).join('') : '<div class="empty" style="padding:16px 0">Yaklaşan görev yok</div>'}
+        </div>
+
+        <div class="side-card">
+          <div class="side-card-head">🕐 Son Aktivite</div>
+          ${(d.recentActivities&&d.recentActivities.length) ? d.recentActivities.map(a=>`
+            <div class="activity-item">
+              <div class="activity-dot" style="background:var(--primary)"></div>
+              <div><b style="font-weight:600">${esc(a.companies?.name||'')}</b><br><span style="color:var(--muted)">${esc(a.description||a.type)}</span></div>
+              <span class="ai-time">${timeAgo(a.created_at)}</span>
+            </div>`).join('') : '<div class="empty" style="padding:16px 0">Henüz aktivite yok</div>'}
+        </div>
       </div>
     </div>`;
+}
+
+function sparkline(data, color){
+  const w=64,h=28;
+  const max = Math.max(1, ...data);
+  const pts = data.map((v,i)=>{
+    const x = data.length>1 ? (i/(data.length-1))*w : w/2;
+    const y = h - (v/max)*h*0.85 - 2;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  const area = `0,${h} ${pts} ${w},${h}`;
+  return `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="flex-shrink:0">
+    <polyline points="${area}" fill="${color}20" stroke="none"/>
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+function donutChart(segments){
+  const total = segments.reduce((s,x)=>s+x.value,0) || 1;
+  let acc = 0;
+  const stops = segments.map(seg=>{
+    const start = (acc/total)*360; acc += seg.value;
+    const end = (acc/total)*360;
+    return `${seg.color} ${start.toFixed(1)}deg ${end.toFixed(1)}deg`;
+  }).join(', ');
+  return `<div class="donut" style="background:conic-gradient(${stops})">
+    <div class="donut-center"><b style="font-size:19px">${total}</b><span style="font-size:9px;color:var(--muted)">Toplam</span></div>
+  </div>`;
+}
+
+function renderFunnelChevron(funnel){
+  const maxReached = Math.max(1, ...funnel.map(f=>f.reached));
+  return `<div style="display:flex;overflow-x:auto;padding:8px 4px 2px">
+    ${funnel.map((f,i)=>{
+      const color = STAGE_COLORS[f.stage] || '#64748B';
+      const nextColor = STAGE_COLORS[funnel[i+1]?.stage] || color;
+      const isFirst = i===0;
+      const pctOfFirst = funnel[0].reached>0 ? Math.round((f.reached/funnel[0].reached)*100) : 0;
+      return `<div style="flex:1;min-width:80px;position:relative">
+        <div style="height:52px;background:linear-gradient(100deg, ${color}, ${nextColor});clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%${isFirst?'':', 14px 50%'});display:flex;flex-direction:column;align-items:center;justify-content:center;color:#06090F;margin-left:${isFirst?'0':'-14px'}">
+          <b style="font-size:14px;line-height:1">${f.reached}</b>
+          <span style="font-size:8.5px;font-weight:700;opacity:.75">${i===0?'':'%'+pctOfFirst}</span>
+        </div>
+        <div style="text-align:center;font-size:9.5px;color:var(--muted);margin-top:5px;padding:0 2px">${f.stage}</div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function timeAgo(iso){
+  if(!iso) return '';
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diffMs/60000);
+  if(mins<1) return 'şimdi';
+  if(mins<60) return mins+'dk';
+  const hrs = Math.floor(mins/60);
+  if(hrs<24) return hrs+'sa';
+  return Math.floor(hrs/24)+'g';
 }
 
 // ══════════════════════════════════════════════
@@ -460,22 +633,10 @@ async function renderAnalytics(){
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Yüklenemedi</div>'; return; }
 
-  const maxReached = Math.max(1, ...d.funnel.map(f=>f.reached));
-  const funnelHtml = `<div style="display:flex;overflow-x:auto;padding:14px 6px 4px">
-    ${d.funnel.map((f,i)=>{
-      const color = STAGE_COLORS[f.stage] || '#64748B';
-      const nextColor = STAGE_COLORS[d.funnel[i+1]?.stage] || color;
-      const isFirst = i===0;
-      const pctOfFirst = maxReached>0 ? Math.round((f.reached/(d.funnel[0].reached||1))*100) : 0;
-      return `<div style="flex:1;min-width:92px;position:relative">
-        <div style="height:62px;background:linear-gradient(100deg, ${color}, ${nextColor});clip-path:polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%${isFirst?'':', 16px 50%'});display:flex;flex-direction:column;align-items:center;justify-content:center;color:#06090F;margin-left:${isFirst?'0':'-16px'};box-shadow:0 6px 18px -6px ${color}88">
-          <b style="font-size:17px;line-height:1">${f.reached}</b>
-          <span style="font-size:9.5px;font-weight:700;opacity:.75">${i===0?'':'%'+pctOfFirst}</span>
-        </div>
-        <div style="text-align:center;font-size:10px;color:var(--muted);margin-top:7px;padding:0 4px">${f.stage}</div>
-      </div>`;
-    }).join('')}
-  </div>`;
+  const donutColors = ['#4C8DFF','#22D3EE','#9F7AEA','#22E5A0','#F0A93A','#FB923C','#F5556C','#64748B'];
+  const sourcesWithData = d.sourcePerformance.filter(s=>s.total>0);
+  const donutHtml = sourcesWithData.length ? donutChart(sourcesWithData.map((s,i)=>({label:s.source, value:s.total, color:donutColors[i%donutColors.length]}))) : '<div class="empty" style="padding:20px">Henüz veri yok</div>';
+  const donutLegend = sourcesWithData.map((s,i)=>`<div class="donut-legend-row"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
 
   const sourceRows = d.sourcePerformance.map(s=>`
     <tr><td><b>${esc(s.source)}</b></td><td>${s.total}</td><td>${s.won}</td>
@@ -496,7 +657,9 @@ async function renderAnalytics(){
       <div class="stat" style="--stat-color:#22E5A0"><div class="icon" style="background:#22E5A022;color:#22E5A0">💰</div><div><div class="n">₺${Math.round(d.avgDealValue).toLocaleString('tr-TR')}</div><div class="l">Ortalama Anlaşma</div></div></div>
     </div>
 
-    <div class="ps"><div class="ps-head">Huni Dönüşümü — Bu aşamaya kadar ulaşan fırsat sayısı</div><div class="ps-body">${funnelHtml}</div></div>
+    <div class="ps"><div class="ps-head">Huni Dönüşümü — Bu aşamaya kadar ulaşan fırsat sayısı</div><div class="ps-body">${renderFunnelChevron(d.funnel)}</div></div>
+
+    <div class="ps"><div class="ps-head">Lead Sources</div><div class="ps-body"><div class="donut-wrap">${donutHtml}<div class="donut-legend">${donutLegend||'<div style="color:var(--muted)">Henüz veri yok</div>'}</div></div></div></div>
 
     <div class="ps"><div class="ps-head">Kaynak Bazlı Performans</div>
       <div class="ps-body" style="padding:0">
