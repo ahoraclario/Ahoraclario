@@ -518,12 +518,12 @@ async function renderDashboard(){
         </div>
 
         <div class="side-card">
-          <div class="side-card-head">📅 Upcoming Tasks<a onclick="showPage('tasks')">View All →</a></div>
-          ${(d.upcomingTasks&&d.upcomingTasks.length) ? d.upcomingTasks.map(t=>`
-            <div class="action-item" onclick="openCompanyPanel('${t.company_id}')">
-              <div class="chk"></div>
-              <div class="at-body"><b>${esc(t.companies?.name||'—')}</b><div class="at-time">${esc(t.title)} · ${t.due_date}</div></div>
-            </div>`).join('') : '<div class="empty" style="padding:16px 0">No upcoming tasks</div>'}
+          <div class="side-card-head">📅 Upcoming Meetings<a onclick="showPage('companies')">View All →</a></div>
+          ${(d.upcomingMeetings&&d.upcomingMeetings.length) ? d.upcomingMeetings.map(m=>`
+            <div class="action-item" onclick="openCompanyPanel('${m.company_id}')">
+              <div class="chk" style="border-color:var(--purple)"></div>
+              <div class="at-body"><b>${esc(m.companies?.name||'—')}</b><div class="at-time">${esc(m.type)} · ${m.meeting_date}${m.start_time?' '+m.start_time:''}</div></div>
+            </div>`).join('') : '<div class="empty" style="padding:16px 0">No meetings scheduled.</div>'}
         </div>
 
         <div class="side-card">
@@ -886,6 +886,67 @@ async function openCompanyPanel(companyId){
     </div>
 
     <div class="ps">
+      <div class="ps-head">Meetings (${(d.meetings||[]).filter(m=>m.status==='Scheduled').length} scheduled)<span style="cursor:pointer;color:var(--primary)" onclick="showAddMeetingForm('${c.id}')">+ Add</span></div>
+      <div class="ps-body mini-list">
+        ${(d.meetings||[]).length===0?'<div style="color:var(--muted);font-size:12px">No meetings scheduled.</div>':d.meetings.map(m=>`
+          <div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;${m.status!=='Scheduled'?'opacity:.5':''}">
+            <span><span class="badge" style="background:var(--purple-bg);color:var(--purple);margin-right:5px">${esc(m.type)}</span>${esc(m.title)} <span style="color:var(--muted)">· ${m.meeting_date}${m.start_time?' '+m.start_time:''}</span></span>
+            ${m.status==='Scheduled'?`<span style="display:flex;gap:6px">
+              <span style="cursor:pointer;color:var(--green);font-size:11px" onclick="updateMeeting('${m.id}','Completed','${c.id}')">Done</span>
+              <span style="cursor:pointer;color:var(--red);font-size:11px" onclick="updateMeeting('${m.id}','Cancelled','${c.id}')">Cancel</span>
+            </span>`:`<span style="font-size:10.5px;color:var(--muted)">${esc(m.status)}</span>`}
+          </div>`).join('')}
+        <div id="addMeetingForm-${c.id}" class="hidden" style="margin-top:6px">
+          <div class="fi"><input id="nmt-title" placeholder="Meeting title — e.g. Discovery call"></div>
+          <div class="fi-row">
+            <div class="fi"><label>Type</label>
+              <select id="nmt-type">
+                <option value="Discovery">Discovery</option>
+                <option value="Demo">Demo</option>
+                <option value="Follow-up">Follow-up</option>
+                <option value="Negotiation">Negotiation</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="fi"><label>Date</label><input id="nmt-date" type="date"></div>
+          </div>
+          <div class="fi-row">
+            <div class="fi"><label>Start</label><input id="nmt-start" type="time"></div>
+            <div class="fi"><label>End</label><input id="nmt-end" type="time"></div>
+          </div>
+          <button class="btn-add" style="width:100%" onclick="submitAddMeeting('${c.id}')">Save Meeting</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">Proposals (${(d.proposals||[]).length})<span style="cursor:pointer;color:var(--primary)" onclick="showAddProposalForm('${c.id}')">+ Add</span></div>
+      <div class="ps-body mini-list">
+        ${(d.proposals||[]).length===0?'<div style="color:var(--muted);font-size:12px">No proposals yet.</div>':d.proposals.map(p=>`
+          <div class="mini-item">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="color:var(--green);font-weight:700">${p.mrr?'₺'+Number(p.mrr).toLocaleString('tr-TR')+'/mo':(p.value?'₺'+Number(p.value).toLocaleString('tr-TR'):'—')}</span>
+              <select onchange="updateProposal('${p.id}',this.value,'${c.id}')" style="width:auto;padding:3px 8px;font-size:11px">
+                ${['Draft','Sent','Viewed','Negotiating','Accepted','Rejected','Expired'].map(s=>`<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}
+              </select>
+            </div>
+            <div style="font-size:10.5px;color:var(--muted);margin-top:3px">Sent ${p.sent_at||'—'}</div>
+          </div>`).join('')}
+        <div id="addProposalForm-${c.id}" class="hidden" style="margin-top:6px">
+          ${(d.opportunities||[]).length===0?'<div style="color:var(--muted);font-size:11.5px;margin-bottom:8px">Add an opportunity first — a proposal must belong to one.</div>':`
+          <div class="fi"><label>Opportunity</label>
+            <select id="npr-opp">${d.opportunities.map(o=>`<option value="${o.id}">${esc(o.stage)}${o.plan?' — '+esc(o.plan):''}</option>`).join('')}</select>
+          </div>
+          <div class="fi-row">
+            <div class="fi"><label>Value (₺)</label><input id="npr-value" type="number" placeholder="0"></div>
+            <div class="fi"><label>MRR (₺/mo)</label><input id="npr-mrr" type="number" placeholder="0"></div>
+          </div>
+          <button class="btn-add" style="width:100%" onclick="submitAddProposal('${c.id}')">Save Proposal</button>`}
+        </div>
+      </div>
+    </div>
+
+    <div class="ps">
       <div class="ps-head">Timeline</div>
       <div class="ps-body">
         ${d.activities.length===0?'<div style="color:var(--muted);font-size:12px">No activity yet.</div>':d.activities.map(a=>`
@@ -995,6 +1056,44 @@ async function completeTaskQuick(taskId, companyId){
   const d = await api('completeTask', { taskId });
   if(d.success){ toast('✓ Task completed'); openCompanyPanel(companyId); }
 }
+
+// ── Meetings ──
+function showAddMeetingForm(companyId){ document.getElementById('addMeetingForm-'+companyId).classList.remove('hidden'); }
+async function submitAddMeeting(companyId){
+  const meeting = {
+    title: document.getElementById('nmt-title').value.trim(),
+    type: document.getElementById('nmt-type').value,
+    meeting_date: document.getElementById('nmt-date').value,
+    start_time: document.getElementById('nmt-start').value || null,
+    end_time: document.getElementById('nmt-end').value || null,
+  };
+  if(!meeting.title || !meeting.meeting_date){ toast('Title and date are required'); return; }
+  const d = await api('addMeeting', { companyId, meeting });
+  if(d.success){ toast('✓ Meeting scheduled'); openCompanyPanel(companyId); }
+}
+async function updateMeeting(meetingId, status, companyId){
+  const d = await api('updateMeetingStatus', { meetingId, status });
+  if(d.success){ toast('✓ Meeting ' + status.toLowerCase()); openCompanyPanel(companyId); }
+}
+
+// ── Proposals ──
+function showAddProposalForm(companyId){ document.getElementById('addProposalForm-'+companyId).classList.remove('hidden'); }
+async function submitAddProposal(companyId){
+  const oppEl = document.getElementById('npr-opp');
+  if(!oppEl){ toast('Add an opportunity first'); return; }
+  const opportunityId = oppEl.value;
+  const proposal = {
+    value: document.getElementById('npr-value').value || null,
+    mrr: document.getElementById('npr-mrr').value || null,
+  };
+  const d = await api('addProposal', { companyId, opportunityId, proposal });
+  if(d.success){ toast('✓ Proposal added'); openCompanyPanel(companyId); }
+}
+async function updateProposal(proposalId, status, companyId){
+  const d = await api('updateProposalStatus', { proposalId, status });
+  if(d.success){ toast('✓ Proposal updated: ' + status); openCompanyPanel(companyId); }
+}
+
 async function deleteCompanyConfirm(companyId){
   if(!confirm('Are you sure you want to delete this company and all related records?')) return;
   const d = await api('deleteCompany', { companyId });
@@ -1043,10 +1142,27 @@ async function onDropCard(e, newStage){
 // ══════════════════════════════════════════════
 // GÖREVLER
 // ══════════════════════════════════════════════
-async function renderTasks(){
+async function renderTasks(filter){
   const d = await api('getTasks');
-  tasks = d.tasks || [];
+  let tasksAll = d.tasks || [];
   const today = new Date().toISOString().slice(0,10);
+
+  // ── Dashboard kartlarından gelen filtre (örn: sadece Call/Meeting türü, ya da bu hafta) ──
+  if(filter?.types){
+    const typeList = filter.types.split(',');
+    tasksAll = tasksAll.filter(t => typeList.includes(t.task_type));
+  }
+  if(filter?.when === 'today'){
+    tasksAll = tasksAll.filter(t => t.due_date === today);
+  } else if(filter?.when === 'week'){
+    const dow = (new Date().getDay()+6)%7;
+    const monday = new Date(); monday.setDate(monday.getDate()-dow); monday.setHours(0,0,0,0);
+    const sunday = new Date(monday); sunday.setDate(monday.getDate()+6);
+    const mS = monday.toISOString().slice(0,10), sS = sunday.toISOString().slice(0,10);
+    tasksAll = tasksAll.filter(t => t.due_date && t.due_date>=mS && t.due_date<=sS);
+  }
+
+  tasks = tasksAll;
   const overdue = tasks.filter(t=>t.due_date && t.due_date < today);
   const todayT = tasks.filter(t=>t.due_date === today);
   const upcoming = tasks.filter(t=>t.due_date && t.due_date > today);
@@ -1057,17 +1173,18 @@ async function renderTasks(){
     return `<div class="ps"><div class="ps-head" style="color:${color}">${title} (${list.length})</div>
       <div class="ps-body mini-list">${list.map(t=>`
         <div class="mini-item" style="display:flex;justify-content:space-between;align-items:center">
-          <span><b>${esc(t.companies?.name||'')}</b> — ${esc(t.title)} ${t.due_date?`<span style="color:var(--muted)">· ${t.due_date}</span>`:''}</span>
-          <span style="cursor:pointer;color:var(--green);font-size:11px" onclick="completeTaskFromList('${t.id}')">Complete</span>
+          <span onclick="openCompanyPanel('${t.company_id}')" style="cursor:pointer"><b>${esc(t.companies?.name||'')}</b> — ${esc(t.title)} ${t.task_type?`<span class="badge" style="background:var(--surface-2);color:var(--muted);margin-left:4px">${esc(t.task_type)}</span>`:''} ${t.due_date?`<span style="color:var(--muted)">· ${t.due_date}</span>`:''}</span>
+          <span style="cursor:pointer;color:var(--green);font-size:11px" onclick="event.stopPropagation();completeTaskFromList('${t.id}')">Complete</span>
         </div>`).join('')}</div></div>`;
   }
+  const filterBadge = filter ? `<span class="badge" style="background:var(--primary-bg);color:var(--primary);cursor:pointer" onclick="showPage('tasks')">Filtered — click to clear ✕</span>` : '';
   document.getElementById('main').innerHTML = `
-    <div class="page-head"><div><h1>Tasks</h1><p>${tasks.length} open tasks</p></div></div>
+    <div class="page-head"><div><h1>Tasks</h1><p>${tasks.length} open tasks ${filterBadge}</p></div></div>
     ${section('🔴 Overdue', overdue, 'var(--red)')}
     ${section('🟡 Today', todayT, 'var(--amber)')}
     ${section('🟢 Upcoming', upcoming, 'var(--green)')}
     ${section('No date', noDate, 'var(--muted)')}
-    ${tasks.length===0?'<div class="empty">No open tasks — great!</div>':''}
+    ${tasks.length===0?'<div class="empty">No tasks match this view.</div>':''}
   `;
 }
 async function completeTaskFromList(taskId){
