@@ -350,8 +350,8 @@ tr.row-click:hover{background:var(--surface-2)}
 const EDGE_FUNCTION_URL = 'https://tuozgfnjxxwrcuyfrwxq.supabase.co/functions/v1/rapid-service';
 
 const STAGES = ["Prospect","Researched","Contacted","Replied","Discovery Call","Demo","Proposal","Negotiation","Won"];
-const STAGE_COLORS = {Prospect:"#64748B",Researched:"#3B82F6",Contacted:"#22D3EE",Replied:"#38BDF8",
-  "Discovery Call":"#818CF8","Demo":"#A78BFA","Proposal":"#C084FC","Negotiation":"#F59E0B","Won":"#39D98A"};
+const STAGE_COLORS = {Prospect:"#64748B",Researched:"#22D3EE",Contacted:"#3B82F6",Replied:"#A855F7",
+  "Discovery Call":"#818CF8","Demo":"#10B981","Proposal":"#F59E0B","Negotiation":"#FB923C","Won":"#39D98A"};
 const OUTCOME_COLORS = {Lost:"#F87171","No Response":"#596579","Not a Fit":"#596579"};
 
 let CU = null; // { token, name, username }
@@ -539,7 +539,7 @@ async function renderDashboard(){
     const pct = trendPct(trendArr);
     const trendHtml = trendArr ? `<span class="trend ${pct>0?'up':'flat'}">${pct>0?'↑'+pct+'%':'—'}</span>` : '';
     return `<div class="stat" style="--stat-color:${color}">
-      <div class="icon" style="background:${color}22;color:${color}">${icon}</div>
+      <div class="icon" style="background:${color}30;color:${color}">${icon}</div>
       <div class="l">${label}</div>
       <div class="value-row"><span class="n">${value}</span>${trendHtml}</div>
       ${trendArr ? `<div class="spark-wrap">${sparkline(trendArr, color)}</div>` : ''}
@@ -782,10 +782,10 @@ async function renderAnalytics(){
   main.innerHTML = `
     <div class="page-head"><div><h1>📈 Reports</h1><p>Funnel conversion, source performance, and loss analysis.</p></div></div>
     <div class="stats">
-      <div class="stat" style="--stat-color:#3B82F6"><div class="icon" style="background:#3B82F622;color:#3B82F6">📊</div><div><div class="n">${d.totalOpportunities}</div><div class="l">Total Opportunities</div></div></div>
-      <div class="stat" style="--stat-color:#39D98A"><div class="icon" style="background:#39D98A22;color:#39D98A">🎉</div><div><div class="n">${d.wonCount}</div><div class="l">Won</div></div></div>
-      <div class="stat" style="--stat-color:#F87171"><div class="icon" style="background:#F8717122;color:#F87171">📉</div><div><div class="n">${d.lostCount}</div><div class="l">Lost</div></div></div>
-      <div class="stat" style="--stat-color:#39D98A"><div class="icon" style="background:#39D98A22;color:#39D98A">💰</div><div><div class="n">₺${Math.round(d.avgDealValue).toLocaleString('tr-TR')}</div><div class="l">Avg. Deal Value</div></div></div>
+      <div class="stat" style="--stat-color:#3B82F6"><div class="icon" style="background:#3B82F630;color:#3B82F6">📊</div><div><div class="n">${d.totalOpportunities}</div><div class="l">Total Opportunities</div></div></div>
+      <div class="stat" style="--stat-color:#39D98A"><div class="icon" style="background:#39D98A30;color:#39D98A">🎉</div><div><div class="n">${d.wonCount}</div><div class="l">Won</div></div></div>
+      <div class="stat" style="--stat-color:#F87171"><div class="icon" style="background:#F8717130;color:#F87171">📉</div><div><div class="n">${d.lostCount}</div><div class="l">Lost</div></div></div>
+      <div class="stat" style="--stat-color:#39D98A"><div class="icon" style="background:#39D98A30;color:#39D98A">💰</div><div><div class="n">₺${Math.round(d.avgDealValue).toLocaleString('tr-TR')}</div><div class="l">Avg. Deal Value</div></div></div>
     </div>
 
     <div class="ps"><div class="ps-head">Funnel Conversion — Opportunities that reached this stage</div><div class="ps-body">${renderFunnelChevron(d.funnel)}</div></div>
