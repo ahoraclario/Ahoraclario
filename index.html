@@ -96,18 +96,18 @@ a{color:var(--blue);text-decoration:none}
 .page-head p{color:var(--muted);font-size:13px;margin:0}
 
 /* ---- Stat cards ---- */
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
-.stat{background:linear-gradient(165deg, var(--surface) 0%, var(--bg-raised) 100%);border:1px solid var(--border-subtle);border-radius:14px;padding:18px 18px 14px;transition:border-color .15s,transform .15s,box-shadow .15s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:10px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:11px;margin-bottom:22px}
+.stat{background:linear-gradient(165deg, var(--surface) 0%, var(--bg-raised) 100%);border:1px solid var(--border-subtle);border-radius:11px;padding:13px 14px 11px;transition:border-color .15s,transform .15s,box-shadow .15s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:7px}
 .stat:hover{border-color:var(--border);border-color:color-mix(in srgb, var(--stat-color, var(--primary)) 45%, var(--border));transform:translateY(-2px);box-shadow:0 10px 30px -10px rgba(0,0,0,.5)}
-.stat::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--stat-color,var(--primary));box-shadow:0 0 12px var(--stat-color,var(--primary))}
-.stat .icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
-.stat .l{font-size:12px;color:var(--muted);font-weight:500}
-.stat .value-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-.stat .n{font-size:25px;font-weight:800;color:var(--text);letter-spacing:-.4px;line-height:1}
-.stat .trend{font-size:11px;font-weight:700}
+.stat::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--stat-color,var(--primary));box-shadow:0 0 10px var(--stat-color,var(--primary))}
+.stat .icon{width:29px;height:29px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.stat .l{font-size:11px;color:var(--muted);font-weight:500}
+.stat .value-row{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+.stat .n{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.3px;line-height:1}
+.stat .trend{font-size:10px;font-weight:700}
 .stat .trend.up{color:var(--green)} .stat .trend.flat{color:var(--faint)}
-.stat .spark-wrap{margin-top:2px;line-height:0}
-.stat .spark-wrap svg{width:100%;height:32px;display:block}
+.stat .spark-wrap{margin-top:1px;line-height:0}
+.stat .spark-wrap svg{width:100%;height:26px;display:block}
 
 /* ---- Table ---- */
 .tbl-wrap{background:var(--surface);border:1px solid var(--border-subtle);border-radius:10px;overflow:hidden}
@@ -315,7 +315,7 @@ const EDGE_FUNCTION_URL = 'https://tuozgfnjxxwrcuyfrwxq.supabase.co/functions/v1
 const STAGES = ["Prospect","Researched","Contacted","Replied","Discovery Call","Demo","Proposal","Negotiation","Won"];
 const STAGE_COLORS = {Prospect:"#64748B",Researched:"#4C8DFF",Contacted:"#38BDF8",Replied:"#9F7AEA",
   "Discovery Call":"#C026D3","Demo":"#2DD4BF","Proposal":"#F0A93A","Negotiation":"#FB923C","Won":"#22E5A0"};
-const OUTCOME_COLORS = {Lost:"#F5556C","No Response":"#5E6889","Note a Fit":"#5E6889"};
+const OUTCOME_COLORS = {Lost:"#F5556C","No Response":"#5E6889","Not a Fit":"#5E6889"};
 
 let CU = null; // { token, name, username }
 let companies = [], opportunities = [], tasks = [];
@@ -377,7 +377,7 @@ async function refreshNavBadges(){
     const el = document.getElementById(id);
     if(n>0){ el.textContent = n; el.classList.remove('hidden'); } else { el.classList.add('hidden'); }
   };
-  setBadge('nbMyDay', (d.tasksToday||0) + (d.tasksOverdue||0));
+  setBadge('nbMyDay', (d.followUpsToday||0) + (d.tasksOverdue||0));
   setBadge('nbCompanies', d.totalCompanies||0);
   setBadge('nbTasks', d.openTasksCount||0);
 }
@@ -466,12 +466,12 @@ async function renderDashboard(){
       </div>
     </div>
     <div class="stats">
-      ${statCard('💰','#22E5A0','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Value', null)}
-      ${statCard('🏢','#4C8DFF',d.totalCompanies||0,'Total Companies', d.trends?.newProspects)}
-      ${statCard('📅','#F0A93A',d.tasksToday||0,'Follow-ups Today', d.trends?.followUps)}
-      ${statCard('⏰','#F5556C',d.tasksOverdue||0,'Overdue Tasks', null)}
-      ${statCard('🎉','#22E5A0',d.wonCount||0,'Won Deals', d.trends?.wonDeals)}
-      ${statCard('⭐','#9F7AEA',d.totalCustomers||0,'Converted Customers', null)}
+      ${statCard('💰','#22E5A0','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Value', d.trends?.pipelineValue)}
+      ${statCard('👥','#4C8DFF',d.newProspects||0,'New Prospects', d.trends?.newProspects)}
+      ${statCard('📅','#9F7AEA',d.followUpsToday||0,'Follow-ups Today', d.trends?.followUps)}
+      ${statCard('🖥️','#22D3EE',d.demosThisWeek||0,'Demos This Week', d.trends?.demos)}
+      ${statCard('📄','#F0A93A',d.openProposals||0,'Open Proposals', d.trends?.openProposals)}
+      ${statCard('🏆','#22E5A0',d.wonThisMonth||0,'Won This Month', d.trends?.wonRevenue)}
     </div>
 
     <div class="dash-grid">
@@ -810,7 +810,7 @@ async function openCompanyPanel(companyId){
               <span style="color:var(--green);font-weight:700">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span>
             </div>
             <div class="stage-track">
-              ${STAGES.concat(['Lost','No Response','Note a Fit']).map(s=>`<span class="stage-pill" onclick="moveOpportunityStage('${o.id}','${s}','${c.id}')" style="background:${o.stage===s?(STAGE_COLORS[s]||OUTCOME_COLORS[s]||'#666'):'var(--surface-2)'};color:${o.stage===s?'#04170F':'var(--muted)'};border-color:${o.stage===s?'transparent':'var(--border)'}">${s}</span>`).join('')}
+              ${STAGES.concat(['Lost','No Response','Not a Fit']).map(s=>`<span class="stage-pill" onclick="moveOpportunityStage('${o.id}','${s}','${c.id}')" style="background:${o.stage===s?(STAGE_COLORS[s]||OUTCOME_COLORS[s]||'#666'):'var(--surface-2)'};color:${o.stage===s?'#04170F':'var(--muted)'};border-color:${o.stage===s?'transparent':'var(--border)'}">${s}</span>`).join('')}
             </div>
           </div>`).join('')}
       </div>
@@ -849,7 +849,19 @@ async function openCompanyPanel(companyId){
           </div>`).join('')}
         <div id="addTaskForm-${c.id}" class="hidden" style="margin-top:6px">
           <div class="fi"><input id="ntk-title" placeholder="Task — e.g. Follow up with Ahmet"></div>
-          <div class="fi"><input id="ntk-due" type="date"></div>
+          <div class="fi-row">
+            <div class="fi"><label>Type</label>
+              <select id="ntk-type">
+                <option value="Follow-up">Follow-up</option>
+                <option value="Call">Call</option>
+                <option value="Meeting">Meeting</option>
+                <option value="Demo">Demo</option>
+                <option value="Proposal">Proposal</option>
+                <option value="Research">Research</option>
+              </select>
+            </div>
+            <div class="fi"><label>Due date</label><input id="ntk-due" type="date"></div>
+          </div>
           <button class="btn-add" style="width:100%" onclick="submitAddTask('${c.id}')">Save Task</button>
         </div>
       </div>
@@ -915,7 +927,11 @@ async function submitAddContact(companyId){
 
 function showAddTaskForm(companyId){ document.getElementById('addTaskForm-'+companyId).classList.remove('hidden'); }
 async function submitAddTask(companyId){
-  const task = { title: document.getElementById('ntk-title').value.trim(), due_date: document.getElementById('ntk-due').value || null };
+  const task = {
+    title: document.getElementById('ntk-title').value.trim(),
+    due_date: document.getElementById('ntk-due').value || null,
+    task_type: document.getElementById('ntk-type').value,
+  };
   if(!task.title){ toast('Task title is required'); return; }
   const d = await api('addTask', { companyId, task });
   if(d.success){ toast('✓ Task added'); openCompanyPanel(companyId); }
