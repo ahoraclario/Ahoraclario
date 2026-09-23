@@ -64,7 +64,7 @@ a{color:var(--blue);text-decoration:none}
 /* ---- App shell ---- */
 #app{display:none}
 #app.open{display:flex;min-height:100vh}
-.sidebar{width:236px;flex-shrink:0;background:var(--bg-raised);border-right:1px solid var(--border-subtle);padding:18px 14px;display:flex;flex-direction:column}
+.sidebar{width:240px;flex-shrink:0;background:var(--bg-raised);border-right:1px solid var(--border-subtle);padding:18px 14px;display:flex;flex-direction:column}
 .sb-logo{display:flex;align-items:center;gap:10px;padding:4px 8px 22px}
 .sb-logo .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--primary),var(--cyan));color:#04170F;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;box-shadow:var(--glow-primary)}
 .sb-logo b{font-size:14.5px;color:var(--text);letter-spacing:-.1px}
@@ -77,7 +77,7 @@ a{color:var(--blue);text-decoration:none}
 .sb-tagline{font-size:11.5px;color:var(--faint);padding:0 8px;line-height:1.5}
 
 .content-area{flex:1;display:flex;flex-direction:column;min-width:0}
-.topbar{height:58px;flex-shrink:0;border-bottom:1px solid var(--border-subtle);background:var(--bg-raised);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:16px}
+.topbar{height:64px;flex-shrink:0;border-bottom:1px solid var(--border-subtle);background:var(--bg-raised);display:flex;align-items:center;justify-content:space-between;padding:0 24px;gap:16px}
 .search-box{flex:1;max-width:420px;display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:8px 12px;color:var(--faint);font-size:13px}
 .search-box input{border:none;background:none;outline:none;color:var(--text);font-size:13px;flex:1;padding:0}
 .search-box input::placeholder{color:var(--faint)}
@@ -102,20 +102,20 @@ a{color:var(--blue);text-decoration:none}
 .user-chip b{font-size:12.5px;color:var(--text);display:block;line-height:1.3}
 .user-chip span{font-size:10.5px;color:var(--muted)}
 
-.main{flex:1;padding:26px 32px;overflow-x:hidden;overflow-y:auto}
+.main{flex:1;padding:24px 24px;overflow-x:hidden;overflow-y:auto}
 .page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:12px}
 .page-head h1{font-size:21px;margin:0 0 4px;color:var(--text);letter-spacing:-.2px}
 .page-head p{color:var(--muted);font-size:13px;margin:0}
 
 /* ---- Stat cards ---- */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:11px;margin-bottom:22px}
-.stat{background:linear-gradient(165deg, var(--surface) 0%, var(--bg-raised) 100%);border:1px solid var(--border-subtle);border-radius:11px;padding:13px 14px 11px;transition:border-color .15s,transform .15s,box-shadow .15s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:7px}
+.stat{height:116px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;transition:border-color .15s,transform .15s,box-shadow .15s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:7px}
 .stat:hover{border-color:var(--border);border-color:color-mix(in srgb, var(--stat-color, var(--primary)) 45%, var(--border));transform:translateY(-2px);box-shadow:0 10px 30px -10px rgba(0,0,0,.5)}
 .stat::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--stat-color,var(--primary));box-shadow:0 0 10px var(--stat-color,var(--primary))}
 .stat .icon{width:29px;height:29px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px}
 .stat .l{font-size:11px;color:var(--muted);font-weight:500}
 .stat .value-row{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
-.stat .n{font-size:20px;font-weight:800;color:var(--text);letter-spacing:-.3px;line-height:1}
+.stat .n{font-size:28px;font-weight:800;color:var(--text);letter-spacing:-.3px;line-height:1}
 .stat .trend{font-size:10px;font-weight:700}
 .stat .trend.up{color:var(--green)} .stat .trend.flat{color:var(--faint)}
 .stat .spark-wrap{margin-top:1px;line-height:0}
@@ -133,7 +133,7 @@ tr.row-click:hover{background:var(--surface-2)}
 .badge-source{background:var(--blue-bg);color:var(--blue)}
 
 /* ---- Dashboard: 2 sütunlu layout, sparkline, donut, yan panel ---- */
-.dash-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
+.dash-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(300px,1fr);gap:18px;align-items:start}
 @media (max-width:1100px){.dash-grid{grid-template-columns:1fr}}
 .dash-main{min-width:0}
 .dash-side{display:flex;flex-direction:column;gap:14px}
@@ -177,7 +177,7 @@ tr.row-click:hover{background:var(--surface-2)}
 
 /* ---- Kanban ---- */
 .board{display:flex;gap:12px;overflow-x:auto;padding-bottom:14px}
-.col{flex:0 0 240px;display:flex;flex-direction:column}
+.col{flex:0 0 180px;display:flex;flex-direction:column}
 .col-head{padding:10px 13px;border-radius:10px 10px 0 0;font-size:12px;font-weight:700;display:flex;justify-content:space-between;color:#0A0E1A;letter-spacing:.01em}
 .col-head .count{background:rgba(10,14,26,.22);border-radius:20px;padding:1px 8px;font-size:10.5px}
 .col-body{background:var(--surface);border:1px solid var(--border-subtle);border-top:none;border-radius:0 0 10px 10px;flex:1;min-height:100px;padding:9px;display:flex;flex-direction:column;gap:8px}
@@ -230,6 +230,36 @@ tr.row-click:hover{background:var(--surface-2)}
 .toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:12px 18px;border-radius:9px;font-size:13px;z-index:400;display:none;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 .toast.show{display:block}
 .empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:13px}
+/* ---- Ahoraclario responsive + visual precision ---- */
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;min-height:300px}
+.dashboard-bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+.kpi-label{text-transform:uppercase;letter-spacing:.04em}
+@media (max-width:1100px){
+  .sidebar{width:220px}
+  .dashboard-bottom-grid{grid-template-columns:1fr}
+}
+@media (max-width:800px){
+  #app.open{display:block}
+  .sidebar{width:100%;height:auto;min-height:0;border-right:none;border-bottom:1px solid var(--border-subtle);padding:10px;display:block}
+  .sb-logo{padding:4px 8px 10px}
+  .nav-item{display:inline-flex;width:auto;margin:2px;padding:8px 10px}
+  .sb-bottom{display:none}
+  .content-area{min-width:0}
+  .topbar{padding:0 14px;height:58px}
+  .search-box{max-width:none}
+  .user-chip b,.user-chip span{display:none}
+  .main{padding:18px 14px}
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dash-grid{grid-template-columns:1fr}
+  .board{gap:8px}
+  .col{flex-basis:210px}
+}
+@media (max-width:520px){
+  .stats{grid-template-columns:1fr}
+  .stat{height:108px}
+  .fi-row{grid-template-columns:1fr}
+  .panel{max-width:100%;padding:18px}
+}
 </style>
 </head>
 <body>
@@ -843,6 +873,7 @@ async function submitAddCompany(){
     if(currentPage==='companies') renderCompanies(); else if(currentPage==='pipeline') renderPipeline();
     // ilk fırsatı da otomatik oluşturalım ki hemen pipeline'da görünsün
     await api('addOpportunity', { companyId: d.company.id, opportunity:{stage:'Prospect'} });
+    refreshNavBadges();
   }
 }
 
@@ -953,7 +984,7 @@ async function openCompanyPanel(companyId){
     </div>
 
     <div class="ps">
-      <div class="ps-head">Tasks (${d.tasks.filter(t=>t.status==='Open').length} open)<span style="cursor:pointer;color:var(--primary)" onclick="showAddTaskForm('${c.id}')">+ Add</span></div>
+      <div class="ps-head">Tasks (${d.tasks.filter(t=>t.status==='Open').length} open)<span style="display:flex;gap:10px"><span style="cursor:pointer;color:var(--cyan)" onclick="startFollowUpSequence('${c.id}')">⚡ Sequence</span><span style="cursor:pointer;color:var(--primary)" onclick="showAddTaskForm('${c.id}')">+ Add</span></span></div>
       <div class="ps-body mini-list" id="tasksList">
         ${d.tasks.length===0?'<div style="color:var(--muted);font-size:12px">No tasks.</div>':d.tasks.map(t=>`
           <div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;${t.status==='Completed'?'opacity:.5':''}">
@@ -1177,7 +1208,7 @@ async function setPrimaryContact(opportunityId, contactId){
 }
 async function completeOppTask(taskId, opportunityId){
   const d = await api('completeTask', { taskId });
-  if(d.success){ toast('✓ Task completed'); openOpportunityDetail(opportunityId); }
+  if(d.success){ toast('✓ Task completed'); openOpportunityDetail(opportunityId); refreshNavBadges(); }
 }
 async function addOppTask(opportunityId, companyId){
   const title = document.getElementById('od-task-title').value.trim();
@@ -1291,7 +1322,34 @@ async function submitAddTask(companyId){
 }
 async function completeTaskQuick(taskId, companyId){
   const d = await api('completeTask', { taskId });
-  if(d.success){ toast('✓ Task completed'); openCompanyPanel(companyId); }
+  if(d.success){ toast('✓ Task completed'); openCompanyPanel(companyId); refreshNavBadges(); }
+}
+
+// ── Follow-up Sequence ──
+// Creates the agreed 3-step follow-up cadence: +3 days, then +5, then +7 days.
+// This uses the existing Task API, so each step is a real CRM task and appears in My Day/Tasks.
+async function startFollowUpSequence(companyId){
+  const start = new Date();
+  const offsets = [3, 8, 15];
+  const titles = [
+    'Follow-up #1 — Check if they received the message',
+    'Follow-up #2 — Second follow-up / value reminder',
+    'Follow-up #3 — Final follow-up / close the loop'
+  ];
+  if(!confirm('Create the 3-step follow-up sequence (+3 / +5 / +7 days)?')) return;
+  let created = 0;
+  for(let i=0;i<offsets.length;i++){
+    const d = new Date(start);
+    d.setDate(d.getDate()+offsets[i]);
+    const due_date = d.toISOString().slice(0,10);
+    const res = await api('addTask', { companyId, task:{title:titles[i], due_date, task_type:'Follow-up'} });
+    if(res.success) created++;
+  }
+  if(created){
+    toast(`✓ ${created}-step follow-up sequence created`);
+    await openCompanyPanel(companyId);
+    refreshNavBadges();
+  }
 }
 
 // ── Meetings ──
@@ -1441,7 +1499,7 @@ async function renderTasks(filter){
 }
 async function completeTaskFromList(taskId){
   const d = await api('completeTask', { taskId });
-  if(d.success){ toast('✓ Completed'); renderTasks(); }
+  if(d.success){ toast('✓ Completed'); renderTasks(); refreshNavBadges(); }
 }
 
 // ── Yardımcılar ──
