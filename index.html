@@ -359,6 +359,23 @@ tr.row-click:hover{background:var(--surface-2)}
   </div>
 </div>
 
+<!-- Kişi Düzenle Modal -->
+<div class="modal-overlay" id="editContactModal">
+  <div class="modal">
+    <h3>Edit Contact</h3>
+    <div class="fi-row"><div class="fi"><input id="ec-c-name" placeholder="Full Name"></div><div class="fi"><input id="ec-c-pos" placeholder="Position"></div></div>
+    <div class="fi-row"><div class="fi"><input id="ec-c-email" placeholder="Email"></div><div class="fi"><input id="ec-c-phone" placeholder="Phone"></div></div>
+    <div class="fi"><input id="ec-c-linkedin" placeholder="LinkedIn (optional)"></div>
+    <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text);margin-bottom:10px;cursor:pointer">
+      <input type="checkbox" id="ec-c-decision" style="width:auto"> 👑 Decision maker
+    </label>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeEditContactModal()">Cancel</button>
+      <button class="btn-add" onclick="saveContactEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -371,6 +388,7 @@ const STAGE_COLORS = {Prospect:"#64748B",Researched:"#3B82F6",Contacted:"#22D3EE
 const OUTCOME_COLORS = {Lost:"#F87171","No Response":"#596579","Not a Fit":"#596579"};
 
 let CU = null; // { token, name, username }
+let heartbeatInterval = null;
 let companies = [], opportunities = [], tasks = [];
 let currentPage = 'dashboard';
 
@@ -410,6 +428,8 @@ async function doLogin(){
 }
 function doLogout(silent){
   if(CU && !silent) api('logout');
+  if(silent && CU) toast('Session expired — please sign in again');
+  if(heartbeatInterval){ clearInterval(heartbeatInterval); heartbeatInterval = null; }
   CU = null;
   sessionStorage.removeItem('ahoraclario_session');
   document.getElementById('app').classList.remove('open');
@@ -422,6 +442,10 @@ function enterApp(){
   document.getElementById('topbarAvatar').textContent = initials(CU.name);
   showPage('dashboard');
   refreshNavBadges();
+  // Sekme açık kaldığı sürece 15 dakikada bir oturumu canlı tutar — daha önce bu mekanizma
+  // hiç çağrılmıyordu, kullanıcı hiçbir uyarı olmadan oturumu bitmiş buluyordu.
+  if(heartbeatInterval) clearInterval(heartbeatInterval);
+  heartbeatInterval = setInterval(() => { if(CU) api('heartbeat'); }, 15*60*1000);
 }
 async function refreshNavBadges(){
   const d = await api('getDashboard');
@@ -1123,8 +1147,10 @@ async function openCompanyPanel(companyId){
             <div class="avatar" style="${p.is_decision_maker?'background:var(--amber-bg);color:var(--amber)':''}">${initials(p.full_name)}</div>
             <div style="flex:1;min-width:0">
               <b>${esc(p.full_name)}</b> <span style="color:var(--muted)">— ${esc(p.position||'—')}</span>${p.is_decision_maker?' <span class="badge" style="background:var(--amber-bg);color:var(--amber)">👑 Decision Maker</span>':''}<br>
-              <span style="color:var(--muted);font-size:11px">${esc(p.email||'')}${p.phone?' · '+esc(p.phone):''}${p.linkedin?' · <a href="'+escAttr(p.linkedin)+'" target="_blank">LinkedIn</a>':''}</span>
+              <span style="color:var(--muted);font-size:11px">${esc(p.email||'')}${p.phone?' · '+esc(p.phone):''}${p.linkedin?' · '+safeLink(p.linkedin,'LinkedIn'):''}</span>
             </div>
+            <span style="cursor:pointer;color:var(--muted);font-size:12px;margin-left:6px" onclick="openEditContactModal('${p.id}','${c.id}')" title="Edit">✎</span>
+            <span style="cursor:pointer;color:var(--faint);font-size:12px;margin-left:6px" onclick="deleteContactConfirm('${p.id}','${c.id}')" title="Delete">🗑</span>
           </div>`).join('')}
         <div id="addContactForm-${c.id}" class="hidden" style="margin-top:6px">
           <div class="fi-row"><div class="fi"><input id="nct-name" placeholder="Full Name"></div><div class="fi"><input id="nct-pos" placeholder="Position"></div></div>
@@ -1144,7 +1170,10 @@ async function openCompanyPanel(companyId){
         ${d.tasks.length===0?'<div style="color:var(--muted);font-size:12px">No tasks.</div>':d.tasks.map(t=>`
           <div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;${t.status==='Completed'?'opacity:.5':''}">
             <span>${t.status==='Completed'?'✓ ':''}${esc(t.title)} ${t.due_date?`<span style="color:var(--muted)">· ${t.due_date}</span>`:''}</span>
-            ${t.status==='Open'?`<span style="cursor:pointer;color:var(--green);font-size:11px" onclick="completeTaskQuick('${t.id}','${c.id}')">Complete</span>`:''}
+            <span style="display:flex;gap:8px;align-items:center;flex-shrink:0">
+              ${t.status==='Open'?`<span style="cursor:pointer;color:var(--green);font-size:11px" onclick="completeTaskQuick('${t.id}','${c.id}')">Complete</span>`:''}
+              <span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="deleteTaskConfirm('${t.id}','${c.id}')" title="Delete">🗑</span>
+            </span>
           </div>`).join('')}
         <div id="addTaskForm-${c.id}" class="hidden" style="margin-top:6px">
           <div class="fi"><input id="ntk-title" placeholder="Task — e.g. Follow up with Ahmet"></div>
@@ -1294,7 +1323,7 @@ async function openOpportunityDetail(opportunityId){
       <div class="ps-body">
         ${pc?`<div class="contact-row"><div class="avatar" style="${pc.is_decision_maker?'background:var(--amber-bg);color:var(--amber)':''}">${initials(pc.full_name)}</div>
           <div><b>${esc(pc.full_name)}</b> ${pc.is_decision_maker?'<span class="badge" style="background:var(--amber-bg);color:var(--amber)">👑 Decision Maker</span>':''}<br>
-          <span style="color:var(--muted);font-size:11px">${esc(pc.email||'')}${pc.phone?' · '+esc(pc.phone):''}${pc.linkedin?' · <a href="'+escAttr(pc.linkedin)+'" target="_blank">LinkedIn</a>':''}</span></div></div>`
+          <span style="color:var(--muted);font-size:11px">${esc(pc.email||'')}${pc.phone?' · '+esc(pc.phone):''}${pc.linkedin?' · '+safeLink(pc.linkedin,'LinkedIn'):''}</span></div></div>`
           :'<div style="color:var(--muted);font-size:12px">No primary contact set.</div>'}
         ${d.contacts.length>1?`<div class="fi" style="margin-top:10px"><label>Set primary contact</label>
           <select onchange="setPrimaryContact('${o.id}',this.value)">
@@ -1353,6 +1382,9 @@ async function openOpportunityDetail(opportunityId){
           <button class="btn-add" style="flex:1;background:var(--green)" onclick="moveOppFromDetail('${o.id}','Won','${co.id}')">Mark Won</button>
           <button class="btn-danger" style="flex:1" onclick="moveOppFromDetail('${o.id}','Lost','${co.id}')">Mark Lost</button>
         </div>
+        <div style="margin-top:10px;text-align:center">
+          <span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="deleteOpportunityConfirm('${o.id}','${co.id}')">🗑 Delete this opportunity</span>
+        </div>
       </div>
     </div>
   `;
@@ -1390,6 +1422,11 @@ async function moveOppFromDetail(opportunityId, newStage, companyId){
   if(newStage === 'Lost'){ lostReason = prompt('Loss reason (optional): Too expensive, No need, No budget, Using another CRM, Bad timing, No response, Not decision maker, Competitor, Other') || ''; }
   const d = await api('updateOpportunityStage', { opportunityId, stage:newStage, lostReason });
   if(d.success){ toast('✓ Stage updated: ' + newStage); openOpportunityDetail(opportunityId); }
+}
+async function deleteOpportunityConfirm(opportunityId, companyId){
+  if(!confirm('Delete this opportunity permanently? This cannot be undone.')) return;
+  const d = await api('deleteOpportunity', { opportunityId });
+  if(d.success){ toast('🗑 Opportunity deleted'); closeOppPanel(); openCompanyPanel(companyId); }
 }
 async function quickAddProposalFromOpp(opportunityId, companyId){
   const d = await api('addProposal', { companyId, opportunityId, proposal:{} });
@@ -1501,6 +1538,49 @@ async function submitAddContact(companyId){
   if(d.success){ toast('✓ Contact added'); openCompanyPanel(companyId); }
 }
 
+let editingContactId = null, editingContactCompanyId = null;
+async function openEditContactModal(contactId, companyId){
+  editingContactId = contactId; editingContactCompanyId = companyId;
+  const d = await api('getCompanyDetail', { companyId });
+  const ct = d.success ? d.contacts.find(x => x.id === contactId) : null;
+  if(!ct) return;
+  document.getElementById('ec-c-name').value = ct.full_name || '';
+  document.getElementById('ec-c-pos').value = ct.position || '';
+  document.getElementById('ec-c-email').value = ct.email || '';
+  document.getElementById('ec-c-phone').value = ct.phone || '';
+  document.getElementById('ec-c-linkedin').value = ct.linkedin || '';
+  document.getElementById('ec-c-decision').checked = !!ct.is_decision_maker;
+  document.getElementById('editContactModal').classList.add('open');
+}
+function closeEditContactModal(){
+  document.getElementById('editContactModal').classList.remove('open');
+  editingContactId = null; editingContactCompanyId = null;
+}
+async function saveContactEdit(){
+  if(!editingContactId) return;
+  const contact = {
+    full_name: document.getElementById('ec-c-name').value.trim(),
+    position: document.getElementById('ec-c-pos').value.trim(),
+    email: document.getElementById('ec-c-email').value.trim(),
+    phone: document.getElementById('ec-c-phone').value.trim(),
+    linkedin: document.getElementById('ec-c-linkedin').value.trim(),
+    is_decision_maker: document.getElementById('ec-c-decision').checked,
+  };
+  if(!contact.full_name){ toast('Name is required'); return; }
+  const d = await api('updateContact', { contactId: editingContactId, contact });
+  if(d.success){
+    toast('✓ Contact updated');
+    const cid = editingContactCompanyId;
+    closeEditContactModal();
+    openCompanyPanel(cid);
+  }
+}
+async function deleteContactConfirm(contactId, companyId){
+  if(!confirm('Delete this contact?')) return;
+  const d = await api('deleteContact', { contactId });
+  if(d.success){ toast('🗑 Contact deleted'); openCompanyPanel(companyId); }
+}
+
 function showAddTaskForm(companyId){ document.getElementById('addTaskForm-'+companyId).classList.remove('hidden'); }
 async function submitAddTask(companyId){
   const task = {
@@ -1515,6 +1595,11 @@ async function submitAddTask(companyId){
 async function completeTaskQuick(taskId, companyId){
   const d = await api('completeTask', { taskId });
   if(d.success){ toast('✓ Task completed'); openCompanyPanel(companyId); }
+}
+async function deleteTaskConfirm(taskId, companyId){
+  if(!confirm('Delete this task?')) return;
+  const d = await api('deleteTask', { taskId });
+  if(d.success){ toast('🗑 Task deleted'); openCompanyPanel(companyId); }
 }
 
 // ── Meetings ──
@@ -1667,7 +1752,10 @@ async function renderTasks(filter){
       <div class="ps-body mini-list">${list.map(t=>`
         <div class="mini-item" style="display:flex;justify-content:space-between;align-items:center">
           <span onclick="openCompanyPanel('${t.company_id}')" style="cursor:pointer"><b>${esc(t.companies?.name||'')}</b> — ${esc(t.title)} ${t.task_type?`<span class="badge" style="background:var(--surface-2);color:var(--muted);margin-left:4px">${esc(t.task_type)}</span>`:''} ${t.due_date?`<span style="color:var(--muted)">· ${t.due_date}</span>`:''}</span>
-          <span style="cursor:pointer;color:var(--green);font-size:11px" onclick="event.stopPropagation();completeTaskFromList('${t.id}')">Complete</span>
+          <span style="display:flex;gap:8px;flex-shrink:0">
+            <span style="cursor:pointer;color:var(--green);font-size:11px" onclick="event.stopPropagation();completeTaskFromList('${t.id}')">Complete</span>
+            <span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="event.stopPropagation();deleteTaskFromList('${t.id}')" title="Delete">🗑</span>
+          </span>
         </div>`).join('')}</div></div>`;
   }
   const filterBadge = filter ? `<span class="badge" style="background:var(--primary-bg);color:var(--primary);cursor:pointer" onclick="showPage('tasks')">Filtered — click to clear ✕</span>` : '';
@@ -1684,10 +1772,22 @@ async function completeTaskFromList(taskId){
   const d = await api('completeTask', { taskId });
   if(d.success){ toast('✓ Completed'); renderTasks(); }
 }
+async function deleteTaskFromList(taskId){
+  if(!confirm('Delete this task?')) return;
+  const d = await api('deleteTask', { taskId });
+  if(d.success){ toast('🗑 Task deleted'); renderTasks(); }
+}
 
 // ── Yardımcılar ──
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function escAttr(s){ return esc(s); }
+// Kullanıcının girdiği bir URL'yi (LinkedIn, Website vb.) güvenle tıklanabilir link yapar.
+// Sadece http/https şemasına izin verir — "javascript:..." gibi tehlikeli şemaları engeller.
+function safeLink(url, label){
+  const u = String(url||'').trim();
+  if(!/^https?:\/\//i.test(u)) return esc(label);  // güvensiz/eksik şema — düz metin olarak göster, link yapma
+  return `<a href="${escAttr(u)}" target="_blank" rel="noopener noreferrer">${esc(label)}</a>`;
+}
 function fmtDT(iso){ if(!iso) return '—'; const d=new Date(iso); return d.toLocaleDateString('tr-TR')+' '+d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }
 function daysSince(iso){ if(!iso) return 0; return Math.max(0, Math.floor((Date.now()-new Date(iso).getTime())/86400000)); }
 function initials(name){
