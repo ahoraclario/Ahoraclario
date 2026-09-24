@@ -241,6 +241,50 @@ tr.row-click:hover{background:var(--surface-2)}
 .toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:12px 18px;border-radius:9px;font-size:13px;z-index:400;display:none;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 .toast.show{display:block}
 .empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:13px}
+
+/* ============================================================
+   REFERENCE-MATCH DASHBOARD OVERRIDES
+   Visual-only: preserves existing data/API/business logic.
+   ============================================================ */
+.dashboard-ref-pipeline{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;overflow:hidden;padding:0 2px 2px}
+.dashboard-ref-col{min-width:0;border-radius:9px;overflow:hidden;background:#061522;border:1px solid #12334c}
+.dashboard-ref-col-head{height:39px;padding:0 11px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:800;letter-spacing:-.05px;color:#eef6ff;border-bottom:1px solid rgba(255,255,255,.05)}
+.dashboard-ref-col-head .ref-count{min-width:24px;height:22px;padding:0 7px;border-radius:7px;background:rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#d9e7f6}
+.dashboard-ref-col-body{min-height:282px;padding:8px;background:linear-gradient(180deg,#071522 0%,#06131f 100%);display:flex;flex-direction:column;gap:7px}
+.dashboard-ref-deal{position:relative;background:linear-gradient(145deg,#0a1b2a 0%,#081725 100%);border:1px solid #163752;border-left:3px solid var(--ref-accent);border-radius:7px;padding:9px 10px 8px;min-height:61px;cursor:pointer;transition:.15s ease;box-shadow:inset 0 1px 0 rgba(255,255,255,.015)}
+.dashboard-ref-deal:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--ref-accent) 55%,#163752);background:#0b1f30}
+.dashboard-ref-deal .ref-top{display:flex;align-items:center;gap:7px;min-width:0;margin-bottom:4px}
+.dashboard-ref-deal .ref-avatar{width:20px;height:20px;border-radius:50%;background:color-mix(in srgb,var(--ref-accent) 22%,#10283c);color:var(--ref-accent);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex:0 0 auto}
+.dashboard-ref-deal b{font-size:10.5px;color:#f0f6fc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;min-width:0}
+.dashboard-ref-deal .ref-sub{font-size:9.5px;color:#8fa7bd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-left:27px}
+.dashboard-ref-deal .ref-meta{display:flex;justify-content:space-between;gap:6px;margin-top:6px;margin-left:27px;font-size:9px;color:#7189a0}
+.dashboard-ref-deal .ref-mrr{color:#9fb8cf}
+.dashboard-ref-deal .ref-age{color:#7890a8}
+.dashboard-ref-add{margin-top:auto;min-height:27px;display:flex;align-items:center;gap:7px;padding:5px 7px;color:#8ea8bf;font-size:10px;cursor:pointer;border-radius:6px}
+.dashboard-ref-add:hover{background:#0b1e2d;color:#22d3ee}
+.dashboard-ref-add span{font-size:16px;line-height:1;color:#22d3ee}
+.dashboard-ref-empty{color:#49637a;text-align:center;font-size:10px;padding:18px 0}
+
+.dashboard-ref-funnel{display:flex;align-items:stretch;height:174px;padding:22px 0 0;overflow:hidden}
+.dashboard-ref-funnel .ref-fseg{position:relative;flex:1;min-width:0;cursor:pointer;height:92px;display:flex;align-items:center;justify-content:center;color:#dcecff}
+.dashboard-ref-funnel .ref-fseg:not(:first-child){margin-left:-18px}
+.dashboard-ref-funnel .ref-fshape{position:absolute;inset:0;clip-path:polygon(0 0,calc(100% - 22px) 0,100% 50%,calc(100% - 22px) 100%,0 100%,22px 50%)}
+.dashboard-ref-funnel .ref-fseg:first-child .ref-fshape{clip-path:polygon(0 0,calc(100% - 22px) 0,100% 50%,calc(100% - 22px) 100%,0 100%)}
+.dashboard-ref-funnel .ref-fcontent{position:relative;z-index:2;text-align:center;line-height:1}
+.dashboard-ref-funnel .ref-fnum{font-size:19px;font-weight:500;color:#e4efff;display:block;margin-bottom:7px}
+.dashboard-ref-funnel .ref-fpct{font-size:8px;font-weight:700;color:rgba(9,18,29,.65);display:block}
+.dashboard-ref-funnel .ref-flabel{position:absolute;top:101px;left:0;right:0;text-align:center;font-size:9px;color:#8fa7bd;white-space:nowrap}
+.dashboard-ref-funnel .ref-fseg:hover .ref-fshape{filter:brightness(1.1)}
+.dashboard-ref-funnel .ref-fseg:hover .ref-fnum{color:#fff}
+
+/* Exact reference-like dashboard panels */
+.dash-main>.ps{background:#071522;border-color:#12324b;border-radius:10px}
+.dash-main>.ps>.ps-head{height:47px;padding:0 17px;background:#071522;border-color:#12324b;font-size:13px;color:#f0f6fc}
+.dash-main>.ps>.ps-body{padding:10px 11px}
+.dash-side .side-card{background:#071522;border-color:#12324b;border-radius:10px}
+
+@media(max-width:1050px){.dashboard-ref-pipeline{grid-template-columns:repeat(5,180px);overflow-x:auto}.dashboard-ref-funnel{min-width:720px;overflow-x:auto}.dash-main>.ps{overflow:hidden}}
+
 </style>
 </head>
 <body>
@@ -586,14 +630,34 @@ async function renderDashboard(){
     </div>`;
   }
 
-  // ── Mini Pipeline önizlemesi (ilk 5 aşama, her sütunda en fazla 3 kart) ──
-  const miniKanban = `<div class="mini-kanban">
-    ${STAGES.slice(0,6).map(s=>{
+  // ── Reference-matched dashboard pipeline preview ──
+  // The dashboard preview intentionally shows the same five visual columns as the reference.
+  // It still reads real Opportunity records; no mock data is introduced.
+  const dashboardPipelineStages = ['Prospect','Contacted','Replied','Discovery Call','Demo'];
+  const miniKanban = `<div class="dashboard-ref-pipeline">
+    ${dashboardPipelineStages.map(s=>{
       const items = opps.filter(o=>o.stage===s).slice(0,3);
-      return `<div class="mini-col">
-        <div class="mini-col-head" style="background:${STAGE_COLORS[s]};cursor:pointer" onclick="renderDrilldown('stage:${s}')">${s} · ${opps.filter(o=>o.stage===s).length}</div>
-        <div class="mini-col-body">
-          ${items.length?items.map(o=>`<div class="mini-card" onclick="openOpportunityDetail('${o.id}')"><b>${esc(o.companies?.name||'—')}</b><span style="color:var(--green)">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span></div>`).join(''):'<div style="font-size:10px;color:var(--faint);text-align:center;padding:6px 0">Empty</div>'}
+      const count = opps.filter(o=>o.stage===s).length;
+      const color = STAGE_COLORS[s] || '#3B82F6';
+      return `<div class="dashboard-ref-col">
+        <div class="dashboard-ref-col-head" style="background:linear-gradient(180deg,${color}22 0%,${color}10 100%);border-top:1px solid ${color}55;color:${color};cursor:pointer" onclick="renderDrilldown('stage:${s}')">
+          <span>${esc(s)}</span><span class="ref-count">${count}</span>
+        </div>
+        <div class="dashboard-ref-col-body">
+          ${items.length ? items.map(o=>{
+            const name=o.companies?.name||'—';
+            const initials=(name||'—').split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
+            const industry=o.companies?.industry||o.companies?.type||'—';
+            const country=o.companies?.country||'';
+            const mrr=o.estimated_mrr!=null ? '₺'+Number(o.estimated_mrr).toLocaleString('tr-TR')+'/mo' : '—';
+            const age=o.updated_at ? '' : '';
+            return `<div class="dashboard-ref-deal" style="--ref-accent:${color}" onclick="openOpportunityDetail('${o.id}')">
+              <div class="ref-top"><span class="ref-avatar">${esc(initials)}</span><b>${esc(name)}</b><span style="margin-left:auto;color:#607990">⋮</span></div>
+              <div class="ref-sub">${esc(industry)}${country?' · '+esc(country):''}</div>
+              <div class="ref-meta"><span class="ref-mrr">◷ ${esc(mrr)}</span><span class="ref-age">${age}</span></div>
+            </div>`;
+          }).join('') : '<div class="dashboard-ref-empty">Empty</div>'}
+          <div class="dashboard-ref-add" onclick="showPage('pipeline')"><span>+</span> Add Deal</div>
         </div>
       </div>`;
     }).join('')}
@@ -724,24 +788,33 @@ function donutChart(segments){
 }
 
 function renderFunnelChevron(funnel){
-  const maxReached = Math.max(1, ...funnel.map(f=>f.reached));
-  return `<div style="display:flex;overflow-x:auto;padding:8px 4px 2px">
-    ${funnel.map((f,i)=>{
-      const color = STAGE_COLORS[f.stage] || '#64748B';
-      const nextColor = STAGE_COLORS[funnel[i+1]?.stage] || color;
-      const isFirst = i===0;
-      const pctOfFirst = funnel[0].reached>0 ? Math.round((f.reached/funnel[0].reached)*100) : 0;
-      return `<div style="flex:1;min-width:80px;position:relative;cursor:pointer" onclick="renderDrilldown('stage:${f.stage}')">
-        <div style="height:52px;background:linear-gradient(100deg, ${color}, ${nextColor});clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%${isFirst?'':', 14px 50%'});display:flex;flex-direction:column;align-items:center;justify-content:center;color:#07110C;margin-left:${isFirst?'0':'-14px'}">
-          <b style="font-size:14px;line-height:1">${f.reached}</b>
-          <span style="font-size:8.5px;font-weight:700;opacity:.75">${i===0?'':'%'+pctOfFirst}</span>
-        </div>
-        <div style="text-align:center;font-size:9.5px;color:var(--muted);margin-top:5px;padding:0 2px">${f.stage}</div>
+  // Reference visual: 7 segments. Each displayed segment remains backed by
+  // real analytics data from the closest corresponding CRM stage.
+  const byStage = Object.fromEntries((funnel||[]).map(x=>[x.stage,x]));
+  const defs = [
+    {label:'Prospect', key:'Prospect', color:'#3B82F6'},
+    {label:'Contacted', key:'Contacted', color:'#22D3EE'},
+    {label:'Replied', key:'Replied', color:'#818CF8'},
+    {label:'Meeting', key:'Discovery Call', color:'#A78BFA'},
+    {label:'Demo', key:'Demo', color:'#39D98A'},
+    {label:'Proposal', key:'Proposal', color:'#F59E0B'},
+    {label:'Won', key:'Won', color:'#64748B'}
+  ];
+  const first = byStage['Prospect']?.reached || 0;
+  return `<div class="dashboard-ref-funnel">
+    ${defs.map((d,i)=>{
+      const source = byStage[d.key];
+      const reached = source?.reached ?? 0;
+      const pct = first>0 ? Math.round((reached/first)*100) : 0;
+      const next = defs[i+1]?.color || d.color;
+      return `<div class="ref-fseg" onclick="renderDrilldown('stage:${d.key}')" title="${esc(d.label)} — ${reached}">
+        <div class="ref-fshape" style="background:linear-gradient(105deg,${d.color} 0%,${next} 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)"></div>
+        <div class="ref-fcontent"><span class="ref-fnum">${reached}</span><span class="ref-fpct">${i===0?'':'%'+pct}</span></div>
+        <div class="ref-flabel">${esc(d.label)}</div>
       </div>`;
     }).join('')}
   </div>`;
 }
-
 function timeAgo(iso){
   if(!iso) return '';
   const diffMs = Date.now() - new Date(iso).getTime();
