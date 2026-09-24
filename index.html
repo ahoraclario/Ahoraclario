@@ -562,7 +562,7 @@ async function renderDashboard(){
     ${STAGES.slice(0,6).map(s=>{
       const items = opps.filter(o=>o.stage===s).slice(0,3);
       return `<div class="mini-col">
-        <div class="mini-col-head" style="background:${STAGE_COLORS[s]};cursor:pointer" onclick="showPage('pipeline',null,null,'${s}')">${s} · ${opps.filter(o=>o.stage===s).length}</div>
+        <div class="mini-col-head" style="background:${STAGE_COLORS[s]};cursor:pointer" onclick="renderDrilldown('stage:${s}')">${s} · ${opps.filter(o=>o.stage===s).length}</div>
         <div class="mini-col-body">
           ${items.length?items.map(o=>`<div class="mini-card" onclick="openOpportunityDetail('${o.id}')"><b>${esc(o.companies?.name||'—')}</b><span style="color:var(--green)">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span></div>`).join(''):'<div style="font-size:10px;color:var(--faint);text-align:center;padding:6px 0">Empty</div>'}
         </div>
@@ -574,7 +574,7 @@ async function renderDashboard(){
   const donutColors = ['#39D98A','#22D3EE','#3B82F6','#A78BFA','#F59E0B'];
   const sources = (analytics?.sourcePerformance || []).filter(s=>s.total>0);
   const donutHtml = sources.length ? donutChart(sources.map((s,i)=>({label:s.source, value:s.total, color:donutColors[i%donutColors.length]}))) : '<div class="empty" style="padding:20px">No source data yet</div>';
-  const donutLegend = sources.map((s,i)=>`<div class="donut-legend-row" style="cursor:pointer" onclick="showPage('companies',null,'${escAttr(s.source)}')"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
+  const donutLegend = sources.map((s,i)=>`<div class="donut-legend-row" style="cursor:pointer" onclick="renderDrilldown('source:'+encodeURIComponent('${escAttr(s.source)}'))"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
 
   // ── Sağ panel: Today's Actions — kaynak dokümandaki action-call/email/followup/demo/overdue renk şemasına göre ──
   const myDay = await api('getMyDay');
@@ -604,12 +604,12 @@ async function renderDashboard(){
       </div>
     </div>
     <div class="stats">
-      ${statCard('💰','#39D98A','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Value', d.trends?.pipelineValue, "showPage('pipeline')")}
-      ${statCard('👥','#3B82F6',d.newProspects||0,'New Prospects', d.trends?.newProspects, "showPage('companies',null,null,null,null,'thisMonth')")}
-      ${statCard('📅','#A78BFA',d.followUpsToday||0,'Follow-ups Today', d.trends?.followUps, "showPage('tasks',null,null,null,{types:'Call,Meeting',when:'today'})")}
-      ${statCard('🖥️','#22D3EE',d.demosThisWeek||0,'Demos This Week', d.trends?.demos, "showPage('tasks',null,null,null,{types:'Demo',when:'week'})")}
-      ${statCard('📄','#F59E0B',d.openProposals||0,'Open Proposals', d.trends?.openProposals, "showPage('pipeline',null,null,'Proposal')")}
-      ${statCard('🏆','#39D98A',d.wonThisMonth||0,'Won This Month', d.trends?.wonRevenue, "showPage('pipeline',null,null,'Won')")}
+      ${statCard('💰','#39D98A','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Value', d.trends?.pipelineValue, "renderDrilldown('pipelineValue')")}
+      ${statCard('👥','#3B82F6',d.newProspects||0,'New Prospects', d.trends?.newProspects, "renderDrilldown('newProspectsMonth')")}
+      ${statCard('📅','#A78BFA',d.followUpsToday||0,'Follow-ups Today', d.trends?.followUps, "renderDrilldown('followUpsToday')")}
+      ${statCard('🖥️','#22D3EE',d.demosThisWeek||0,'Demos This Week', d.trends?.demos, "renderDrilldown('demosWeek')")}
+      ${statCard('📄','#F59E0B',d.openProposals||0,'Open Proposals', d.trends?.openProposals, "renderDrilldown('openProposals')")}
+      ${statCard('🏆','#39D98A',d.wonThisMonth||0,'Won This Month', d.trends?.wonRevenue, "renderDrilldown('wonMonth')")}
     </div>
 
     <div class="dash-grid">
@@ -702,7 +702,7 @@ function renderFunnelChevron(funnel){
       const nextColor = STAGE_COLORS[funnel[i+1]?.stage] || color;
       const isFirst = i===0;
       const pctOfFirst = funnel[0].reached>0 ? Math.round((f.reached/funnel[0].reached)*100) : 0;
-      return `<div style="flex:1;min-width:80px;position:relative;cursor:pointer" onclick="showPage('pipeline',null,null,'${f.stage}')">
+      return `<div style="flex:1;min-width:80px;position:relative;cursor:pointer" onclick="renderDrilldown('stage:${f.stage}')">
         <div style="height:52px;background:linear-gradient(100deg, ${color}, ${nextColor});clip-path:polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%${isFirst?'':', 14px 50%'});display:flex;flex-direction:column;align-items:center;justify-content:center;color:#07110C;margin-left:${isFirst?'0':'-14px'}">
           <b style="font-size:14px;line-height:1">${f.reached}</b>
           <span style="font-size:8.5px;font-weight:700;opacity:.75">${i===0?'':'%'+pctOfFirst}</span>
@@ -793,15 +793,15 @@ async function renderAnalytics(){
   const donutColors = ['#39D98A','#22D3EE','#3B82F6','#A78BFA','#F59E0B'];
   const sourcesWithData = d.sourcePerformance.filter(s=>s.total>0);
   const donutHtml = sourcesWithData.length ? donutChart(sourcesWithData.map((s,i)=>({label:s.source, value:s.total, color:donutColors[i%donutColors.length]}))) : '<div class="empty" style="padding:20px">No data yet</div>';
-  const donutLegend = sourcesWithData.map((s,i)=>`<div class="donut-legend-row" style="cursor:pointer" onclick="showPage('companies',null,'${escAttr(s.source)}')"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
+  const donutLegend = sourcesWithData.map((s,i)=>`<div class="donut-legend-row" style="cursor:pointer" onclick="renderDrilldown('source:'+encodeURIComponent('${escAttr(s.source)}'))"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
 
   const sourceRows = d.sourcePerformance.map(s=>`
-    <tr class="row-click" onclick="showPage('companies', null, '${escAttr(s.source)}')"><td><b>${esc(s.source)}</b></td><td>${s.total}</td><td>${s.won}</td>
+    <tr class="row-click" onclick="renderDrilldown('source:'+encodeURIComponent('${escAttr(s.source)}'))"><td><b>${esc(s.source)}</b></td><td>${s.total}</td><td>${s.won}</td>
       <td><span style="color:${s.conversionRate>=20?'var(--green)':'var(--muted)'};font-weight:700">%${s.conversionRate}</span></td>
       <td style="color:var(--green);font-weight:700">₺${s.wonMrr.toLocaleString('tr-TR')}</td></tr>`).join('');
 
   const lostRows = Object.entries(d.lostReasons).sort((a,b)=>b[1]-a[1]).map(([reason,count])=>`
-    <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border-subtle);font-size:12.5px">
+    <div class="row-click" style="cursor:pointer;display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border-subtle);font-size:12.5px" onclick="renderDrilldown('lostReason:'+encodeURIComponent('${escAttr(reason)}'))">
       <span>${esc(reason)}</span><b style="color:var(--red)">${count}</b>
     </div>`).join('') || '<div style="color:var(--muted);font-size:12px">No lost opportunities yet.</div>';
 
@@ -889,6 +889,44 @@ async function renderSettings(){
     </div>
   `;
 }
+
+// ══════════════════════════════════════════════
+// DRILLDOWN — her tıklanabilir kart/grafiğin ortak, gerçek varış noktası.
+// VizeCRM'deki "Detay için tıkla" mantığı: hangi metriğe tıklarsan, o metriğin
+// arkasındaki GERÇEK kayıtlar burada, alakasız bir sayfaya değil.
+// ══════════════════════════════════════════════
+async function renderDrilldown(view){
+  const d = await api('getDrilldown', { view });
+  const main = document.getElementById('main');
+  if(!d.success){ main.innerHTML='<div class="empty">Unable to load data.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderDrilldown(\''+view+'\')">↻ Retry</span></div>'; return; }
+  const records = d.records || [];
+  main.innerHTML = `
+    <div class="page-head">
+      <div><h1>${esc(d.title)}</h1><p>${records.length} record${records.length===1?'':'s'}</p></div>
+      <button class="btn-ghost" onclick="showPage('dashboard')">← Back to Dashboard</button>
+    </div>
+    <div class="tbl-wrap">
+      ${records.length===0 ? '<div class="empty" style="padding:40px">No records match this view.</div>' : `
+      <table>
+        <thead><tr><th></th><th>Name</th><th>Detail</th><th>Value</th><th>Date</th></tr></thead>
+        <tbody>
+          ${records.map(r=>`
+            <tr class="row-click" onclick="openDrilldownRecord('${r.type}','${r.id}','${r.companyId}')">
+              <td><span class="badge" style="background:${r.badgeColor}22;color:${r.badgeColor}">${esc(r.badge||'')}</span></td>
+              <td><b>${esc(r.title)}</b></td>
+              <td style="color:var(--muted)">${esc(r.subtitle||'')}</td>
+              <td style="color:var(--green);font-weight:700">${r.value?'₺'+Number(r.value).toLocaleString('tr-TR'):'—'}</td>
+              <td style="color:var(--muted)">${r.date?String(r.date).slice(0,10):'—'}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`}
+    </div>`;
+}
+function openDrilldownRecord(type, id, companyId){
+  if(type==='opportunity') openOpportunityDetail(id);
+  else openCompanyPanel(companyId);
+}
+
 async function submitChangePassword(){
   const currentPassword = document.getElementById('st-cur-pw').value;
   const newPassword = document.getElementById('st-new-pw').value;
