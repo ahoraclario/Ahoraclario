@@ -643,12 +643,16 @@ async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter
 // ══════════════════════════════════════════════
 // DASHBOARD
 // ══════════════════════════════════════════════
+let dashboardPeriod = 'month';
+let dashboardPipeFilter = 'all';
 async function renderDashboard(){
-  const [d, oppsRes, anaRes] = await Promise.all([ api('getDashboard'), api('getOpportunities'), api('getAnalytics') ]);
+  const [d, oppsRes, anaRes] = await Promise.all([ api('getDashboard', {period: dashboardPeriod}), api('getOpportunities'), api('getAnalytics') ]);
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderDashboard()">↻ Tekrar Dene</span></div>'; return; }
-  const opps = oppsRes.success ? oppsRes.opportunities : [];
+  let opps = oppsRes.success ? oppsRes.opportunities : [];
   const analytics = anaRes.success ? anaRes : null;
+  // Sales Pipeline (mini önizleme) filtresi — SADECE o bölümdeki kartları etkiler, özet kartlarına dokunmaz.
+  if(dashboardPipeFilter === 'high') opps = opps.filter(o => o.companies?.priority === 'High');
 
   function trendPct(arr){
     if(!arr || arr.length<2) return 0;
@@ -687,12 +691,12 @@ async function renderDashboard(){
             const initials=(name||'—').split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
             const industry=o.companies?.industry||o.companies?.type||'—';
             const country=o.companies?.country||'';
-            const mrr=o.estimated_mrr!=null ? '₺'+Number(o.estimated_mrr).toLocaleString('tr-TR')+'/mo' : '—';
-            const age=o.updated_at ? '' : '';
+            const mrr=o.estimated_mrr!=null ? '₺'+Number(o.estimated_mrr).toLocaleString('tr-TR')+'/mo' : 'Fiyat gir';
+            const age=daysSince(o.stage_changed_at)+'g';
             return `<div class="dashboard-ref-deal" style="--ref-accent:${color}" onclick="openOpportunityDetail('${o.id}')">
               <div class="ref-top"><span class="ref-avatar">${esc(initials)}</span><b>${esc(name)}</b><span style="margin-left:auto;color:#607990">⋮</span></div>
               <div class="ref-sub">${esc(industry)}${country?' · '+esc(country):''}</div>
-              <div class="ref-meta"><span class="ref-mrr">◷ ${esc(mrr)}</span><span class="ref-age">${age}</span></div>
+              <div class="ref-meta"><span class="ref-mrr" style="cursor:pointer;${o.estimated_mrr==null?'color:var(--primary)':''}" onclick="event.stopPropagation();openEditOpportunityModal('${o.id}','${o.company_id}')" title="Tutarı düzenle">◷ ${esc(mrr)}</span><span class="ref-age">${age}</span></div>
             </div>`;
           }).join('') : '<div class="dashboard-ref-empty">Boş</div>'}
           <div class="dashboard-ref-add" onclick="openAddCompanyModal('${s}')"><span>+</span> Anlaşma Ekle</div>
@@ -729,9 +733,16 @@ async function renderDashboard(){
   main.innerHTML = `
     <div class="page-head">
       <div><h1>Good morning, ${esc(CU.name)} 👋</h1><p>İşte satış operasyonunun bugünkü özeti.</p></div>
-      <div style="display:flex;gap:8px">
-        <button class="btn-ghost" onclick="showPage('myday')">☀️ Go to My Day</button>
-        <button class="btn-add" onclick="showPage('companies');setTimeout(openAddCompanyModal,80)">+ New Company</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select onchange="dashboardPeriod=this.value;renderDashboard()" style="width:auto;padding:8px 12px;font-size:12.5px" title="Sadece özet kartlarını etkiler">
+          <option value="today" ${dashboardPeriod==='today'?'selected':''}>Bugün</option>
+          <option value="week" ${dashboardPeriod==='week'?'selected':''}>Bu Hafta</option>
+          <option value="month" ${dashboardPeriod==='month'?'selected':''}>Bu Ay</option>
+          <option value="quarter" ${dashboardPeriod==='quarter'?'selected':''}>Bu Çeyrek</option>
+          <option value="all" ${dashboardPeriod==='all'?'selected':''}>Tüm Zamanlar</option>
+        </select>
+        <button class="btn-ghost" onclick="showPage('myday')">☀️ My Day'e Git</button>
+        <button class="btn-add" onclick="showPage('companies');setTimeout(openAddCompanyModal,80)">+ Yeni Şirket</button>
       </div>
     </div>
     <div class="stats">
@@ -746,7 +757,15 @@ async function renderDashboard(){
     <div class="dash-grid">
       <div class="dash-main">
         <div class="ps">
-          <div class="ps-head">Satış Pipeline'ı<span style="cursor:pointer" onclick="showPage('pipeline')">Tümünü Gör →</span></div>
+          <div class="ps-head">Satış Pipeline'ı
+            <span style="display:flex;align-items:center;gap:10px">
+              <select onchange="dashboardPipeFilter=this.value;renderDashboard()" style="width:auto;padding:4px 9px;font-size:11px" title="Sadece bu bölümü etkiler">
+                <option value="all" ${dashboardPipeFilter==='all'?'selected':''}>Tüm Anlaşmalar</option>
+                <option value="high" ${dashboardPipeFilter==='high'?'selected':''}>🔥 Yüksek Öncelikli</option>
+              </select>
+              <span style="cursor:pointer" onclick="showPage('pipeline')">Tümünü Gör →</span>
+            </span>
+          </div>
           <div class="ps-body">${miniKanban}</div>
         </div>
 
@@ -1636,8 +1655,9 @@ async function saveOpportunityDetails(){
     const cid = editingOppCompanyId;
     closeEditOppModal();
     if(currentPage==='companies') renderCompanies();
+    else if(currentPage==='pipeline') renderPipeline();
+    else if(currentPage==='dashboard') renderDashboard();
     else openCompanyPanel(cid);
-    if(currentPage==='pipeline') renderPipeline();
   }
 }
 
