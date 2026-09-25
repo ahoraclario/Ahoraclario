@@ -382,6 +382,18 @@ tr.row-click:hover{background:var(--surface-2)}
         <option value="Low">Düşük</option>
       </select>
     </div>
+    <div class="fi"><label>Başlangıç Aşaması</label>
+      <select id="nc-stage">
+        <option value="Prospect">Aday</option>
+        <option value="Researched">Araştırıldı</option>
+        <option value="Contacted">İletişime Geçildi</option>
+        <option value="Replied">Cevap Verdi</option>
+        <option value="Discovery Call">Keşif Görüşmesi</option>
+        <option value="Demo">Demo</option>
+        <option value="Proposal">Teklif</option>
+        <option value="Negotiation">Pazarlık</option>
+      </select>
+    </div>
     <div class="fi"><label>Not</label><textarea id="nc-notes" rows="2"></textarea></div>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeAddCompanyModal()">Vazgeç</button>
@@ -683,7 +695,7 @@ async function renderDashboard(){
               <div class="ref-meta"><span class="ref-mrr">◷ ${esc(mrr)}</span><span class="ref-age">${age}</span></div>
             </div>`;
           }).join('') : '<div class="dashboard-ref-empty">Boş</div>'}
-          <div class="dashboard-ref-add" onclick="showPage('pipeline')"><span>+</span> Add Deal</div>
+          <div class="dashboard-ref-add" onclick="openAddCompanyModal('${s}')"><span>+</span> Anlaşma Ekle</div>
         </div>
       </div>`;
     }).join('')}
@@ -1089,7 +1101,7 @@ async function renderCompanies(searchQuery, sourceFilter, periodFilter){
   main.innerHTML = `
     <div class="page-head">
       <div><h1>Şirketler</h1><p>${companies.length} aday/müşteri${filterLabel?` · ${filterLabel} <span style="color:var(--primary);cursor:pointer" onclick="showPage('companies')">✕ temizle</span>`:''}</p></div>
-      <button class="btn-add" onclick="openAddCompanyModal()">+ New Company</button>
+      <button class="btn-add" onclick="openAddCompanyModal()">+ Yeni Şirket</button>
     </div>
     <div class="tbl-wrap">
       <table>
@@ -1113,12 +1125,16 @@ async function renderCompanies(searchQuery, sourceFilter, periodFilter){
     </div>`;
 }
 
-function openAddCompanyModal(){ document.getElementById('addCompanyModal').classList.add('open'); }
+function openAddCompanyModal(startStage){
+  document.getElementById('addCompanyModal').classList.add('open');
+  document.getElementById('nc-stage').value = startStage || 'Prospect';
+}
 function closeAddCompanyModal(){
   document.getElementById('addCompanyModal').classList.remove('open');
   ['name','industry','country','website','notes'].forEach(k=>document.getElementById('nc-'+k).value='');
   document.getElementById('nc-source').value='';
   document.getElementById('nc-priority').value='Normal';
+  document.getElementById('nc-stage').value='Prospect';
 }
 async function submitAddCompany(){
   const name = document.getElementById('nc-name').value.trim();
@@ -1131,13 +1147,16 @@ async function submitAddCompany(){
     priority: document.getElementById('nc-priority').value,
     research_notes: document.getElementById('nc-notes').value.trim(),
   };
+  const startStage = document.getElementById('nc-stage').value || 'Prospect';
   const d = await api('addCompany', { company });
   if(d.success){
     toast('✓ Şirket eklendi');
     closeAddCompanyModal();
-    if(currentPage==='companies') renderCompanies(); else if(currentPage==='pipeline') renderPipeline();
-    // ilk fırsatı da otomatik oluşturalım ki hemen pipeline'da görünsün
-    await api('addOpportunity', { companyId: d.company.id, opportunity:{stage:'Prospect'} });
+    // İlk fırsatı, seçilen başlangıç aşamasında otomatik oluşturuyoruz ki hemen o sütunda görünsün.
+    await api('addOpportunity', { companyId: d.company.id, opportunity:{stage:startStage} });
+    if(currentPage==='companies') renderCompanies();
+    else if(currentPage==='pipeline') renderPipeline();
+    else if(currentPage==='dashboard') renderDashboard();
   }
 }
 
@@ -1792,6 +1811,7 @@ async function renderPipeline(highlightStage){
                 </div>
                 ${o.next_task?`<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border-subtle);font-size:10px;color:var(--amber)">📅 ${esc(o.next_task.title)}${o.next_task.due_date?' · '+o.next_task.due_date:''}</div>`:''}
               </div>`).join('')}
+            <div style="cursor:pointer;color:var(--muted);font-size:11px;padding:7px 5px;text-align:center;border-radius:6px" onmouseover="this.style.background='var(--surface-2)';this.style.color='var(--primary)'" onmouseout="this.style.background='';this.style.color='var(--muted)'" onclick="openAddCompanyModal('${s}')">+ Anlaşma Ekle</div>
           </div>
         </div>`;
       }).join('')}
