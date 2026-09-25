@@ -6,18 +6,18 @@
 <title>Ahoraclario — Sales CRM</title>
 <style>
 :root{
-  /* AHORACLARIO — DARK TECHNICAL SAAS COLOR SYSTEM — source of truth, birebir */
-  --bg:#070B14; --bg-raised:#080D18;
-  --surface-secondary:#0A101C; --surface:#0D1421; --surface-2:#111B2B;
-  --opp-card:#0F1826;
-  --border:#1B2A3A; --border-subtle:#172435; --border-hover:#29415A;
+  /* AHORACLARIO — GPT'nin "Reference-Match" paletiyle hizalandı (tek, tutarlı kaynak) */
+  --bg:#061522; --bg-raised:#071522;
+  --surface-secondary:#06131F; --surface:#0A1B2A; --surface-2:#0B1F30;
+  --opp-card:#081725;
+  --border:#12334C; --border-subtle:#12334C; --border-hover:#163752;
   --border-soft:rgba(139,154,175,0.08);
   --text:#F0F6FC; --text-primary:#F0F6FC;
-  --muted:#8B9AAF; --text-secondary:#8B9AAF;
-  --faint:#596579; --text-muted:#596579;
-  --text-disabled:#3F4B5C;
+  --muted:#8FA7BD; --text-secondary:#8FA7BD;
+  --faint:#7189A0; --text-muted:#7189A0;
+  --text-disabled:#49637A;
   --primary:#39D98A; --primary-dark:#2BC27A; --primary-bg:rgba(57,217,138,0.14);
-  --green:#39D98A; --green-bg:rgba(57,217,138,0.14); --green-glow:rgba(57,217,138,0.10);a
+  --green:#39D98A; --green-bg:rgba(57,217,138,0.14); --green-glow:rgba(57,217,138,0.10);
   --blue:#3B82F6; --blue-bg:rgba(59,130,246,0.14); --blue-glow:rgba(59,130,246,0.10);
   --cyan:#22D3EE; --cyan-bg:rgba(34,211,238,0.14); --cyan-glow:rgba(34,211,238,0.10);
   --purple:#A78BFA; --purple-bg:rgba(167,139,250,0.14); --purple-glow:rgba(167,139,250,0.10);
@@ -247,143 +247,45 @@ tr.row-click:hover{background:var(--surface-2)}
    Visual-only: preserves existing data/API/business logic.
    ============================================================ */
 .dashboard-ref-pipeline{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;overflow:hidden;padding:0 2px 2px}
-.dashboard-ref-col{min-width:0;border-radius:9px;overflow:hidden;background:#061522;border:1px solid #12334c}
-.dashboard-ref-col-head{height:39px;padding:0 11px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:800;letter-spacing:-.05px;color:#eef6ff;border-bottom:1px solid rgba(255,255,255,.05)}
-.dashboard-ref-col-head .ref-count{min-width:24px;height:22px;padding:0 7px;border-radius:7px;background:rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:#d9e7f6}
-.dashboard-ref-col-body{min-height:282px;padding:8px;background:linear-gradient(180deg,#071522 0%,#06131f 100%);display:flex;flex-direction:column;gap:7px}
-.dashboard-ref-deal{position:relative;background:linear-gradient(145deg,#0a1b2a 0%,#081725 100%);border:1px solid #163752;border-left:3px solid var(--ref-accent);border-radius:7px;padding:9px 10px 8px;min-height:61px;cursor:pointer;transition:.15s ease;box-shadow:inset 0 1px 0 rgba(255,255,255,.015)}
-.dashboard-ref-deal:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--ref-accent) 55%,#163752);background:#0b1f30}
+.dashboard-ref-col{min-width:0;border-radius:9px;overflow:hidden;background:var(--bg);border:1px solid var(--border)}
+.dashboard-ref-col-head{height:39px;padding:0 11px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:800;letter-spacing:-.05px;color:var(--text);border-bottom:1px solid rgba(255,255,255,.05)}
+.dashboard-ref-col-head .ref-count{min-width:24px;height:22px;padding:0 7px;border-radius:7px;background:rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:var(--text)}
+.dashboard-ref-col-body{min-height:282px;padding:8px;background:linear-gradient(180deg,var(--bg-raised) 0%,var(--surface-secondary) 100%);display:flex;flex-direction:column;gap:7px}
+.dashboard-ref-deal{position:relative;background:linear-gradient(145deg,var(--surface) 0%,var(--opp-card) 100%);border:1px solid var(--border-hover);border-left:3px solid var(--ref-accent);border-radius:7px;padding:9px 10px 8px;min-height:61px;cursor:pointer;transition:.15s ease;box-shadow:inset 0 1px 0 rgba(255,255,255,.015)}
+.dashboard-ref-deal:hover{transform:translateY(-1px);border-color:color-mix(in srgb,var(--ref-accent) 55%,var(--border-hover));background:var(--surface-2)}
 .dashboard-ref-deal .ref-top{display:flex;align-items:center;gap:7px;min-width:0;margin-bottom:4px}
-.dashboard-ref-deal .ref-avatar{width:20px;height:20px;border-radius:50%;background:color-mix(in srgb,var(--ref-accent) 22%,#10283c);color:var(--ref-accent);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex:0 0 auto}
-.dashboard-ref-deal b{font-size:10.5px;color:#f0f6fc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;min-width:0}
-.dashboard-ref-deal .ref-sub{font-size:9.5px;color:#8fa7bd;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-left:27px}
-.dashboard-ref-deal .ref-meta{display:flex;justify-content:space-between;gap:6px;margin-top:6px;margin-left:27px;font-size:9px;color:#7189a0}
-.dashboard-ref-deal .ref-mrr{color:#9fb8cf}
-.dashboard-ref-deal .ref-age{color:#7890a8}
-.dashboard-ref-add{margin-top:auto;min-height:27px;display:flex;align-items:center;gap:7px;padding:5px 7px;color:#8ea8bf;font-size:10px;cursor:pointer;border-radius:6px}
-.dashboard-ref-add:hover{background:#0b1e2d;color:#22d3ee}
-.dashboard-ref-add span{font-size:16px;line-height:1;color:#22d3ee}
-.dashboard-ref-empty{color:#49637a;text-align:center;font-size:10px;padding:18px 0}
+.dashboard-ref-deal .ref-avatar{width:20px;height:20px;border-radius:50%;background:color-mix(in srgb,var(--ref-accent) 22%,var(--opp-card));color:var(--ref-accent);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex:0 0 auto}
+.dashboard-ref-deal b{font-size:10.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;min-width:0}
+.dashboard-ref-deal .ref-sub{font-size:9.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-left:27px}
+.dashboard-ref-deal .ref-meta{display:flex;justify-content:space-between;gap:6px;margin-top:6px;margin-left:27px;font-size:9px;color:var(--faint)}
+.dashboard-ref-deal .ref-mrr{color:var(--muted)}
+.dashboard-ref-deal .ref-age{color:var(--faint)}
+.dashboard-ref-add{margin-top:auto;min-height:27px;display:flex;align-items:center;gap:7px;padding:5px 7px;color:var(--muted);font-size:10px;cursor:pointer;border-radius:6px}
+.dashboard-ref-add:hover{background:var(--surface-2);color:var(--cyan)}
+.dashboard-ref-add span{font-size:16px;line-height:1;color:var(--cyan)}
+.dashboard-ref-empty{color:var(--text-disabled);text-align:center;font-size:10px;padding:18px 0}
 
 .dashboard-ref-funnel{display:flex;align-items:stretch;height:174px;padding:22px 0 0;overflow:hidden}
-.dashboard-ref-funnel .ref-fseg{position:relative;flex:1;min-width:0;cursor:pointer;height:92px;display:flex;align-items:center;justify-content:center;color:#dcecff}
+.dashboard-ref-funnel .ref-fseg{position:relative;flex:1;min-width:0;cursor:pointer;height:92px;display:flex;align-items:center;justify-content:center;color:var(--text);}
 .dashboard-ref-funnel .ref-fseg:not(:first-child){margin-left:-18px}
 .dashboard-ref-funnel .ref-fshape{position:absolute;inset:0;clip-path:polygon(0 0,calc(100% - 22px) 0,100% 50%,calc(100% - 22px) 100%,0 100%,22px 50%)}
 .dashboard-ref-funnel .ref-fseg:first-child .ref-fshape{clip-path:polygon(0 0,calc(100% - 22px) 0,100% 50%,calc(100% - 22px) 100%,0 100%)}
 .dashboard-ref-funnel .ref-fcontent{position:relative;z-index:2;text-align:center;line-height:1}
-.dashboard-ref-funnel .ref-fnum{font-size:19px;font-weight:500;color:#e4efff;display:block;margin-bottom:7px}
+.dashboard-ref-funnel .ref-fnum{font-size:19px;font-weight:500;color:var(--text);display:block;margin-bottom:7px}
 .dashboard-ref-funnel .ref-fpct{font-size:8px;font-weight:700;color:rgba(9,18,29,.65);display:block}
-.dashboard-ref-funnel .ref-flabel{position:absolute;top:101px;left:0;right:0;text-align:center;font-size:9px;color:#8fa7bd;white-space:nowrap}
+.dashboard-ref-funnel .ref-flabel{position:absolute;top:101px;left:0;right:0;text-align:center;font-size:9px;color:var(--muted);white-space:nowrap}
 .dashboard-ref-funnel .ref-fseg:hover .ref-fshape{filter:brightness(1.1)}
 .dashboard-ref-funnel .ref-fseg:hover .ref-fnum{color:#fff}
 
 /* Exact reference-like dashboard panels */
-.dash-main>.ps{background:#071522;border-color:#12324b;border-radius:10px}
-.dash-main>.ps>.ps-head{height:47px;padding:0 17px;background:#071522;border-color:#12324b;font-size:13px;color:#f0f6fc}
+.dash-main>.ps{background:var(--bg-raised);border-color:var(--border);border-radius:10px}
+.dash-main>.ps>.ps-head{height:47px;padding:0 17px;background:var(--bg-raised);border-color:var(--border);font-size:13px;color:var(--text)}
 .dash-main>.ps>.ps-body{padding:10px 11px}
-.dash-side .side-card{background:#071522;border-color:#12324b;border-radius:10px}
+.dash-side .side-card{background:var(--bg-raised);border-color:var(--border);border-radius:10px}
 
 @media(max-width:1050px){.dashboard-ref-pipeline{grid-template-columns:repeat(5,180px);overflow-x:auto}.dashboard-ref-funnel{min-width:720px;overflow-x:auto}.dash-main>.ps{overflow:hidden}}
 
 </style>
-
-<style id="sidebar-reference-fix">
-/* =========================================================
-   Ahoraclario Sidebar — Reference Dashboard Color System
-   Visual-only override; no layout/data/API changes.
-   ========================================================= */
-
-:root{
-  --sb-bg:#030A12;
-  --sb-border:#102235;
-  --sb-text:#8B9AAF;
-  --sb-text-hover:#DCE7F2;
-  --sb-active:#39D98A;
-  --sb-active-bg:rgba(57,217,138,.075);
-  --sb-active-border:#39D98A;
-  --sb-badge-bg:#10243A;
-  --sb-badge-text:#8EB5D8;
-  --sb-divider:#102235;
-  --sb-logo-a:#22D3EE;
-  --sb-logo-b:#39D98A;
-}
-
-/* Sidebar background */
-.sidebar{
-  background:#030A12 !important;
-  border-right:1px solid var(--sb-border) !important;
-}
-
-/* Logo */
-.sb-logo{
-  background:transparent !important;
-}
-.sb-logo .mark{
-  background:linear-gradient(135deg,var(--sb-logo-a) 0%,var(--sb-logo-b) 100%) !important;
-  color:#07110C !important;
-  box-shadow:
-    0 0 18px rgba(34,211,238,.10),
-    0 0 18px rgba(57,217,138,.08) !important;
-}
-.sb-logo b{
-  color:#F0F6FC !important;
-}
-
-/* Navigation — inactive */
-.nav-item{
-  color:var(--sb-text) !important;
-  background:transparent !important;
-  border-left-color:transparent !important;
-}
-.nav-item:hover{
-  color:var(--sb-text-hover) !important;
-  background:rgba(21,48,74,.38) !important;
-  border-left-color:rgba(34,211,238,.35) !important;
-}
-
-/* Navigation — active */
-.nav-item.active{
-  color:var(--sb-active) !important;
-  background:linear-gradient(
-    90deg,
-    rgba(57,217,138,.095) 0%,
-    rgba(34,211,238,.035) 62%,
-    rgba(3,10,18,0) 100%
-  ) !important;
-  border-left-color:var(--sb-active-border) !important;
-  box-shadow:inset 0 0 22px rgba(34,211,238,.025) !important;
-}
-.nav-item.active:hover{
-  color:#45E6A0 !important;
-  background:linear-gradient(
-    90deg,
-    rgba(57,217,138,.12) 0%,
-    rgba(34,211,238,.045) 65%,
-    rgba(3,10,18,0) 100%
-  ) !important;
-}
-
-/* Notification counters */
-.nav-item .nb{
-  background:var(--sb-badge-bg) !important;
-  color:var(--sb-badge-text) !important;
-  border:1px solid rgba(59,130,246,.10) !important;
-}
-.nav-item.active .nb{
-  background:rgba(57,217,138,.10) !important;
-  color:var(--sb-active) !important;
-  border-color:rgba(57,217,138,.12) !important;
-}
-
-/* Bottom section */
-.sb-bottom{
-  border-top-color:var(--sb-divider) !important;
-}
-.sb-tagline{
-  color:#596579 !important;
-}
-</style>
-
 </head>
 <body>
 
@@ -1976,3 +1878,138 @@ function leadScoreColor(score){
 </script>
 </body>
 </html>
+
+<style id="ahoraclario-sidebar-reference-exact">
+/* =========================================================
+   AHORACLARIO SIDEBAR — REFERENCE IMAGE MATCH
+   Visual-only override. Does not change page/data logic.
+   ========================================================= */
+:root{
+  --sidebar-ref-bg:#010B17;
+  --sidebar-ref-border:#102338;
+  --sidebar-ref-text:#9CB1C9;
+  --sidebar-ref-muted:#6F87A3;
+  --sidebar-ref-active:#39D98A;
+  --sidebar-ref-active-bg:rgba(34,211,238,.075);
+  --sidebar-ref-hover:rgba(34,211,238,.055);
+  --sidebar-ref-badge-bg:#122842;
+  --sidebar-ref-badge-text:#B9CBE0;
+}
+
+.sidebar{
+  width:180px !important;
+  min-width:180px !important;
+  flex-basis:180px !important;
+  box-sizing:border-box !important;
+  background:var(--sidebar-ref-bg) !important;
+  border-right:1px solid var(--sidebar-ref-border) !important;
+  padding:0 8px 18px !important;
+}
+
+.sb-logo{
+  height:57px !important;
+  box-sizing:border-box !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:9px !important;
+  padding:0 10px !important;
+  margin:0 !important;
+}
+
+.sb-logo .mark{
+  width:31px !important;
+  height:31px !important;
+  min-width:31px !important;
+  border-radius:8px !important;
+  background:linear-gradient(145deg,#20C997 0%,#27DDB4 48%,#29B8E8 100%) !important;
+  color:#031016 !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+  box-shadow:0 7px 22px rgba(34,211,238,.14) !important;
+}
+
+.sb-logo b{
+  font-size:14px !important;
+  font-weight:700 !important;
+  color:#E7F0FA !important;
+  letter-spacing:-.15px !important;
+}
+
+.nav-item{
+  height:36px !important;
+  min-height:36px !important;
+  box-sizing:border-box !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:9px !important;
+  padding:0 9px !important;
+  margin:0 0 1px !important;
+  border:0 !important;
+  border-left:3px solid transparent !important;
+  border-radius:7px !important;
+  color:var(--sidebar-ref-text) !important;
+  background:transparent !important;
+  font-size:11.5px !important;
+  line-height:1 !important;
+  font-weight:500 !important;
+  letter-spacing:0 !important;
+  box-shadow:none !important;
+}
+
+.nav-item:hover{
+  color:#CFE1F4 !important;
+  background:var(--sidebar-ref-hover) !important;
+}
+
+.nav-item.active{
+  color:var(--sidebar-ref-active) !important;
+  background:linear-gradient(90deg,rgba(34,211,238,.115),rgba(34,211,238,.045)) !important;
+  border-left-color:var(--sidebar-ref-active) !important;
+  box-shadow:none !important;
+}
+
+.nav-item .nb{
+  margin-left:auto !important;
+  min-width:20px !important;
+  height:18px !important;
+  box-sizing:border-box !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:0 5px !important;
+  border-radius:8px !important;
+  background:var(--sidebar-ref-badge-bg) !important;
+  color:var(--sidebar-ref-badge-text) !important;
+  font-size:9px !important;
+  font-weight:700 !important;
+  border:1px solid rgba(66,122,170,.18) !important;
+}
+
+.nav-item.active .nb{
+  background:rgba(57,217,138,.12) !important;
+  color:var(--sidebar-ref-active) !important;
+  border-color:rgba(57,217,138,.12) !important;
+}
+
+.sb-bottom{
+  padding-top:12px !important;
+  border-top:1px solid var(--sidebar-ref-border) !important;
+}
+
+.sb-tagline{
+  color:#617995 !important;
+  font-size:10px !important;
+}
+
+/* The reference uses compact line icons. Keep the existing icon glyphs
+   readable and visually subordinate until SVG icons are wired in. */
+.nav-item::first-letter{
+  font-size:12px;
+}
+
+/* Prevent the narrower reference sidebar from being visually swallowed
+   by the main content. */
+.app-shell > .sidebar + *{
+  min-width:0;
+}
+</style>
