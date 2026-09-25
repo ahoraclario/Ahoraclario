@@ -17,7 +17,7 @@
   --faint:#596579; --text-muted:#596579;
   --text-disabled:#3F4B5C;
   --primary:#39D98A; --primary-dark:#2BC27A; --primary-bg:rgba(57,217,138,0.14);
-  --green:#39D98A; --green-bg:rgba(57,217,138,0.14); --green-glow:rgba(57,217,138,0.10);
+  --green:#39D98A; --green-bg:rgba(57,217,138,0.14); --green-glow:rgba(57,217,138,0.10);a
   --blue:#3B82F6; --blue-bg:rgba(59,130,246,0.14); --blue-glow:rgba(59,130,246,0.10);
   --cyan:#22D3EE; --cyan-bg:rgba(34,211,238,0.14); --cyan-glow:rgba(34,211,238,0.10);
   --purple:#A78BFA; --purple-bg:rgba(167,139,250,0.14); --purple-glow:rgba(167,139,250,0.10);
@@ -286,6 +286,104 @@ tr.row-click:hover{background:var(--surface-2)}
 @media(max-width:1050px){.dashboard-ref-pipeline{grid-template-columns:repeat(5,180px);overflow-x:auto}.dashboard-ref-funnel{min-width:720px;overflow-x:auto}.dash-main>.ps{overflow:hidden}}
 
 </style>
+
+<style id="sidebar-reference-fix">
+/* =========================================================
+   Ahoraclario Sidebar — Reference Dashboard Color System
+   Visual-only override; no layout/data/API changes.
+   ========================================================= */
+
+:root{
+  --sb-bg:#030A12;
+  --sb-border:#102235;
+  --sb-text:#8B9AAF;
+  --sb-text-hover:#DCE7F2;
+  --sb-active:#39D98A;
+  --sb-active-bg:rgba(57,217,138,.075);
+  --sb-active-border:#39D98A;
+  --sb-badge-bg:#10243A;
+  --sb-badge-text:#8EB5D8;
+  --sb-divider:#102235;
+  --sb-logo-a:#22D3EE;
+  --sb-logo-b:#39D98A;
+}
+
+/* Sidebar background */
+.sidebar{
+  background:#030A12 !important;
+  border-right:1px solid var(--sb-border) !important;
+}
+
+/* Logo */
+.sb-logo{
+  background:transparent !important;
+}
+.sb-logo .mark{
+  background:linear-gradient(135deg,var(--sb-logo-a) 0%,var(--sb-logo-b) 100%) !important;
+  color:#07110C !important;
+  box-shadow:
+    0 0 18px rgba(34,211,238,.10),
+    0 0 18px rgba(57,217,138,.08) !important;
+}
+.sb-logo b{
+  color:#F0F6FC !important;
+}
+
+/* Navigation — inactive */
+.nav-item{
+  color:var(--sb-text) !important;
+  background:transparent !important;
+  border-left-color:transparent !important;
+}
+.nav-item:hover{
+  color:var(--sb-text-hover) !important;
+  background:rgba(21,48,74,.38) !important;
+  border-left-color:rgba(34,211,238,.35) !important;
+}
+
+/* Navigation — active */
+.nav-item.active{
+  color:var(--sb-active) !important;
+  background:linear-gradient(
+    90deg,
+    rgba(57,217,138,.095) 0%,
+    rgba(34,211,238,.035) 62%,
+    rgba(3,10,18,0) 100%
+  ) !important;
+  border-left-color:var(--sb-active-border) !important;
+  box-shadow:inset 0 0 22px rgba(34,211,238,.025) !important;
+}
+.nav-item.active:hover{
+  color:#45E6A0 !important;
+  background:linear-gradient(
+    90deg,
+    rgba(57,217,138,.12) 0%,
+    rgba(34,211,238,.045) 65%,
+    rgba(3,10,18,0) 100%
+  ) !important;
+}
+
+/* Notification counters */
+.nav-item .nb{
+  background:var(--sb-badge-bg) !important;
+  color:var(--sb-badge-text) !important;
+  border:1px solid rgba(59,130,246,.10) !important;
+}
+.nav-item.active .nb{
+  background:rgba(57,217,138,.10) !important;
+  color:var(--sb-active) !important;
+  border-color:rgba(57,217,138,.12) !important;
+}
+
+/* Bottom section */
+.sb-bottom{
+  border-top-color:var(--sb-divider) !important;
+}
+.sb-tagline{
+  color:#596579 !important;
+}
+</style>
+
 </head>
 <body>
 
