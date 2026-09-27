@@ -1486,18 +1486,22 @@ function fileIcon(name){
   if(['html','htm','js','ts','css','json','sql','py'].includes(ext)) return '💻';
   return '📄';
 }
-function companyFilesSection(companyId, files){
+// oppId verilirse bölüm fırsat panelinde gösteriliyor demektir: yükleme/silme sonrası o panel yenilenir.
+// (Pipeline ve Dashboard kartları şirket panelini değil fırsat panelini açıyor — dosyalar orada da görünsün.)
+function companyFilesSection(companyId, files, oppId){
+  const key = oppId ? 'opp-'+oppId : companyId;           // iki panel aynı anda DOM'da olabilir, id'ler çakışmasın
+  const ctx = `'${companyId}','${oppId||''}'`;
   return `<div class="ps">
-    <div class="ps-head">📁 Dosyalar (${files.length})<span style="cursor:pointer;color:var(--primary)" onclick="document.getElementById('fileInput-${companyId}').click()">+ Yükle</span></div>
+    <div class="ps-head">📁 Dosyalar (${files.length})<span style="cursor:pointer;color:var(--primary)" onclick="document.getElementById('fileInput-${key}').click()">+ Yükle</span></div>
     <div class="ps-body">
-      <input type="file" id="fileInput-${companyId}" multiple class="hidden" onchange="uploadCompanyFiles('${companyId}', this.files); this.value=''">
-      <div class="file-drop" onclick="document.getElementById('fileInput-${companyId}').click()"
+      <input type="file" id="fileInput-${key}" multiple class="hidden" onchange="uploadCompanyFiles(${ctx}, this.files); this.value=''">
+      <div class="file-drop" onclick="document.getElementById('fileInput-${key}').click()"
         ondragover="event.preventDefault();this.classList.add('dragover')"
         ondragleave="this.classList.remove('dragover')"
-        ondrop="event.preventDefault();this.classList.remove('dragover');uploadCompanyFiles('${companyId}', event.dataTransfer.files)">
+        ondrop="event.preventDefault();this.classList.remove('dragover');uploadCompanyFiles(${ctx}, event.dataTransfer.files)">
         Dosyaları buraya sürükle veya <b>seçmek için tıkla</b><br><span style="font-size:10.5px;color:var(--faint)">Dosya başına en fazla ${MAX_FILE_MB} MB</span>
       </div>
-      <div id="fileUploadStatus-${companyId}" class="file-upload-status hidden"></div>
+      <div id="fileUploadStatus-${key}" class="file-upload-status hidden"></div>
       <div class="mini-list">
         ${files.length===0 ? '<div style="color:var(--muted);font-size:12px">Henüz dosya yok.</div>' : files.map(f=>`
           <div class="mini-item file-row">
@@ -1507,16 +1511,19 @@ function companyFilesSection(companyId, files){
               <div class="file-sub">${fmtSize(f.file_size)} · ${fmtDT(f.created_at)}${f.uploaded_by?' · '+esc(f.uploaded_by):''}</div>
             </div>
             <span style="cursor:pointer;color:var(--primary);font-size:11px" onclick="downloadCompanyFile('${f.id}')">İndir</span>
-            <span style="cursor:pointer;color:var(--faint);font-size:12px;margin-left:4px" onclick="deleteCompanyFile('${f.id}','${companyId}')" title="Sil">🗑</span>
+            <span style="cursor:pointer;color:var(--faint);font-size:12px;margin-left:4px" onclick="deleteCompanyFile('${f.id}',${ctx})" title="Sil">🗑</span>
           </div>`).join('')}
       </div>
     </div>
   </div>`;
 }
-async function uploadCompanyFiles(companyId, fileList){
+function refreshFilesPanel(companyId, oppId){
+  if(oppId) openOpportunityDetail(oppId); else openCompanyPanel(companyId);
+}
+async function uploadCompanyFiles(companyId, oppId, fileList){
   const files = Array.from(fileList||[]);
   if(!files.length) return;
-  const statusEl = document.getElementById('fileUploadStatus-'+companyId);
+  const statusEl = document.getElementById('fileUploadStatus-'+(oppId ? 'opp-'+oppId : companyId));
   const setStatus = t => { if(statusEl){ statusEl.textContent = t; statusEl.classList.remove('hidden'); } };
   let okCount = 0;
   for(let i=0; i<files.length; i++){
@@ -1538,7 +1545,7 @@ async function uploadCompanyFiles(companyId, fileList){
     if(conf.success) okCount++;
   }
   if(okCount) toast(`✓ ${okCount} dosya yüklendi`);
-  openCompanyPanel(companyId);
+  refreshFilesPanel(companyId, oppId);
 }
 async function downloadCompanyFile(fileId){
   const d = await api('getFileDownloadUrl', { fileId });
@@ -1547,10 +1554,10 @@ async function downloadCompanyFile(fileId){
   a.href = d.url; a.rel = 'noopener';
   document.body.appendChild(a); a.click(); a.remove();
 }
-async function deleteCompanyFile(fileId, companyId){
+async function deleteCompanyFile(fileId, companyId, oppId){
   if(!confirm('Bu dosyayı kalıcı olarak sil? Bu işlem geri alınamaz.')) return;
   const d = await api('deleteFile', { fileId });
-  if(d.success){ toast('🗑 Dosya silindi'); openCompanyPanel(companyId); }
+  if(d.success){ toast('🗑 Dosya silindi'); refreshFilesPanel(companyId, oppId); }
 }
 
 // ══════════════════════════════════════════════
@@ -1624,6 +1631,8 @@ async function openOpportunityDetail(opportunityId){
           <div class="mini-item"><span class="badge" style="background:var(--purple-bg);color:var(--purple);margin-right:5px">${trLabel(m.type)}</span>${esc(m.title)} <span style="color:var(--muted)">· ${m.meeting_date}</span></div>`).join('')}
       </div>
     </div>
+
+    ${companyFilesSection(co.id, d.files || [], o.id)}
 
     <div class="ps">
       <div class="ps-head">Teklifler (${d.proposals.length})<span style="cursor:pointer;color:var(--primary)" onclick="quickAddProposalFromOpp('${o.id}','${co.id}')">+ Ekle</span></div>
