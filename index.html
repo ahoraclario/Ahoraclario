@@ -663,17 +663,17 @@ async function renderDashboard(){
   // Sales Pipeline (mini önizleme) filtresi — SADECE o bölümdeki kartları etkiler, özet kartlarına dokunmaz.
   if(dashboardPipeFilter === 'high') opps = opps.filter(o => o.companies?.priority === 'High');
   if(dashboardPipeDateFilter !== 'all'){
-    const todayStr = new Date().toISOString().slice(0,10);
+    const todayStr = localDateStr();
     let cutoff = todayStr;
     if(dashboardPipeDateFilter==='week'){
       const dow = (new Date().getDay()+6)%7;
       const monday = new Date(); monday.setDate(monday.getDate()-dow);
-      cutoff = monday.toISOString().slice(0,10);
+      cutoff = localDateStr(monday);
     } else if(dashboardPipeDateFilter==='month'){
       const now = new Date();
       cutoff = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
     }
-    opps = opps.filter(o => o.created_at && o.created_at.slice(0,10) >= cutoff);
+    opps = opps.filter(o => o.created_at && localDateStr(new Date(o.created_at)) >= cutoff);
   }
 
   function trendPct(arr){
@@ -773,10 +773,10 @@ async function renderDashboard(){
     <div class="stats">
       ${statCard('💰','#39D98A','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Değeri', d.trends?.pipelineValue, "renderDrilldown('pipelineValue')")}
       ${statCard('👥','#3B82F6',d.newProspects||0,'Yeni Adaylar', d.trends?.newProspects, "renderDrilldown('newProspectsMonth')")}
-      ${statCard('📅','#A78BFA',d.followUpsToday||0,'Bugünkü Follow-up', d.trends?.followUps, "renderDrilldown('followUpsToday')")}
-      ${statCard('🖥️','#22D3EE',d.demosThisWeek||0,'Bu Hafta Demo', d.trends?.demos, "renderDrilldown('demosWeek')")}
+      ${statCard('📅','#A78BFA',d.followUpsToday||0,'Follow-up', d.trends?.followUps, "renderDrilldown('followUpsToday')")}
+      ${statCard('🖥️','#22D3EE',d.demosThisWeek||0,'Demo', d.trends?.demos, "renderDrilldown('demosWeek')")}
       ${statCard('📄','#F59E0B',d.openProposals||0,'Bekleyen Teklifler', d.trends?.openProposals, "renderDrilldown('openProposals')")}
-      ${statCard('🏆','#39D98A',d.wonThisMonth||0,'Bu Ay Kazanılan', d.trends?.wonRevenue, "renderDrilldown('wonMonth')")}
+      ${statCard('🏆','#39D98A',d.wonThisMonth||0,'Kazanılan', d.trends?.wonRevenue, "renderDrilldown('wonMonth')")}
     </div>
 
     <div class="dash-grid">
@@ -1093,7 +1093,8 @@ async function renderDrilldown(view){
   const panel = document.getElementById('drilldownPanel');
   panel.innerHTML = '<div class="empty" style="padding:40px">Yükleniyor...</div>';
   document.getElementById('drilldownOverlay').classList.add('open');
-  const d = await api('getDrilldown', { view });
+  // Dönem her zaman gönderiliyor; backend sadece döneme bağlı görünümlerde (yeni aday, follow-up, demo, kazanılan) kullanıyor.
+  const d = await api('getDrilldown', { view, period: dashboardPeriod });
   if(!d.success){ panel.innerHTML = `<div class="panel-top"><h2>Hata</h2><button class="panel-close" onclick="closeDrilldownPanel()">✕</button></div><div class="empty" style="padding:40px">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderDrilldown('${view}')">↻ Tekrar Dene</span></div>`; return; }
   const records = d.records || [];
   panel.innerHTML = `
@@ -1897,7 +1898,7 @@ async function renderTasks(filter){
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderTasks()">↻ Tekrar Dene</span></div>'; return; }
   let tasksAll = d.tasks || [];
-  const today = new Date().toISOString().slice(0,10);
+  const today = localDateStr();
 
   // ── Dashboard kartlarından gelen filtre (örn: sadece Call/Meeting türü, ya da bu hafta) ──
   if(filter?.types){
@@ -1910,7 +1911,7 @@ async function renderTasks(filter){
     const dow = (new Date().getDay()+6)%7;
     const monday = new Date(); monday.setDate(monday.getDate()-dow); monday.setHours(0,0,0,0);
     const sunday = new Date(monday); sunday.setDate(monday.getDate()+6);
-    const mS = monday.toISOString().slice(0,10), sS = sunday.toISOString().slice(0,10);
+    const mS = localDateStr(monday), sS = localDateStr(sunday);
     tasksAll = tasksAll.filter(t => t.due_date && t.due_date>=mS && t.due_date<=sS);
   }
 
@@ -1962,6 +1963,8 @@ function safeLink(url, label){
   if(!/^https?:\/\//i.test(u)) return esc(label);  // güvensiz/eksik şema — düz metin olarak göster, link yapma
   return `<a href="${escAttr(u)}" target="_blank" rel="noopener noreferrer">${esc(label)}</a>`;
 }
+// Tarayıcının yerel saatine göre "YYYY-MM-DD". toISOString() UTC verdiği için gece 00:00–03:00 arası bir önceki günü döndürüyordu.
+function localDateStr(d=new Date()){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function fmtDT(iso){ if(!iso) return '—'; const d=new Date(iso); return d.toLocaleDateString('tr-TR')+' '+d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }
 function daysSince(iso){ if(!iso) return 0; return Math.max(0, Math.floor((Date.now()-new Date(iso).getTime())/86400000)); }
 function initials(name){
