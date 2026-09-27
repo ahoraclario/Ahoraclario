@@ -631,13 +631,20 @@ async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.page===page));
   const main = document.getElementById('main');
   main.innerHTML = '<div class="empty">Yükleniyor...</div>';
-  if(page==='dashboard') await renderDashboard();
-  else if(page==='myday') await renderMyDay();
-  else if(page==='pipeline') await renderPipeline(stageFilter);
-  else if(page==='companies') await renderCompanies(searchQuery, sourceFilter, periodFilter);
-  else if(page==='tasks') await renderTasks(taskFilter);
-  else if(page==='analytics') await renderAnalytics();
-  else if(page==='settings') await renderSettings();
+  try{
+    if(page==='dashboard') await renderDashboard();
+    else if(page==='myday') await renderMyDay();
+    else if(page==='pipeline') await renderPipeline(stageFilter);
+    else if(page==='companies') await renderCompanies(searchQuery, sourceFilter, periodFilter);
+    else if(page==='tasks') await renderTasks(taskFilter);
+    else if(page==='analytics') await renderAnalytics();
+    else if(page==='settings') await renderSettings();
+  }catch(err){
+    // Beklenmedik bir JS hatası olursa sonsuza dek "Yükleniyor..." yazmasın —
+    // gerçek hatayı göster ki hem kullanıcı sıkışmasın hem sorunu teşhis edebilelim.
+    console.error('Sayfa render hatası:', err);
+    main.innerHTML = `<div class="empty" style="padding:40px">Bir hata oluştu.<br><span style="color:var(--faint);font-size:11px">${esc(err.message||String(err))}</span><br><span style="cursor:pointer;color:var(--primary)" onclick="showPage('${page}')">↻ Tekrar Dene</span></div>`;
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -645,14 +652,29 @@ async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter
 // ══════════════════════════════════════════════
 let dashboardPeriod = 'month';
 let dashboardPipeFilter = 'all';
+let dashboardPipeDateFilter = 'all';
 async function renderDashboard(){
-  const [d, oppsRes, anaRes] = await Promise.all([ api('getDashboard', {period: dashboardPeriod}), api('getOpportunities'), api('getAnalytics') ]);
+  const [d, oppsRes, anaRes, myDay] = await Promise.all([ api('getDashboard', {period: dashboardPeriod}), api('getOpportunities'), api('getAnalytics'), api('getMyDay') ]);
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderDashboard()">↻ Tekrar Dene</span></div>'; return; }
+  try{
   let opps = oppsRes.success ? oppsRes.opportunities : [];
   const analytics = anaRes.success ? anaRes : null;
   // Sales Pipeline (mini önizleme) filtresi — SADECE o bölümdeki kartları etkiler, özet kartlarına dokunmaz.
   if(dashboardPipeFilter === 'high') opps = opps.filter(o => o.companies?.priority === 'High');
+  if(dashboardPipeDateFilter !== 'all'){
+    const todayStr = new Date().toISOString().slice(0,10);
+    let cutoff = todayStr;
+    if(dashboardPipeDateFilter==='week'){
+      const dow = (new Date().getDay()+6)%7;
+      const monday = new Date(); monday.setDate(monday.getDate()-dow);
+      cutoff = monday.toISOString().slice(0,10);
+    } else if(dashboardPipeDateFilter==='month'){
+      const now = new Date();
+      cutoff = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
+    }
+    opps = opps.filter(o => o.created_at && o.created_at.slice(0,10) >= cutoff);
+  }
 
   function trendPct(arr){
     if(!arr || arr.length<2) return 0;
@@ -711,8 +733,7 @@ async function renderDashboard(){
   const donutHtml = sources.length ? donutChart(sources.map((s,i)=>({label:s.source, value:s.total, color:donutColors[i%donutColors.length]}))) : '<div class="empty" style="padding:20px">Henüz kaynak verisi yok</div>';
   const donutLegend = sources.map((s,i)=>`<div class="donut-legend-row" style="cursor:pointer" onclick="renderDrilldown('source:'+encodeURIComponent('${escAttr(s.source)}'))"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
 
-  // ── Sağ panel: Today's Actions — kaynak dokümandaki action-call/email/followup/demo/overdue renk şemasına göre ──
-  const myDay = await api('getMyDay');
+  // ── Sağ panel: Today's Actions — kaynak dokümandaki action-call/email/followup/demo/overdue renk şemasına göre (myDay artık yukarıdaki paralel çağrıdan geliyor) ──
   const TASK_TYPE_TAG = {
     Call: { tag:'Call', color:'#3B82F6' },
     Meeting: { tag:'Meeting', color:'#3B82F6' },
@@ -732,13 +753,17 @@ async function renderDashboard(){
 
   main.innerHTML = `
     <div class="page-head">
-      <div><h1>Good morning, ${esc(CU.name)} 👋</h1><p>İşte satış operasyonunun bugünkü özeti.</p></div>
+      <div><h1>Merhaba, ${esc(CU.name)} 👋</h1><p>İşte satış operasyonunun özeti.</p></div>
       <div style="display:flex;gap:8px;align-items:center">
         <select onchange="dashboardPeriod=this.value;renderDashboard()" style="width:auto;padding:8px 12px;font-size:12.5px" title="Sadece özet kartlarını etkiler">
           <option value="today" ${dashboardPeriod==='today'?'selected':''}>Bugün</option>
+          <option value="yesterday" ${dashboardPeriod==='yesterday'?'selected':''}>Dün</option>
           <option value="week" ${dashboardPeriod==='week'?'selected':''}>Bu Hafta</option>
+          <option value="last7" ${dashboardPeriod==='last7'?'selected':''}>Son 7 Gün</option>
           <option value="month" ${dashboardPeriod==='month'?'selected':''}>Bu Ay</option>
+          <option value="last30" ${dashboardPeriod==='last30'?'selected':''}>Son 30 Gün</option>
           <option value="quarter" ${dashboardPeriod==='quarter'?'selected':''}>Bu Çeyrek</option>
+          <option value="year" ${dashboardPeriod==='year'?'selected':''}>Bu Yıl</option>
           <option value="all" ${dashboardPeriod==='all'?'selected':''}>Tüm Zamanlar</option>
         </select>
         <button class="btn-ghost" onclick="showPage('myday')">☀️ My Day'e Git</button>
@@ -759,6 +784,12 @@ async function renderDashboard(){
         <div class="ps">
           <div class="ps-head">Satış Pipeline'ı
             <span style="display:flex;align-items:center;gap:10px">
+              <select onchange="dashboardPipeDateFilter=this.value;renderDashboard()" style="width:auto;padding:4px 9px;font-size:11px" title="Sadece bu bölümü etkiler">
+                <option value="all" ${dashboardPipeDateFilter==='all'?'selected':''}>Her Tarihten</option>
+                <option value="today" ${dashboardPipeDateFilter==='today'?'selected':''}>Bugün Eklenen</option>
+                <option value="week" ${dashboardPipeDateFilter==='week'?'selected':''}>Bu Hafta Eklenen</option>
+                <option value="month" ${dashboardPipeDateFilter==='month'?'selected':''}>Bu Ay Eklenen</option>
+              </select>
               <select onchange="dashboardPipeFilter=this.value;renderDashboard()" style="width:auto;padding:4px 9px;font-size:11px" title="Sadece bu bölümü etkiler">
                 <option value="all" ${dashboardPipeFilter==='all'?'selected':''}>Tüm Anlaşmalar</option>
                 <option value="high" ${dashboardPipeFilter==='high'?'selected':''}>🔥 Yüksek Öncelikli</option>
@@ -811,6 +842,10 @@ async function renderDashboard(){
         </div>
       </div>
     </div>`;
+  }catch(err){
+    console.error('Dashboard render hatası:', err);
+    main.innerHTML = `<div class="empty" style="padding:40px">Bir hata oluştu.<br><span style="color:var(--faint);font-size:11px">${esc(err.message||String(err))}</span><br><span style="cursor:pointer;color:var(--primary)" onclick="renderDashboard()">↻ Tekrar Dene</span></div>`;
+  }
 }
 
 function sparkline(data, color){
