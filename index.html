@@ -618,12 +618,17 @@ async function toggleNotifications(){
       <div><div>${esc(i.text)}</div><div style="color:var(--muted);font-size:10.5px">${esc(i.sub||'')}</div></div>
     </div>`).join('') : '<div class="search-empty">You\'re all caught up 🎉</div>';
 }
-(function tryRestoreSession(){
+// Oturum geri yükleme, script'in TAMAMI çalıştıktan SONRA yapılır. Önceden burada anında
+// çalışıyordu: sayfa açık oturumla yenilenince dashboard, aşağıda tanımlı `let dashboardPeriod`
+// vb. değişkenler henüz oluşmadan çiziliyor ve "Cannot access ... before initialization" veriyordu.
+function tryRestoreSession(){
   try{
     const raw = sessionStorage.getItem('ahoraclario_session');
     if(raw){ CU = JSON.parse(raw); enterApp(); }
   }catch(e){}
-})();
+}
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tryRestoreSession);
+else setTimeout(tryRestoreSession, 0);
 
 // ── SAYFA YÖNLENDİRME ──
 async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter, periodFilter){
