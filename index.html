@@ -340,17 +340,17 @@ tr.row-click:hover{background:var(--surface-2)}
 </div>
 
 <!-- Company Detay Paneli -->
-<div class="overlay" id="companyOverlay">
+<div class="overlay" id="companyOverlay" onclick="if(event.target===this) closeCompanyPanel()">
   <div class="panel" id="companyPanel"></div>
 </div>
 
 <!-- Opportunity Detail Paneli -->
-<div class="overlay" id="oppOverlay">
+<div class="overlay" id="oppOverlay" onclick="if(event.target===this) closeOppPanel()">
   <div class="panel" id="oppPanel"></div>
 </div>
 
 <!-- Drilldown Paneli (kart/grafik tıklamalarının GERÇEK varış noktası — üstte açılır, kapatınca alttaki sayfa aynen kalır) -->
-<div class="modal-overlay" id="drilldownOverlay">
+<div class="modal-overlay" id="drilldownOverlay" onclick="if(event.target===this) closeDrilldownPanel()">
   <div class="modal-wide" id="drilldownPanel"></div>
 </div>
 
@@ -480,6 +480,40 @@ function toast(msg){
   setTimeout(()=>t.classList.remove('show'), 2600);
 }
 
+// ══════════════════════════════════════════════
+// PENCERE KATMANLARI (alttan üste):
+//   sayfa → drilldown listesi (z150) → sağ paneller: şirket / fırsat (z200) → form pencereleri (z300)
+// Üstteki kapanınca alttaki AYNEN açık kalır. Panelde veri değiştiyse, son panel kapanınca
+// arkadaki liste ve sayfa sessizce tazelenir (silinmiş/eski kayıt görünmesin).
+// ══════════════════════════════════════════════
+const READ_ONLY_ACTIONS = new Set(['login','logout','heartbeat','globalSearch']);
+let dataDirty = false;          // panelde veri değişti mi?
+let lastPageArgs = null;        // arkadaki sayfayı AYNI filtrelerle yeniden çizmek için
+let lastDrilldownView = null;   // arkadaki listeyi yenilemek için
+let currentOppPanelId = null, currentCompanyPanelId = null;
+function isOpen(id){ return document.getElementById(id)?.classList.contains('open'); }
+function anySidePanelOpen(){ return isOpen('companyOverlay') || isOpen('oppOverlay'); }
+function refreshBackgroundIfDirty(){
+  if(!dataDirty || anySidePanelOpen()) return;
+  dataDirty = false;
+  if(isOpen('drilldownOverlay') && lastDrilldownView) renderDrilldown(lastDrilldownView);
+  if(lastPageArgs) showPage(...lastPageArgs);
+}
+// Açık panelleri taze veriyle yeniden çiz (form penceresinde kayıt yapıldıktan sonra).
+function refreshOpenPanels(){
+  if(isOpen('companyOverlay') && currentCompanyPanelId) openCompanyPanel(currentCompanyPanelId);
+  if(isOpen('oppOverlay') && currentOppPanelId) openOpportunityDetail(currentOppPanelId);
+}
+// ESC → sadece EN ÜSTTEKİ pencereyi kapatır.
+function closeTopLayer(){
+  if(isOpen('editContactModal')) return closeEditContactModal();
+  if(isOpen('editOppModal')) return closeEditOppModal();
+  if(isOpen('addCompanyModal')) return closeAddCompanyModal();
+  if(isOpen('oppOverlay')) return closeOppPanel();
+  if(isOpen('companyOverlay')) return closeCompanyPanel();
+  if(isOpen('drilldownOverlay')) return closeDrilldownPanel();
+}
+
 async function api(action, params={}){
   try{
     const res = await fetch(EDGE_FUNCTION_URL, {
@@ -487,6 +521,7 @@ async function api(action, params={}){
       body: JSON.stringify({ action, token: CU?.token, ...params })
     });
     const d = await res.json();
+    if(d.success && !READ_ONLY_ACTIONS.has(action) && !action.startsWith('get')) dataDirty = true;
     if(!d.success){
       if(d.error?.status === 401){ doLogout(true); }
       toast('Hata: ' + (d.error?.message || 'Bilinmeyen hata'));
@@ -586,7 +621,11 @@ document.addEventListener('click', e => {
   if(!e.target.closest('.topbar-right')) document.getElementById('notifDropdown')?.classList.add('hidden');
 });
 document.addEventListener('keydown', e => {
-  if(e.key === 'Escape'){ document.getElementById('searchResults')?.classList.add('hidden'); document.getElementById('globalSearch')?.blur(); }
+  if(e.key === 'Escape'){
+    const searchOpen = !document.getElementById('searchResults')?.classList.contains('hidden');
+    document.getElementById('searchResults')?.classList.add('hidden'); document.getElementById('globalSearch')?.blur();
+    if(!searchOpen) closeTopLayer();
+  }
 });
 
 // ── Bildirimler (gerçek CRM olaylarından: geciken görev, yaklaşan toplantı, bekleyen teklif) ──
@@ -633,6 +672,8 @@ else setTimeout(tryRestoreSession, 0);
 // ── SAYFA YÖNLENDİRME ──
 async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter, periodFilter){
   currentPage = page;
+  lastPageArgs = [page, searchQuery, sourceFilter, stageFilter, taskFilter, periodFilter];
+  dataDirty = false;
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.page===page));
   const main = document.getElementById('main');
   main.innerHTML = '<div class="empty">Yükleniyor...</div>';
@@ -1095,6 +1136,7 @@ async function renderSettings(){
 // arkasındaki GERÇEK kayıtlar burada, alakasız bir sayfaya değil.
 // ══════════════════════════════════════════════
 async function renderDrilldown(view){
+  lastDrilldownView = view;
   const panel = document.getElementById('drilldownPanel');
   panel.innerHTML = '<div class="empty" style="padding:40px">Yükleniyor...</div>';
   document.getElementById('drilldownOverlay').classList.add('open');
@@ -1224,6 +1266,7 @@ async function submitAddCompany(){
 async function openCompanyPanel(companyId){
   const d = await api('getCompanyDetail', { companyId });
   if(!d.success) return;
+  currentCompanyPanelId = companyId;
   const c = d.company;
   const panel = document.getElementById('companyPanel');
   panel.innerHTML = `
@@ -1461,7 +1504,7 @@ async function openCompanyPanel(companyId){
   `;
   document.getElementById('companyOverlay').classList.add('open');
 }
-function closeCompanyPanel(){ document.getElementById('companyOverlay').classList.remove('open'); }
+function closeCompanyPanel(){ document.getElementById('companyOverlay').classList.remove('open'); refreshBackgroundIfDirty(); }
 
 // ══════════════════════════════════════════════
 // ŞİRKET DOSYALARI
@@ -1566,6 +1609,7 @@ async function deleteCompanyFile(fileId, companyId, oppId){
 async function openOpportunityDetail(opportunityId){
   const d = await api('getOpportunityDetail', { opportunityId });
   if(!d.success) return;
+  currentOppPanelId = opportunityId;
   const o = d.opportunity, co = d.company, pc = d.primaryContact;
   const panel = document.getElementById('oppPanel');
   panel.innerHTML = `
@@ -1669,7 +1713,7 @@ async function openOpportunityDetail(opportunityId){
   `;
   document.getElementById('oppOverlay').classList.add('open');
 }
-function closeOppPanel(){ document.getElementById('oppOverlay').classList.remove('open'); }
+function closeOppPanel(){ document.getElementById('oppOverlay').classList.remove('open'); refreshBackgroundIfDirty(); }
 
 async function saveOppDetailFields(opportunityId){
   const opportunity = {
@@ -1796,10 +1840,8 @@ async function saveOpportunityDetails(){
     toast('✓ Anlaşma detayları kaydedildi');
     const cid = editingOppCompanyId;
     closeEditOppModal();
-    if(currentPage==='companies') renderCompanies();
-    else if(currentPage==='pipeline') renderPipeline();
-    else if(currentPage==='dashboard') renderDashboard();
-    else openCompanyPanel(cid);
+    if(anySidePanelOpen()) refreshOpenPanels();   // panel açıksa onu tazele; arka plan panel kapanınca tazelenir
+    else refreshBackgroundIfDirty();              // panel yoksa (örn. dashboard kartından açıldıysa) sayfayı tazele
   }
 }
 
@@ -1852,7 +1894,7 @@ async function saveContactEdit(){
     toast('✓ Kişi güncellendi');
     const cid = editingContactCompanyId;
     closeEditContactModal();
-    openCompanyPanel(cid);
+    if(anySidePanelOpen()) refreshOpenPanels(); else openCompanyPanel(cid);
   }
 }
 async function deleteContactConfirm(contactId, companyId){
@@ -1936,7 +1978,7 @@ async function deleteProposalConfirm(proposalId, companyId){
 async function deleteCompanyConfirm(companyId){
   if(!confirm('Bu şirketi ve tüm ilişkili kayıtları silmek istediğinize emin misiniz?')) return;
   const d = await api('deleteCompany', { companyId });
-  if(d.success){ toast('🗑 Şirket silindi'); closeCompanyPanel(); renderCompanies(); }
+  if(d.success){ toast('🗑 Şirket silindi'); closeOppPanel(); closeCompanyPanel(); }
 }
 
 // ══════════════════════════════════════════════
