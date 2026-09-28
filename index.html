@@ -499,6 +499,173 @@ function toast(msg){
   setTimeout(()=>t.classList.remove('show'), 2600);
 }
 
+// ══════════════════════════════════════════════
+// ANINDA AÇILAN SAYFALAR
+// Veriler arka planda önceden çekilip burada tutulur. Sayfa/panel açılırken hazır veri
+// BEKLEMEDEN gösterilir; aynı anda taze veri istenir, değiştiyse ekran sessizce güncellenir.
+// Bir kayıt değişince (ekle/sil/güncelle) tüm veriler "eski" işaretlenip arkada yenilenir.
+// ══════════════════════════════════════════════
+const CACHE_STORE = 'ahoraclario_cache_v1';
+const DETAIL_ACTIONS = new Set(['getCompanyDetail','getOpportunityDetail','getTicketDetail']);
+const CACHE_MAX_AGE = 30000;             // 30 sn'den eski veri gösterilir ama arkada tazelenir
+let qcache = new Map();                  // key → { data, t, stale }
+const inflight = new Map();              // aynı veri için aynı anda tek istek
+let renderKeys = null, pageKeys = new Set(), preferFresh = false, silentRender = false;
+const qkey = (action, params) => action + '|' + JSON.stringify(params || {});
+function loadCache(){
+  try{
+    const raw = sessionStorage.getItem(CACHE_STORE);
+    if(raw) qcache = new Map(Object.entries(JSON.parse(raw)).map(([k,v]) => [k, { ...v, stale:true }]));
+  }catch(e){}
+}
+let persistTimer = null;
+function persistCache(){
+  clearTimeout(persistTimer);
+  persistTimer = setTimeout(() => {
+    try{
+      const o = {};
+      for(const [k,v] of qcache) if(!DETAIL_ACTIONS.has(k.split('|')[0])) o[k] = { data:v.data, t:v.t };
+      sessionStorage.setItem(CACHE_STORE, JSON.stringify(o));
+    }catch(e){}
+  }, 800);
+}
+function clearCache(){ qcache = new Map(); try{ sessionStorage.removeItem(CACHE_STORE); }catch(e){} }
+function fetchFresh(action, params){
+  const k = qkey(action, params);
+  if(inflight.has(k)) return inflight.get(k);
+  const pr = api(action, params).then(d => {
+    inflight.delete(k);
+    if(d.success){
+      const prev = qcache.get(k);
+      const changed = prev && JSON.stringify(prev.data) !== JSON.stringify(d);
+      qcache.set(k, { data:d, t:Date.now(), stale:false });
+      persistCache();
+      if(changed) onCacheUpdated(k);
+    }
+    return d;
+  });
+  inflight.set(k, pr);
+  return pr;
+}
+// Okuma isteği: hazırsa ANINDA döner (gerekirse arkada tazeler); yoksa bekler.
+// opts.fresh: veri bir değişiklik yüzünden eskidiyse taze veriyi bekle (panel yenilemeleri için).
+function rq(action, params = {}, opts = {}){
+  const k = qkey(action, params);
+  if(renderKeys && !DETAIL_ACTIONS.has(action)) renderKeys.add(k);
+  const hit = qcache.get(k);
+  const wantFresh = opts.fresh || preferFresh;
+  if(hit && !(wantFresh && hit.stale)){
+    if(hit.stale || Date.now() - hit.t > CACHE_MAX_AGE) fetchFresh(action, params);
+    return Promise.resolve(hit.data);
+  }
+  return fetchFresh(action, params);
+}
+function prefetch(action, params = {}){
+  if(!CU) return;
+  const hit = qcache.get(qkey(action, params));
+  if(hit && !hit.stale && Date.now() - hit.t < CACHE_MAX_AGE) return;
+  fetchFresh(action, params);
+}
+function invalidateCache(){ for(const v of qcache.values()) v.stale = true; }
+const PAGE_DATA = {
+  dashboard: () => [['getDashboard',{period:dashboardPeriod}],['getOpportunities',{}],['getAnalytics',{}],['getMyDay',{}]],
+  myday:     () => [['getMyDay',{}],['getSettings',{}]],
+  pipeline:  () => [['getOpportunities',{}]],
+  companies: () => [['getCompanies',{}]],
+  tasks:     () => [['getTasks',{}]],
+  tickets:   () => [['getTickets',{filter:ticketFilter}]],
+  analytics: () => [['getAnalytics',{}]],
+  settings:  () => [['getSettings',{}]],
+};
+function prefetchPage(page){ (PAGE_DATA[page]?.() || []).forEach(([a,p]) => prefetch(a, p)); }
+// Tüm sayfaların verisini sırayla (sunucuyu boğmadan) hazırlar.
+function prefetchAllPages(){
+  const jobs = [];
+  const seen = new Set();
+  Object.values(PAGE_DATA).forEach(fn => fn().forEach(j => { const k = qkey(j[0], j[1]); if(!seen.has(k)){ seen.add(k); jobs.push(j); } }));
+  let i = 0;
+  const next = () => { if(i >= jobs.length || !CU) return; const [a,p] = jobs[i++]; prefetch(a, p); setTimeout(next, 120); };
+  next();
+}
+let bgRefreshTimer = null;
+function scheduleBackgroundRefresh(){
+  clearTimeout(bgRefreshTimer);
+  bgRefreshTimer = setTimeout(() => {
+    prefetchAllPages();
+    if(isOpen('drilldownOverlay') && lastDrilldownView) prefetch('getDrilldown', { view:lastDrilldownView, period:dashboardPeriod });
+  }, 600);
+}
+// Arkadan taze veri geldi ve farklıysa: o veriyi kullanan sayfa/paneli sessizce yeniden çiz.
+function onCacheUpdated(k){
+  if(pageKeys.has(k)) silentRerenderPage();
+  const action = k.split('|')[0], params = JSON.parse(k.slice(action.length + 1));
+  if(action === 'getCompanyDetail' && isOpen('companyOverlay') && currentCompanyPanelId === params.companyId) silentRefreshPanel('companyOverlay', () => openCompanyPanel(params.companyId));
+  if(action === 'getOpportunityDetail' && isOpen('oppOverlay') && currentOppPanelId === params.opportunityId) silentRefreshPanel('oppOverlay', () => openOpportunityDetail(params.opportunityId));
+  if(action === 'getTicketDetail' && isOpen('ticketOverlay') && currentTicketId === params.ticketId) silentRefreshPanel('ticketOverlay', () => openTicketPanel(params.ticketId));
+  if(action === 'getDrilldown' && isOpen('drilldownOverlay') && lastDrilldownView === params.view) renderDrilldown(params.view);
+}
+function userIsEditingIn(root){
+  const ae = document.activeElement;
+  if(ae && root.contains(ae) && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName) && ae.id !== 'co-search') return true;
+  return [...root.querySelectorAll('[id^="add"][id*="Form-"]')].some(f => !f.classList.contains('hidden'));  // açık ekleme formu
+}
+// Sayfadaki kutulara yazılanlar her tuşta kaydedilir; sessiz güncellemeden sonra EN SON değer geri konur.
+let liveInputs = {};
+['input','change'].forEach(ev => document.addEventListener(ev, e => {
+  const el = e.target;
+  if(el?.id && el.closest?.('#main') && el.type !== 'file') liveInputs[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+}));
+let pageSeq = 0;
+function captureInputs(root){ const v = {}; root.querySelectorAll('input[id],textarea[id],select[id]').forEach(el => { if(el.type !== 'file') v[el.id] = el.type === 'checkbox' ? el.checked : el.value; }); return v; }
+function restoreInputs(v){ Object.entries(v).forEach(([id,val]) => { const el = document.getElementById(id); if(el){ if(el.type === 'checkbox') el.checked = val; else el.value = val; } }); }
+function silentRerenderPage(){
+  const main = document.getElementById('main');
+  if(!lastPageArgs || userIsEditingIn(main)) return;
+  runSilentRender(false);
+}
+function runSilentRender(fresh){
+  const main = document.getElementById('main'), y = main.scrollTop;
+  silentRender = true; preferFresh = !!fresh;
+  const pr = showPage(...lastPageArgs);          // silentRender/preferFresh showPage'in başında tüketilir
+  const mySeq = pageSeq;
+  pr.finally(() => {
+    if(mySeq !== pageSeq) return;                // bu arada başka bir sayfa çizimi başladı: ona dokunma
+    restoreInputs(liveInputs);
+    if(document.getElementById('co-search')) filterCompanyRows();
+    main.scrollTop = y;
+  });
+}
+async function silentRefreshPanel(overlayId, reopen){
+  const panel = document.getElementById(overlayId).querySelector('.panel');
+  if(userIsEditingIn(panel)) return;
+  const y = panel.scrollTop, vals = captureInputs(panel);
+  await reopen();
+  restoreInputs(vals);
+  panel.scrollTop = y;
+}
+// Arka planda tazeleme döngüsü: sekme görünürken 2 dakikada bir, sekmeye dönünce hemen.
+setInterval(() => { if(CU && document.visibilityState === 'visible') prefetchAllPages(); }, 120000);
+window.addEventListener('focus', () => { if(CU) prefetchAllPages(); });
+// Fare bir menüye / şirkete / fırsata / talebe gelince verisini hazırlamaya başla.
+let hoverTimer = null;
+document.addEventListener('mouseover', e => {
+  if(!CU) return;
+  const nav = e.target.closest?.('.nav-item[data-page]');
+  if(nav){ prefetchPage(nav.dataset.page); return; }
+  const el = e.target.closest?.('[onclick]');
+  if(!el) return;
+  const m = el.getAttribute('onclick').match(/(openCompanyPanel|closeSearchAndOpen|openOpportunityDetail|openTicketPanel|openDrilldownRecord)\('([^']*)'(?:,\s*'([^']*)')?(?:,\s*'([^']*)')?/);
+  if(!m) return;
+  clearTimeout(hoverTimer);
+  hoverTimer = setTimeout(() => {
+    const [, fn, a1, a2, a3] = m;
+    if(fn === 'openCompanyPanel' || fn === 'closeSearchAndOpen') prefetch('getCompanyDetail', { companyId:a1 });
+    else if(fn === 'openOpportunityDetail') prefetch('getOpportunityDetail', { opportunityId:a1 });
+    else if(fn === 'openTicketPanel') prefetch('getTicketDetail', { ticketId:a1 });
+    else if(fn === 'openDrilldownRecord') a1 === 'opportunity' ? prefetch('getOpportunityDetail', { opportunityId:a2 }) : prefetch('getCompanyDetail', { companyId:a3 });
+  }, 60);
+});
+
 const READ_ONLY_ACTIONS = new Set(['login','logout','heartbeat','globalSearch']);
 let dataDirty = false;
 let lastPageArgs = null;
@@ -522,8 +689,13 @@ function anySidePanelOpen(){ return isOpen('companyOverlay') || isOpen('oppOverl
 function refreshBackgroundIfDirty(){
   if(!dataDirty || anySidePanelOpen()) return;
   dataDirty = false;
-  if(isOpen('drilldownOverlay') && lastDrilldownView) renderDrilldown(lastDrilldownView);
-  if(lastPageArgs) showPage(...lastPageArgs);
+  if(isOpen('drilldownOverlay') && lastDrilldownView) renderDrilldown(lastDrilldownView, true);
+  refreshPageFresh();
+}
+// Değişiklik sonrası: sayfa ekranda kalır, taze veri gelince yerinde güncellenir.
+function refreshPageFresh(){
+  if(!lastPageArgs) return;
+  runSilentRender(true);
 }
 function refreshOpenPanels(){
   if(isOpen('companyOverlay') && currentCompanyPanelId) openCompanyPanel(currentCompanyPanelId);
@@ -584,7 +756,7 @@ async function api(action, params={}){
       body: JSON.stringify({ action, token: sentToken, ...params })
     });
     const d = await res.json();
-    if(d.success && !READ_ONLY_ACTIONS.has(action) && !action.startsWith('get') && action !== 'exportData'){ dataDirty = true; scheduleNavBadgeRefresh(); }
+    if(d.success && !READ_ONLY_ACTIONS.has(action) && !action.startsWith('get') && action !== 'exportData'){ dataDirty = true; invalidateCache(); scheduleNavBadgeRefresh(); scheduleBackgroundRefresh(); }
     if(!d.success){
       if(d.error?.status === 401 && action !== 'login'){
         if(sentToken && CU?.token === sentToken) doLogout(true);
@@ -609,6 +781,7 @@ async function doLogin(){
   loginInFlight = false; btn.disabled = false; btn.textContent = 'Giriş Yap';
   if(!d.success){ errEl.textContent = d.error?.message || 'Giriş yapılamadı'; errEl.style.display='block'; return; }
   document.getElementById('li-pass').value = '';
+  clearCache();
   CU = { token: d.token, name: d.user.name, username: d.user.username, email: d.user.email || null };
   sessionStorage.setItem('ahoraclario_session', JSON.stringify(CU));
   enterApp();
@@ -619,6 +792,7 @@ function doLogout(silent){
   if(heartbeatInterval){ clearInterval(heartbeatInterval); heartbeatInterval = null; }
   CU = null;
   sessionStorage.removeItem('ahoraclario_session');
+  clearCache();
   document.getElementById('app').classList.remove('open');
   document.getElementById('login-screen').style.display='flex';
 }
@@ -627,7 +801,7 @@ function enterApp(){
   document.getElementById('app').classList.add('open');
   document.getElementById('sbUserName').textContent = CU.name;
   document.getElementById('topbarAvatar').textContent = initials(CU.name);
-  showPage('dashboard');
+  showPage('dashboard').then(() => setTimeout(prefetchAllPages, 300));
   refreshNavBadges();
   if(heartbeatInterval) clearInterval(heartbeatInterval);
   heartbeatInterval = setInterval(() => { if(CU) api('heartbeat'); }, 15*60*1000);
@@ -702,7 +876,7 @@ async function toggleNotifications(){
   if(!dd.classList.contains('hidden')){ dd.classList.add('hidden'); return; }
   dd.innerHTML = '<div class="search-empty">Yükleniyor...</div>';
   dd.classList.remove('hidden');
-  const [myDayRes, dashRes, tkRes] = await Promise.all([ api('getMyDay'), api('getDashboard'), api('getTickets', { filter:'open' }) ]);
+  const [myDayRes, dashRes, tkRes] = await Promise.all([ rq('getMyDay'), rq('getDashboard', {period: dashboardPeriod}), rq('getTickets', { filter:'open' }) ]);
   const items = [];
   if(tkRes.success) (tkRes.tickets||[]).filter(t=>t.status==='Open').slice(0,5).forEach(t => items.push({ color:'var(--blue)', text:`🎫 Yeni talep #${t.ticket_no}: ${t.title}`, sub:t.companies?.name, ticketId:t.id }));
   if(myDayRes.success){
@@ -728,20 +902,28 @@ async function toggleNotifications(){
 function tryRestoreSession(){
   try{
     const raw = sessionStorage.getItem('ahoraclario_session');
-    if(raw){ CU = JSON.parse(raw); enterApp(); }
+    if(raw){ CU = JSON.parse(raw); loadCache(); enterApp(); }
   }catch(e){}
 }
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tryRestoreSession);
 else setTimeout(tryRestoreSession, 0);
 
 async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter, periodFilter){
+  const silent = silentRender, fresh = preferFresh;
+  silentRender = false;
+  pageSeq++;
+  if(!silent) liveInputs = {};
   currentPage = page;
   lastPageArgs = [page, searchQuery, sourceFilter, stageFilter, taskFilter, periodFilter];
   dataDirty = false;
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.page===page));
   const main = document.getElementById('main');
-  main.innerHTML = '<div class="empty">Yükleniyor...</div>';
+  const loadingTimer = silent ? null : setTimeout(() => { if(currentPage === page) main.innerHTML = '<div class="empty">Yükleniyor...</div>'; }, 150);
+  if(!silent) main.scrollTop = 0;
+  const myKeys = renderKeys = new Set();
+  preferFresh = fresh;
   try{
+    const done = (async () => {
     if(page==='dashboard') await renderDashboard();
     else if(page==='myday') await renderMyDay();
     else if(page==='pipeline') await renderPipeline(stageFilter);
@@ -750,9 +932,17 @@ async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter
     else if(page==='analytics') await renderAnalytics();
     else if(page==='tickets') await renderTickets(taskFilter);
     else if(page==='settings') await renderSettings();
+    })();
+    preferFresh = false;          // rq çağrıları yukarıda senkron başladı; bayrak başka isteklere sızmasın
+    await done;
+    if(currentPage === page) pageKeys = myKeys;
   }catch(err){
     console.error('Sayfa render hatası:', err);
+    if(currentPage !== page) return;
     main.innerHTML = `<div class="empty" style="padding:40px">Bir hata oluştu.<br><span style="color:var(--faint);font-size:11px">${esc(err.message||String(err))}</span><br><span style="cursor:pointer;color:var(--primary)" onclick="showPage('${page}')">↻ Tekrar Dene</span></div>`;
+  }finally{
+    clearTimeout(loadingTimer);
+    if(renderKeys === myKeys) renderKeys = null;
   }
 }
 
@@ -761,7 +951,8 @@ let dashboardPeriod = 'month';
 let dashboardPipeFilter = 'all';
 let dashboardPipeDateFilter = 'all';
 async function renderDashboard(){
-  const [d, oppsRes, anaRes, myDay] = await Promise.all([ api('getDashboard', {period: dashboardPeriod}), api('getOpportunities'), api('getAnalytics'), api('getMyDay') ]);
+  const [d, oppsRes, anaRes, myDay] = await Promise.all([ rq('getDashboard', {period: dashboardPeriod}), rq('getOpportunities'), rq('getAnalytics'), rq('getMyDay') ]);
+  if(currentPage !== 'dashboard') return;
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderDashboard()">↻ Tekrar Dene</span></div>'; return; }
   try{
@@ -1019,7 +1210,8 @@ function timeAgo(iso){
 
 // ── MY DAY ──
 async function renderMyDay(){
-  const [d, settingsRes] = await Promise.all([ api('getMyDay'), api('getSettings') ]);
+  const [d, settingsRes] = await Promise.all([ rq('getMyDay'), rq('getSettings') ]);
+  if(currentPage !== 'myday') return;
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderMyDay()">↻ Tekrar Dene</span></div>'; return; }
   const targets = settingsRes.success ? (settingsRes.dailyTargets||{}) : {};
@@ -1075,7 +1267,8 @@ async function renderMyDay(){
 
 // ── RAPORLAR / ANALİTİK ──
 async function renderAnalytics(){
-  const d = await api('getAnalytics');
+  const d = await rq('getAnalytics');
+  if(currentPage !== 'analytics') return;
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderAnalytics()">↻ Tekrar Dene</span></div>'; return; }
 
@@ -1133,7 +1326,8 @@ async function renderAnalytics(){
 
 // ── SETTINGS ──
 async function renderSettings(){
-  const d = await api('getSettings');
+  const d = await rq('getSettings');
+  if(currentPage !== 'settings') return;
   setTimeout(loadClientProjects, 0);
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderSettings()">↻ Tekrar Dene</span></div>'; return; }
@@ -1213,12 +1407,14 @@ async function renderSettings(){
   `;
 }
 
-async function renderDrilldown(view){
+async function renderDrilldown(view, fresh){
   lastDrilldownView = view;
   const panel = document.getElementById('drilldownPanel');
-  panel.innerHTML = '<div class="empty" style="padding:40px">Yükleniyor...</div>';
+  const params = { view, period: dashboardPeriod };
+  if(!qcache.has(qkey('getDrilldown', params))) panel.innerHTML = '<div class="empty" style="padding:40px">Yükleniyor...</div>';
   document.getElementById('drilldownOverlay').classList.add('open');
-  const d = await api('getDrilldown', { view, period: dashboardPeriod });
+  const d = await rq('getDrilldown', params, { fresh: !!fresh });
+  if(lastDrilldownView !== view) return;
   if(!d.success){ panel.innerHTML = `<div class="panel-top"><h2>Hata</h2><button class="panel-close" onclick="closeDrilldownPanel()">✕</button></div><div class="empty" style="padding:40px">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" data-view="${escAttr(view)}" onclick="renderDrilldown(this.dataset.view)">↻ Tekrar Dene</span></div>`; return; }
   const records = d.records || [];
   panel.innerHTML = `
@@ -1270,7 +1466,8 @@ async function renderCompanies(searchQuery, sourceFilter, periodFilter){
   if(searchQuery) params.search = searchQuery;
   if(sourceFilter) params.filterSource = sourceFilter;
   if(periodFilter) params.filterPeriod = periodFilter;
-  const d = await api('getCompanies', params);
+  const d = await rq('getCompanies', params);
+  if(currentPage !== 'companies') return;
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderCompanies()">↻ Tekrar Dene</span></div>'; return; }
   companies = d.companies || [];
@@ -1350,7 +1547,7 @@ async function submitAddCompany(){
 }
 
 async function openCompanyPanel(companyId){
-  const d = await api('getCompanyDetail', { companyId });
+  const d = await rq('getCompanyDetail', { companyId }, { fresh:true });
   if(!d.success) return;
   currentCompanyPanelId = companyId;
   const c = d.company;
@@ -1699,7 +1896,7 @@ async function deleteCompanyFile(fileId, companyId, oppId){
 
 // ── OPPORTUNITY DETAIL ──
 async function openOpportunityDetail(opportunityId){
-  const d = await api('getOpportunityDetail', { opportunityId });
+  const d = await rq('getOpportunityDetail', { opportunityId }, { fresh:true });
   if(!d.success) return;
   currentOppPanelId = opportunityId;
   const o = d.opportunity, co = d.company, pc = d.primaryContact;
@@ -1909,7 +2106,7 @@ async function quickSetPrice(companyId, opportunityId){
 
 async function openEditOpportunityModal(opportunityId, companyId){
   editingOppId = opportunityId; editingOppCompanyId = companyId;
-  const d = await api('getCompanyDetail', { companyId });
+  const d = await rq('getCompanyDetail', { companyId }, { fresh:true });
   const opp = d.success ? d.opportunities.find(o => o.id === opportunityId) : null;
   document.getElementById('eo-mrr').value = opp?.estimated_mrr || '';
   document.getElementById('eo-plan').value = opp?.plan || '';
@@ -1955,7 +2152,7 @@ async function submitAddContact(companyId){
 let editingContactId = null, editingContactCompanyId = null;
 async function openEditContactModal(contactId, companyId){
   editingContactId = contactId; editingContactCompanyId = companyId;
-  const d = await api('getCompanyDetail', { companyId });
+  const d = await rq('getCompanyDetail', { companyId }, { fresh:true });
   const ct = d.success ? d.contacts.find(x => x.id === contactId) : null;
   if(!ct) return;
   document.getElementById('ec-c-name').value = ct.full_name || '';
@@ -2074,7 +2271,8 @@ async function deleteCompanyConfirm(companyId){
 
 // ── PIPELINE (Kanban, sürükle-bırak) ──
 async function renderPipeline(highlightStage){
-  const d = await api('getOpportunities');
+  const d = await rq('getOpportunities');
+  if(currentPage !== 'pipeline') return;
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderPipeline()">↻ Tekrar Dene</span></div>'; return; }
   opportunities = d.opportunities || [];
@@ -2127,7 +2325,8 @@ async function onDropCard(e, newStage){
 
 // ── GÖREVLER ──
 async function renderTasks(filter){
-  const d = await api('getTasks');
+  const d = await rq('getTasks');
+  if(currentPage !== 'tasks') return;
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderTasks()">↻ Tekrar Dene</span></div>'; return; }
   let tasksAll = d.tasks || [];
@@ -2491,7 +2690,8 @@ function ticketStatusBadge(v){ const c = TICKET_COLORS[v]||'#8B9AAF'; return `<s
 let currentTicketId = null, ticketFilter = 'open';
 async function renderTickets(filter){
   if(filter) ticketFilter = filter;
-  const d = await api('getTickets', { filter: ticketFilter });
+  const d = await rq('getTickets', { filter: ticketFilter });
+  if(currentPage !== 'tickets') return;
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML = '<div class="empty">Talepler yüklenemedi. schema_faz9.sql çalıştırıldı mı?<br><span style="cursor:pointer;color:var(--primary)" onclick="renderTickets()">↻ Tekrar Dene</span></div>'; return; }
   const t = d.tickets;
@@ -2515,7 +2715,7 @@ async function renderTickets(filter){
     </table></div>`;
 }
 async function openTicketPanel(ticketId){
-  const d = await api('getTicketDetail', { ticketId });
+  const d = await rq('getTicketDetail', { ticketId }, { fresh:true });
   if(!d.success) return;
   currentTicketId = ticketId;
   const t = d.ticket;
@@ -2575,7 +2775,7 @@ function filterCompanyRows(){
   const empty = document.getElementById('co-empty'); if(empty) empty.style.display = shown ? 'none' : '';
 }
 
-function rerenderCurrentPage(){ if(lastPageArgs) showPage(...lastPageArgs); }
+function rerenderCurrentPage(){ refreshPageFresh(); }
 async function completeTaskFromList(taskId){
   const d = await api('completeTask', { taskId });
   if(d.success){ toast('✓ Tamamlandı'); rerenderCurrentPage(); }
