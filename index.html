@@ -568,11 +568,20 @@ function persistCache(){
   }, 800);
 }
 function clearCache(){ qcache = new Map(); try{ sessionStorage.removeItem(CACHE_STORE); }catch(e){} }
+// Her değişiklik (kayıt/sil/güncelle) nesli artırır. Nesil değiştiyse, o değişiklikten ÖNCE başlamış
+// bir okumanın sonucu eski olabilir: önbelleğe yazılmaz (yoksa kart eski sütununda takılı kalıyordu).
+let cacheGen = 0;
 function fetchFresh(action, params){
   const k = qkey(action, params);
-  if(inflight.has(k)) return inflight.get(k);
+  const gen = cacheGen;
+  const cur = inflight.get(k);
+  if(cur && cur.gen === gen) return cur.pr;
   const pr = api(action, params).then(d => {
-    inflight.delete(k);
+    if(inflight.get(k)?.pr === pr) inflight.delete(k);
+    if(d.success && gen !== cacheGen){
+      if(!qcache.has(k)) qcache.set(k, { data:d, t:Date.now(), stale:true });
+      return d;
+    }
     if(d.success){
       const prev = qcache.get(k);
       const changed = prev && JSON.stringify(prev.data) !== JSON.stringify(d);
@@ -582,7 +591,7 @@ function fetchFresh(action, params){
     }
     return d;
   });
-  inflight.set(k, pr);
+  inflight.set(k, { pr, gen });
   return pr;
 }
 // Okuma isteği: hazırsa ANINDA döner (gerekirse arkada tazeler); yoksa bekler.
@@ -604,7 +613,7 @@ function prefetch(action, params = {}){
   if(hit && !hit.stale && Date.now() - hit.t < CACHE_MAX_AGE) return;
   fetchFresh(action, params);
 }
-function invalidateCache(){ for(const v of qcache.values()) v.stale = true; }
+function invalidateCache(){ cacheGen++; for(const v of qcache.values()) v.stale = true; }
 const PAGE_DATA = {
   dashboard: () => [['getDashboard',{period:dashboardPeriod}],['getOpportunities',{}],['getAnalytics',{}],['getMyDay',{}]],
   myday:     () => [['getMyDay',{}],['getSettings',{}]],
@@ -790,13 +799,15 @@ function closeTopLayer(){
 
 async function api(action, params={}){
   const sentToken = CU?.token;
+  const mutating = !READ_ONLY_ACTIONS.has(action) && !action.startsWith('get') && action !== 'exportData';
+  if(mutating) cacheGen++;   // bu andan önce başlamış okumalar eski sayılır
   try{
     const res = await fetch(EDGE_FUNCTION_URL, {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ action, token: sentToken, ...params })
     });
     const d = await res.json();
-    if(d.success && !READ_ONLY_ACTIONS.has(action) && !action.startsWith('get') && action !== 'exportData'){ dataDirty = true; invalidateCache(); scheduleNavBadgeRefresh(); scheduleBackgroundRefresh(); }
+    if(d.success && mutating){ dataDirty = true; invalidateCache(); scheduleNavBadgeRefresh(); scheduleBackgroundRefresh(); }
     if(!d.success){
       if(d.error?.status === 401 && action !== 'login'){
         if(sentToken && CU?.token === sentToken) doLogout(true);
@@ -859,7 +870,7 @@ async function refreshNavBadges(){
   setBadge('nbTasks', d.openTasks);
   setBadge('nbTickets', d.openTickets);
   setBadge('nbCalendar', d.upcomingMeetings);   // bugün + yarın
-  document.getElementById('notifDot')?.classList.toggle('hidden', !(d.overdue > 0 || d.upcomingMeetings > 0 || d.openTickets > 0));
+  buildNotifications().catch(()=>{});   // kırmızı nokta sadece görülmemiş bildirim varsa
 }
 let navBadgeTimer = null;
 function scheduleNavBadgeRefresh(){ clearTimeout(navBadgeTimer); navBadgeTimer = setTimeout(refreshNavBadges, 700); }
@@ -912,33 +923,68 @@ document.addEventListener('keydown', e => {
   }
 });
 
+// ══ Bildirimler: tıklanan (görülen) bildirim bir daha gösterilmez ══
+function seenKey(){ return 'ahc_seen_notifs_' + (CU?.username || ''); }
+function loadSeen(){ try{ return JSON.parse(localStorage.getItem(seenKey()) || '{}') || {}; }catch(e){ return {}; } }
+function saveSeen(seen){
+  const cutoff = Date.now() - 45*24*3600*1000;   // 45 günden eski kayıtları temizle
+  for(const k in seen) if(seen[k] < cutoff) delete seen[k];
+  try{ localStorage.setItem(seenKey(), JSON.stringify(seen)); }catch(e){}
+}
+let notifItems = [];
+async function buildNotifications(){
+  const [myDayRes, dashRes, tkRes] = await Promise.all([ rq('getMyDay'), rq('getDashboard', {period: dashboardPeriod}), rq('getTickets', { filter:'open' }) ]);
+  const items = [];
+  if(tkRes.success) (tkRes.tickets||[]).filter(t=>t.status==='Open').slice(0,5).forEach(t => items.push({ key:`t:${t.id}:${t.updated_at||t.created_at}`, color:'var(--blue)', text:`🎫 Yeni talep #${t.ticket_no}: ${t.title}`, sub:t.companies?.name, ticketId:t.id }));
+  if(myDayRes.success){
+    (myDayRes.overdueTasks||[]).forEach(t => items.push({ key:`task:${t.id}`, color:'var(--red)', text:`Geciken görev: ${t.title}`, sub:t.companies?.name, companyId:t.company_id }));
+    (myDayRes.openProposals||[]).forEach(o => items.push({ key:`prop:${o.id}`, color:'var(--purple)', text:'Teklif cevap bekliyor', sub:o.companies?.name, companyId:o.company_id }));
+  }
+  if(dashRes.success){
+    (dashRes.upcomingMeetings||[]).slice(0,3).forEach(m => items.push({ key:`m:${m.id}:${m.meeting_date}:${m.start_time||''}`, color:'var(--blue)', text:`${trLabel(m.type)} toplantısı · ${m.meeting_date}${m.start_time?' '+m.start_time:''}`, sub:m.companies?.name, companyId:m.company_id }));
+    const recentCutoff = Date.now() - 48*3600*1000;
+    (dashRes.recentActivities||[]).forEach(a => {
+      if(new Date(a.created_at).getTime() < recentCutoff) return;
+      if(a.type === 'won') items.push({ key:`a:${a.id}`, color:'var(--green)', text:'🎉 Anlaşma kazanıldı', sub:a.companies?.name, companyId:a.company_id });
+      else if(a.type === 'stage_changed' && /→ (Lost|Kaybedildi)/.test(a.description||'')) items.push({ key:`a:${a.id}`, color:'var(--red)', text:'📉 Anlaşma kaybedildi', sub:a.companies?.name, companyId:a.company_id });
+    });
+  }
+  const seen = loadSeen();
+  notifItems = items.filter(i => !seen[i.key]);
+  document.getElementById('notifDot')?.classList.toggle('hidden', notifItems.length===0);
+  return notifItems;
+}
+function drawNotifications(){
+  const dd = document.getElementById('notifDropdown');
+  dd.innerHTML = notifItems.length ? `
+    <div style="display:flex;justify-content:flex-end;padding:2px 6px 6px"><span style="font-size:11px;color:var(--primary);cursor:pointer" onclick="event.stopPropagation();markAllNotifsSeen()">Tümünü okundu say</span></div>
+    ${notifItems.map((i,idx)=>`
+    <div class="notif-item" onclick="openNotification(${idx})">
+      <div class="nd" style="background:${i.color}"></div>
+      <div><div>${esc(i.text)}</div><div style="color:var(--muted);font-size:10.5px">${esc(i.sub||'')}</div></div>
+    </div>`).join('')}` : '<div class="search-empty">Yeni bildirim yok 🎉</div>';
+}
+function openNotification(idx){
+  const i = notifItems[idx]; if(!i) return;
+  const seen = loadSeen(); seen[i.key] = Date.now(); saveSeen(seen);
+  notifItems.splice(idx, 1);
+  document.getElementById('notifDot')?.classList.toggle('hidden', notifItems.length===0);
+  document.getElementById('notifDropdown').classList.add('hidden');
+  if(i.ticketId) openTicketPanel(i.ticketId); else if(i.companyId) closeSearchAndOpen(i.companyId);
+}
+function markAllNotifsSeen(){
+  const seen = loadSeen(); notifItems.forEach(i => seen[i.key] = Date.now()); saveSeen(seen);
+  notifItems = [];
+  document.getElementById('notifDot')?.classList.add('hidden');
+  drawNotifications();
+}
 async function toggleNotifications(){
   const dd = document.getElementById('notifDropdown');
   if(!dd.classList.contains('hidden')){ dd.classList.add('hidden'); return; }
   dd.innerHTML = '<div class="search-empty">Yükleniyor...</div>';
   dd.classList.remove('hidden');
-  const [myDayRes, dashRes, tkRes] = await Promise.all([ rq('getMyDay'), rq('getDashboard', {period: dashboardPeriod}), rq('getTickets', { filter:'open' }) ]);
-  const items = [];
-  if(tkRes.success) (tkRes.tickets||[]).filter(t=>t.status==='Open').slice(0,5).forEach(t => items.push({ color:'var(--blue)', text:`🎫 Yeni talep #${t.ticket_no}: ${t.title}`, sub:t.companies?.name, ticketId:t.id }));
-  if(myDayRes.success){
-    (myDayRes.overdueTasks||[]).forEach(t => items.push({ color:'var(--red)', text:`Geciken görev: ${t.title}`, sub:t.companies?.name, companyId:t.company_id }));
-    (myDayRes.openProposals||[]).forEach(o => items.push({ color:'var(--purple)', text:'Teklif cevap bekliyor', sub:o.companies?.name, companyId:o.company_id }));
-  }
-  if(dashRes.success){
-    (dashRes.upcomingMeetings||[]).slice(0,3).forEach(m => items.push({ color:'var(--blue)', text:`${trLabel(m.type)} toplantısı · ${m.meeting_date}${m.start_time?' '+m.start_time:''}`, sub:m.companies?.name, companyId:m.company_id }));
-    const recentCutoff = Date.now() - 48*3600*1000;
-    (dashRes.recentActivities||[]).forEach(a => {
-      if(new Date(a.created_at).getTime() < recentCutoff) return;
-      if(a.type === 'won') items.push({ color:'var(--green)', text:'🎉 Anlaşma kazanıldı', sub:a.companies?.name, companyId:a.company_id });
-      else if(a.type === 'stage_changed' && /→ (Lost|Kaybedildi)/.test(a.description||'')) items.push({ color:'var(--red)', text:'📉 Anlaşma kaybedildi', sub:a.companies?.name, companyId:a.company_id });
-    });
-  }
-  document.getElementById('notifDot').classList.toggle('hidden', items.length===0);
-  dd.innerHTML = items.length ? items.map(i=>`
-    <div class="notif-item" onclick="${i.ticketId?`openTicketPanel('${i.ticketId}')`:`closeSearchAndOpen('${i.companyId}')`};document.getElementById('notifDropdown').classList.add('hidden')">
-      <div class="nd" style="background:${i.color}"></div>
-      <div><div>${esc(i.text)}</div><div style="color:var(--muted);font-size:10.5px">${esc(i.sub||'')}</div></div>
-    </div>`).join('') : '<div class="search-empty">Her şey yolunda, bildirim yok 🎉</div>';
+  await buildNotifications();
+  if(!dd.classList.contains('hidden')) drawNotifications();
 }
 function tryRestoreSession(){
   try{
@@ -2287,6 +2333,11 @@ async function renderPipeline(highlightStage){
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Could not load data.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderPipeline()">↻ Retry</span></div>'; return; }
   opportunities = d.opportunities || [];
+  drawPipeline(highlightStage);
+}
+function drawPipeline(highlightStage){
+  const main = document.getElementById('main');
+  const y = main.scrollTop, boardX = document.querySelector('#main .board')?.scrollLeft || 0;
   main.innerHTML = `
     <div class="page-head"><div><h1>Pipeline</h1><p>Kartları sürükleyerek ilerlet. Sonuçlanan fırsatları alttaki kutulara bırak. Başlıkların üzerine gelince açıklama görünür.</p></div></div>
     <div class="board">
@@ -2330,17 +2381,33 @@ async function renderPipeline(highlightStage){
   if(highlightStage){
     const el = document.getElementById('pipeline-target-col');
     if(el) el.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+  } else {
+    main.scrollTop = y;
+    const b = document.querySelector('#main .board'); if(b) b.scrollLeft = boardX;
   }
 }
 let draggedOppId = null;
 function onDragStart(e, oppId){ draggedOppId = oppId; }
+// Kart BIRAKILDIĞI AN yeni sütununa geçer; kayıt arkada yapılır. Kayıt başarısız olursa kart geri döner.
 async function onDropCard(e, newStage){
   e.preventDefault();
   e.currentTarget.classList.remove('dragover');
   if(!draggedOppId) return;
   const id = draggedOppId; draggedOppId = null;
-  const d = await changeOpportunityStage(id, newStage);
-  if(d?.success) renderPipeline();
+  const opp = opportunities.find(o => o.id === id);
+  if(!opp || opp.stage === newStage) return;              // aynı sütuna bırakıldı: istek yok
+  let lostReason = null;
+  if(newStage === 'Lost'){ lostReason = await askLostReason(); if(lostReason === null) return; }
+  const before = { stage: opp.stage, stage_changed_at: opp.stage_changed_at };
+  opp.stage = newStage; opp.stage_changed_at = new Date().toISOString();   // önbellekteki nesne de güncellenir
+  drawPipeline();
+  const d = await api('updateOpportunityStage', { opportunityId: id, stage: newStage, lostReason });
+  if(d.success){
+    toast('✓ ' + trStage(newStage));
+  } else {
+    Object.assign(opp, before);
+    if(currentPage === 'pipeline') drawPipeline();
+  }
 }
 
 // ── GÖREVLER ──
