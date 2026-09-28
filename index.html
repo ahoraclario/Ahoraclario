@@ -267,6 +267,51 @@ tr.row-click:hover{background:var(--surface-2)}
 .dash-side .side-card{background:var(--bg-raised);border-color:var(--border);border-radius:10px}
 
 @media(max-width:1050px){.dashboard-ref-pipeline{grid-template-columns:repeat(7,170px);overflow-x:auto}.dashboard-ref-funnel{min-width:720px;overflow-x:auto}.dash-main>.ps{overflow:hidden}}
+
+/* ── Filtreler: tarih aralığı seçici, filtre çubuğu, pipeline spot ışığı ── */
+.fbtn{display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:7px 12px;font-size:12.5px;font-weight:600;white-space:nowrap;transition:border-color .12s,background .12s}
+.fbtn:hover{border-color:var(--primary);background:var(--surface-2)}
+.fbtn.sm{padding:4px 10px;font-size:11px;border-radius:7px}
+.fbtn.on{border-color:var(--primary);color:var(--primary);background:var(--primary-bg)}
+.fbtn .car{opacity:.6;font-size:10px}
+.fsel{width:auto !important;background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:7px 10px;font-size:12.5px;font-weight:600;cursor:pointer}
+.fsel.sm{padding:4px 8px;font-size:11px;border-radius:7px}
+.fsel.on{border-color:var(--primary);color:var(--primary)}
+.drp{position:fixed;z-index:400;background:var(--bg-raised);border:1px solid var(--border);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.55);display:grid;grid-template-columns:170px 250px;overflow:hidden;animation:drpIn .12s ease}
+@keyframes drpIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.drp-pre{border-right:1px solid var(--border);padding:8px;display:flex;flex-direction:column;gap:2px;background:var(--surface-secondary)}
+.drp-pre button{background:none;border:none;color:var(--text);text-align:left;padding:7px 10px;border-radius:7px;font-size:12.5px}
+.drp-pre button:hover{background:var(--surface-2)}
+.drp-pre button.on{background:var(--primary-bg);color:var(--primary);font-weight:700}
+.drp-cus{padding:14px;display:flex;flex-direction:column;gap:10px}
+.drp-cus h4{margin:0;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.drp-cus label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px}
+.drp-cus input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 10px;font-size:13px}
+.drp-cus input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-bg)}
+.drp-days{font-size:11px;color:var(--muted);min-height:14px}
+.drp-act{display:flex;gap:8px;justify-content:flex-end;margin-top:auto}
+@media (max-width:560px){.drp{grid-template-columns:1fr;left:8px !important;right:8px}.drp-pre{border-right:none;border-bottom:1px solid var(--border);flex-direction:row;flex-wrap:wrap}}
+.fbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:8px;margin-bottom:14px}
+.fsearch{position:relative;flex:1 1 260px;min-width:200px}
+.fsearch input{width:100%;background:var(--bg-raised);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:8px 64px 8px 34px;font-size:13px}
+.fsearch input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-bg)}
+.fsearch .ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;opacity:.7;pointer-events:none}
+.fsearch .x{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:none;background:var(--surface-2);color:var(--muted);border-radius:6px;font-size:11px;padding:3px 7px}
+.fsearch .x:hover{color:var(--text)}
+.fsearch kbd{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:10.5px;color:var(--muted);border:1px solid var(--border);border-radius:5px;padding:1px 6px;font-family:inherit;pointer-events:none}
+.fcount{font-size:11.5px;color:var(--muted);padding:0 4px;white-space:nowrap}
+.fcount b{color:var(--primary)}
+.fclear{background:none;border:none;color:var(--muted);font-size:11.5px;padding:6px 8px;border-radius:7px}
+.fclear:hover{color:var(--red);background:var(--red-bg)}
+.board .kcard{transition:filter .25s,opacity .25s,transform .25s,box-shadow .25s,border-color .12s}
+.board.spotlight .kcard:not(.spot){filter:blur(2.5px) grayscale(.7);opacity:.2;transform:scale(.96);pointer-events:none}
+.board.spotlight .kcard.spot{position:relative;z-index:3;transform:scale(1.045);border-color:var(--primary);box-shadow:0 0 0 2px var(--primary),0 14px 36px rgba(57,217,138,.35);animation:spotPulse 1.4s ease 2}
+.board.spotlight .col:not(.has-spot) .col-head{filter:grayscale(.8);opacity:.35}
+.board.spotlight .col:not(.has-spot) .col-body{opacity:.45}
+.board.spotlight .add-deal{opacity:.15}
+.board.spotlight ~ .outcome-row{opacity:.35;filter:grayscale(.6)}
+@keyframes spotPulse{0%,100%{box-shadow:0 0 0 2px var(--primary),0 14px 36px rgba(57,217,138,.35)}50%{box-shadow:0 0 0 5px rgba(57,217,138,.45),0 18px 44px rgba(57,217,138,.5)}}
+.spot-empty{font-size:12px;color:var(--amber);padding:0 4px}
 </style>
 </head>
 <body>
@@ -879,6 +924,11 @@ function onGlobalSearchInput(){
   clearTimeout(searchDebounce);
   const q = document.getElementById('globalSearch').value.trim();
   const box = document.getElementById('searchResults');
+  if(currentPage === 'pipeline'){   // pipeline'da yazarken kartlar canlı olarak öne çıkar
+    pipeF.q = q; pipeF.spotCompany = null;
+    const pi = document.getElementById('pipe-search'); if(pi) pi.value = q; liveInputs['pipe-search'] = q;
+    applyPipeSpot(true);
+  }
   if(q.length < 2){ box.classList.add('hidden'); return; }
   searchDebounce = setTimeout(async () => {
     const d = await api('globalSearch', { query: q });
@@ -909,6 +959,14 @@ function renderSearchResults(d){
 function closeSearchAndOpen(companyId){
   document.getElementById('searchResults').classList.add('hidden');
   document.getElementById('globalSearch').value = '';
+  // Pipeline'dayken: şirketin kartı panoda varsa paneli açmak yerine kartı öne çıkar
+  if(currentPage === 'pipeline' && document.querySelector(`#main .kcard[data-co="${companyId}"]`) && !topSidePanel()){
+    const o = opportunities.find(x => x.company_id === companyId);
+    pipeF.spotCompany = companyId; pipeF.q = o?.companies?.name || '';
+    const pi = document.getElementById('pipe-search'); if(pi) pi.value = pipeF.q; liveInputs['pipe-search'] = pipeF.q;
+    applyPipeSpot(true);
+    return;
+  }
   openCompanyPanel(companyId);
 }
 document.addEventListener('click', e => {
@@ -919,7 +977,12 @@ document.addEventListener('keydown', e => {
   if(e.key === 'Escape'){
     const searchOpen = !document.getElementById('searchResults')?.classList.contains('hidden');
     document.getElementById('searchResults')?.classList.add('hidden'); document.getElementById('globalSearch')?.blur();
-    if(!searchOpen) closeTopLayer();
+    if(drpState){ closeRangePicker(); return; }
+    if(!searchOpen){
+      const layerOpen = !!document.querySelector('[id$="Overlay"].open, [id$="Modal"].open');
+      if(!layerOpen && currentPage === 'pipeline' && (pipeF.q || pipeF.spotCompany)) clearPipeSpot();
+      else closeTopLayer();
+    }
   }
 });
 
@@ -970,7 +1033,7 @@ function openNotification(idx){
   notifItems.splice(idx, 1);
   document.getElementById('notifDot')?.classList.toggle('hidden', notifItems.length===0);
   document.getElementById('notifDropdown').classList.add('hidden');
-  if(i.ticketId) openTicketPanel(i.ticketId); else if(i.companyId) closeSearchAndOpen(i.companyId);
+  if(i.ticketId) openTicketPanel(i.ticketId); else if(i.companyId) openCompanyPanel(i.companyId);
 }
 function markAllNotifsSeen(){
   const seen = loadSeen(); notifItems.forEach(i => seen[i.key] = Date.now()); saveSeen(seen);
@@ -1000,7 +1063,7 @@ async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter
   const silent = silentRender, fresh = preferFresh;
   silentRender = false;
   pageSeq++;
-  if(!silent) liveInputs = {};
+  if(!silent){ liveInputs = {}; pipeF.q = ''; pipeF.spotCompany = null; }
   currentPage = page;
   lastPageArgs = [page, searchQuery, sourceFilter, stageFilter, taskFilter, periodFilter];
   dataDirty = false;
@@ -1035,6 +1098,140 @@ async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter
   }
 }
 
+
+// ══ Tarih aralığı: hazır seçenekler + özel aralık ══
+const RANGE_PRESETS = [['today','Today'],['yesterday','Yesterday'],['week','This Week'],['last7','Last 7 Days'],['month','This Month'],['lastMonth','Last Month'],['last30','Last 30 Days'],['quarter','This Quarter'],['year','This Year'],['all','All Time']];
+const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function addDaysStr(d, n){ const x = new Date(d+'T12:00:00'); x.setDate(x.getDate()+n); return localDateStr(x); }
+function fmtShortDate(d, withYear){ return `${Number(d.slice(8))} ${MONTHS_SHORT[Number(d.slice(5,7))-1]}${withYear?' '+d.slice(0,4):''}`; }
+// Değeri {start,end} (yerel tarih, dahil) aralığına çevirir; 'all' → null
+function rangeOf(v){
+  const today = localDateStr(), [y,m] = today.split('-').map(Number);
+  const monthEnd = (yy,mm) => addDaysStr(`${yy+Math.floor(mm/12)}-${String(mm%12+1).padStart(2,'0')}-01`, -1);
+  const cm = /^custom:(\d{4}-\d{2}-\d{2}):(\d{4}-\d{2}-\d{2})$/.exec(v||'');
+  if(cm) return cm[1] <= cm[2] ? { start:cm[1], end:cm[2] } : { start:cm[2], end:cm[1] };
+  const dow = (new Date().getDay()+6)%7;
+  switch(v){
+    case 'all': return null;
+    case 'today': return { start:today, end:today };
+    case 'yesterday': { const d = addDaysStr(today,-1); return { start:d, end:d }; }
+    case 'week': { const s0 = addDaysStr(today,-dow); return { start:s0, end:addDaysStr(s0,6) }; }
+    case 'last7': return { start:addDaysStr(today,-6), end:today };
+    case 'last30': return { start:addDaysStr(today,-29), end:today };
+    case 'lastMonth': { const pm = m===1?12:m-1, py = m===1?y-1:y; return { start:`${py}-${String(pm).padStart(2,'0')}-01`, end:addDaysStr(`${today.slice(0,7)}-01`,-1) }; }
+    case 'quarter': { const qm = Math.floor((m-1)/3)*3+1; return { start:`${y}-${String(qm).padStart(2,'0')}-01`, end:monthEnd(y,qm+2) }; }
+    case 'year': return { start:`${y}-01-01`, end:`${y}-12-31` };
+    default: return { start:`${today.slice(0,7)}-01`, end:monthEnd(y,m) };
+  }
+}
+function rangeLabel(v, allLabel){
+  if(v === 'all' && allLabel) return allLabel;
+  const p = RANGE_PRESETS.find(x => x[0] === v); if(p) return p[1];
+  const r = rangeOf(v); if(!r) return 'All Time';
+  const sameYear = r.start.slice(0,4) === r.end.slice(0,4);
+  return r.start === r.end ? fmtShortDate(r.start, true) : `${fmtShortDate(r.start, !sameYear)} – ${fmtShortDate(r.end, true)}`;
+}
+function inRange(iso, v){
+  const r = rangeOf(v); if(!r) return true; if(!iso) return false;
+  const d = localDateStr(new Date(iso)); return d >= r.start && d <= r.end;
+}
+let drpState = null;
+function closeRangePicker(){ document.getElementById('drp')?.remove(); drpState = null; }
+function openRangePicker(btn, value, onApply, allLabel){
+  if(drpState && drpState.btn === btn){ closeRangePicker(); return; }
+  closeRangePicker();
+  const r = rangeOf(value) || { start:addDaysStr(localDateStr(),-29), end:localDateStr() };
+  const el = document.createElement('div'); el.id = 'drp'; el.className = 'drp';
+  el.innerHTML = `
+    <div class="drp-pre">${RANGE_PRESETS.map(([k,l]) => `<button data-k="${k}" class="${k===value?'on':''}">${k==='all'&&allLabel?allLabel:l}</button>`).join('')}</div>
+    <div class="drp-cus">
+      <h4>Custom Range</h4>
+      <div><label>From</label><input type="date" id="drp-from" value="${r.start}"></div>
+      <div><label>To</label><input type="date" id="drp-to" value="${r.end}"></div>
+      <div class="drp-days" id="drp-days"></div>
+      <div class="drp-act"><button class="btn-ghost" data-act="cancel">Cancel</button><button class="btn-add" data-act="apply">Apply</button></div>
+    </div>`;
+  document.body.appendChild(el);
+  drpState = { btn, onApply };
+  const b = btn.getBoundingClientRect(), w = el.offsetWidth;
+  el.style.top = (b.bottom + 6) + 'px';
+  el.style.left = Math.max(8, Math.min(b.right - w, window.innerWidth - w - 8)) + 'px';
+  const from = el.querySelector('#drp-from'), to = el.querySelector('#drp-to'), days = el.querySelector('#drp-days');
+  const upd = () => { const a = from.value, z = to.value; if(!a || !z){ days.textContent=''; return; }
+    const n = Math.round((new Date(z) - new Date(a))/86400000); days.textContent = n < 0 ? '⚠ "From" date is after "To" date' : `${n+1} day${n?'s':''} selected`; days.style.color = n < 0 ? 'var(--red)' : ''; };
+  from.oninput = to.oninput = upd; upd();
+  const apply = v => { const cb = drpState?.onApply; closeRangePicker(); cb && cb(v); };
+  el.addEventListener('click', e => {
+    e.stopPropagation();
+    const k = e.target.closest('[data-k]')?.dataset.k; if(k) return apply(k);
+    const act = e.target.closest('[data-act]')?.dataset.act;
+    if(act === 'cancel') closeRangePicker();
+    if(act === 'apply'){
+      if(!from.value || !to.value){ toast('Select both dates'); return; }
+      if(from.value > to.value){ toast('"From" must be before "To"'); return; }
+      apply(`custom:${from.value}:${to.value}`);
+    }
+  });
+  el.addEventListener('keydown', e => { if(e.key === 'Enter') el.querySelector('[data-act=apply]').click(); });
+}
+document.addEventListener('mousedown', e => { if(drpState && !e.target.closest('#drp') && e.target.closest('button') !== drpState.btn) closeRangePicker(); });
+window.addEventListener('resize', closeRangePicker);
+function pickDashPeriod(btn){ openRangePicker(btn, dashboardPeriod, v => { dashboardPeriod = v; renderDashboard(); }); }
+function pickDashPipeDate(btn){ openRangePicker(btn, dashboardPipeDateFilter, v => { dashboardPipeDateFilter = v; renderDashboard(); }, 'All Dates'); }
+
+// ══ Pipeline filtreleri + spot ışığı ══
+const pipeF = { q:'', spotCompany:null, date:'all', priority:'all', deal:'all' };
+const DEAL_FILTERS = [['all','All Deals'],['high','🔥 High Priority'],['withValue','💰 With Amount'],['noValue','⚠️ No Amount'],['stalled','⏳ Stalled 14+ Days'],['hasTask','📅 Has Next Step'],['noTask','🚫 No Next Step']];
+function normTxt(t){ return String(t||'').toLocaleLowerCase('tr-TR').replace(/ı/g,'i').replace(/ş/g,'s').replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ö/g,'o').replace(/ç/g,'c').replace(/\s+/g,' ').trim(); }
+function dealFilterPass(o, f){
+  switch(f){
+    case 'high': return o.companies?.priority === 'High';
+    case 'withValue': return Number(o.estimated_mrr) > 0;
+    case 'noValue': return !(Number(o.estimated_mrr) > 0);
+    case 'stalled': return daysSince(o.stage_changed_at) >= 14;
+    case 'hasTask': return !!o.next_task;
+    case 'noTask': return !o.next_task;
+    default: return true;
+  }
+}
+function pipeFiltersActive(){ return pipeF.date !== 'all' || pipeF.priority !== 'all' || pipeF.deal !== 'all'; }
+function pipeVisible(o){
+  if(pipeF.priority !== 'all' && (o.companies?.priority || 'Normal') !== pipeF.priority) return false;
+  if(!dealFilterPass(o, pipeF.deal)) return false;
+  if(pipeF.date !== 'all' && !inRange(o.created_at, pipeF.date)) return false;
+  return true;
+}
+function oppSearchText(o){ return normTxt([o.companies?.name, o.primary_contact_name, o.companies?.industry, o.companies?.country].filter(Boolean).join(' ')); }
+function setPipeF(k, v){ pipeF[k] = v; drawPipeline(); }
+function clearPipeFilters(){ Object.assign(pipeF, { q:'', spotCompany:null, date:'all', priority:'all', deal:'all' }); drawPipeline(); }
+function onPipeSearch(v){ pipeF.q = v; pipeF.spotCompany = null; applyPipeSpot(true); }
+function clearPipeSpot(){ pipeF.q = ''; pipeF.spotCompany = null; delete liveInputs['pipe-search']; const i = document.getElementById('pipe-search'); if(i) i.value = ''; applyPipeSpot(false); }
+// Aranan kart(lar) öne çıkar, geri kalanı bulanıklaşır
+function applyPipeSpot(scroll){
+  const board = document.querySelector('#main .board'); if(!board) return;
+  const q = normTxt(pipeF.q), active = !!(q || pipeF.spotCompany);
+  let hits = [];
+  board.querySelectorAll('.kcard').forEach(c => {
+    const hit = active && (pipeF.spotCompany ? c.dataset.co === pipeF.spotCompany : c.dataset.s.includes(q));
+    c.classList.toggle('spot', hit); if(hit) hits.push(c);
+  });
+  board.querySelectorAll('.col').forEach(col => col.classList.toggle('has-spot', !!col.querySelector('.kcard.spot')));
+  board.classList.toggle('spotlight', active && hits.length > 0);
+  const info = document.getElementById('pipe-spot-info');
+  if(info) info.innerHTML = !active ? '' : hits.length ? `<b>${hits.length}</b> match${hits.length>1?'es':''} highlighted` : '<span class="spot-empty">No matching deal on the board</span>';
+  const x = document.querySelector('.fsearch .x'), kbd = document.querySelector('.fsearch kbd');
+  if(x) x.classList.toggle('hidden', !active); if(kbd) kbd.classList.toggle('hidden', active);
+  if(scroll && hits[0]){
+    const b = board.getBoundingClientRect(), r = hits[0].getBoundingClientRect();
+    board.scrollTo({ left: board.scrollLeft + (r.left - b.left) - b.width/2 + r.width/2, behavior:'smooth' });
+    const main = document.getElementById('main'), mr = main.getBoundingClientRect();
+    if(r.top < mr.top + 80 || r.bottom > mr.bottom - 20) main.scrollTo({ top: main.scrollTop + (r.top - mr.top) - mr.height/3, behavior:'smooth' });
+  }
+}
+document.addEventListener('keydown', e => {
+  if(e.key === '/' && currentPage === 'pipeline' && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName||'')){ e.preventDefault(); document.getElementById('pipe-search')?.focus(); }
+});
+
 // ── DASHBOARD ──
 let dashboardPeriod = 'month';
 let dashboardPipeFilter = 'all';
@@ -1048,20 +1245,7 @@ async function renderDashboard(){
   try{
   let opps = oppsRes.success ? oppsRes.opportunities : [];
   const analytics = anaRes.success ? anaRes : null;
-  if(dashboardPipeFilter === 'high') opps = opps.filter(o => o.companies?.priority === 'High');
-  if(dashboardPipeDateFilter !== 'all'){
-    const todayStr = localDateStr();
-    let cutoff = todayStr;
-    if(dashboardPipeDateFilter==='week'){
-      const dow = (new Date().getDay()+6)%7;
-      const monday = new Date(); monday.setDate(monday.getDate()-dow);
-      cutoff = localDateStr(monday);
-    } else if(dashboardPipeDateFilter==='month'){
-      const now = new Date();
-      cutoff = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`;
-    }
-    opps = opps.filter(o => o.created_at && localDateStr(new Date(o.created_at)) >= cutoff);
-  }
+  opps = opps.filter(o => dealFilterPass(o, dashboardPipeFilter) && (dashboardPipeDateFilter === 'all' || inRange(o.created_at, dashboardPipeDateFilter)));
 
   function trendPct(arr){
     if(!arr || arr.length<2) return 0;
@@ -1138,17 +1322,7 @@ async function renderDashboard(){
     <div class="page-head">
       <div><h1>Hello, ${esc(CU.name)} 👋</h1><p>Here's your sales overview.</p></div>
       <div style="display:flex;gap:8px;align-items:center">
-        <select onchange="dashboardPeriod=this.value;renderDashboard()" style="width:auto;padding:8px 12px;font-size:12.5px" title="Only affects the summary cards">
-          <option value="today" ${dashboardPeriod==='today'?'selected':''}>Today</option>
-          <option value="yesterday" ${dashboardPeriod==='yesterday'?'selected':''}>Yesterday</option>
-          <option value="week" ${dashboardPeriod==='week'?'selected':''}>This Week</option>
-          <option value="last7" ${dashboardPeriod==='last7'?'selected':''}>Last 7 Days</option>
-          <option value="month" ${dashboardPeriod==='month'?'selected':''}>This Month</option>
-          <option value="last30" ${dashboardPeriod==='last30'?'selected':''}>Last 30 Days</option>
-          <option value="quarter" ${dashboardPeriod==='quarter'?'selected':''}>This Quarter</option>
-          <option value="year" ${dashboardPeriod==='year'?'selected':''}>This Year</option>
-          <option value="all" ${dashboardPeriod==='all'?'selected':''}>All Time</option>
-        </select>
+        <button class="fbtn" onclick="pickDashPeriod(this)" title="Only affects the summary cards">📅 ${esc(rangeLabel(dashboardPeriod))} <span class="car">▾</span></button>
         <button class="btn-ghost" onclick="showPage('myday')">☀️ Go to My Day</button>
         <button class="btn-add" onclick="showPage('companies');setTimeout(openAddCompanyModal,80)">+ New Company</button>
       </div>
@@ -1169,15 +1343,9 @@ async function renderDashboard(){
         <div class="ps">
           <div class="ps-head">Sales Pipeline
             <span style="display:flex;align-items:center;gap:10px">
-              <select onchange="dashboardPipeDateFilter=this.value;renderDashboard()" style="width:auto;padding:4px 9px;font-size:11px" title="Only affects this section">
-                <option value="all" ${dashboardPipeDateFilter==='all'?'selected':''}>All Dates</option>
-                <option value="today" ${dashboardPipeDateFilter==='today'?'selected':''}>Added Today</option>
-                <option value="week" ${dashboardPipeDateFilter==='week'?'selected':''}>Added This Week</option>
-                <option value="month" ${dashboardPipeDateFilter==='month'?'selected':''}>Added This Month</option>
-              </select>
-              <select onchange="dashboardPipeFilter=this.value;renderDashboard()" style="width:auto;padding:4px 9px;font-size:11px" title="Only affects this section">
-                <option value="all" ${dashboardPipeFilter==='all'?'selected':''}>All Deals</option>
-                <option value="high" ${dashboardPipeFilter==='high'?'selected':''}>🔥 High Priority</option>
+              <button class="fbtn sm ${dashboardPipeDateFilter!=='all'?'on':''}" onclick="pickDashPipeDate(this)" title="Filter by date added">📅 ${esc(rangeLabel(dashboardPipeDateFilter, 'All Dates'))} <span class="car">▾</span></button>
+              <select class="fsel sm ${dashboardPipeFilter!=='all'?'on':''}" onchange="dashboardPipeFilter=this.value;renderDashboard()" title="Only affects this section">
+                ${DEAL_FILTERS.map(([k,l])=>`<option value="${k}" ${dashboardPipeFilter===k?'selected':''}>${l}</option>`).join('')}
               </select>
               <span style="cursor:pointer" onclick="showPage('pipeline')">View All →</span>
             </span>
@@ -2340,15 +2508,29 @@ function drawPipeline(highlightStage){
   const y = main.scrollTop, boardX = document.querySelector('#main .board')?.scrollLeft || 0;
   main.innerHTML = `
     <div class="page-head"><div><h1>Pipeline</h1><p>Kartları sürükleyerek ilerlet. Sonuçlanan fırsatları alttaki kutulara bırak. Başlıkların üzerine gelince açıklama görünür.</p></div></div>
+    <div class="fbar">
+      <div class="fsearch"><span class="ic">🔍</span>
+        <input id="pipe-search" placeholder="Search company, contact, industry…" value="${escAttr(pipeF.q)}" oninput="onPipeSearch(this.value)" onkeydown="if(event.key==='Escape'){event.stopPropagation();clearPipeSpot();this.blur()}" autocomplete="off">
+        <kbd>/</kbd><button class="x hidden" onclick="clearPipeSpot()" title="Clear (Esc)">✕</button></div>
+      <button class="fbtn ${pipeF.date!=='all'?'on':''}" onclick="openRangePicker(this, pipeF.date, v=>setPipeF('date',v), 'All Dates')" title="Date added">📅 ${esc(rangeLabel(pipeF.date,'All Dates'))} <span class="car">▾</span></button>
+      <select class="fsel ${pipeF.priority!=='all'?'on':''}" onchange="setPipeF('priority',this.value)" title="Company priority">
+        ${[['all','All Priorities'],['High','🔥 High'],['Normal','Normal'],['Low','Low']].map(([k,l])=>`<option value="${k}" ${pipeF.priority===k?'selected':''}>${l}</option>`).join('')}
+      </select>
+      <select class="fsel ${pipeF.deal!=='all'?'on':''}" onchange="setPipeF('deal',this.value)">
+        ${DEAL_FILTERS.filter(x=>x[0]!=='high').map(([k,l])=>`<option value="${k}" ${pipeF.deal===k?'selected':''}>${l}</option>`).join('')}
+      </select>
+      <span class="fcount" id="pipe-spot-info"></span>
+      ${pipeFiltersActive()?`<span class="fcount">Showing <b>${opportunities.filter(o=>STAGES.includes(o.stage)&&pipeVisible(o)).length}</b> of ${opportunities.filter(o=>STAGES.includes(o.stage)).length}</span><button class="fclear" onclick="clearPipeFilters()">✕ Clear filters</button>`:''}
+    </div>
     <div class="board">
       ${STAGES.map(s=>{
-        const items = opportunities.filter(o=>o.stage===s);
+        const items = opportunities.filter(o=>o.stage===s && pipeVisible(o));
         const isTarget = highlightStage && s===highlightStage;
         return `<div class="col" id="${isTarget?'pipeline-target-col':''}" style="${isTarget?'box-shadow:0 0 0 2px '+STAGE_COLORS[s]+';border-radius:11px':''}">
           <div class="col-head" title="${escAttr(STAGE_HINTS[s]||'')}" style="background:linear-gradient(135deg, ${STAGE_COLORS[s]}, ${STAGE_COLORS[s]}CC)">${trStage(s)}<span class="count">${items.length}</span></div>
           <div class="col-body" data-stage="${s}" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="onDropCard(event,'${s}')">
             ${items.map(o=>`
-              <div class="kcard" style="--stat-color:${STAGE_COLORS[s]}" draggable="true" ondragstart="onDragStart(event,'${o.id}')" onclick="openOpportunityDetail('${o.id}')">
+              <div class="kcard" data-opp-id="${o.id}" data-co="${o.company_id}" data-s="${escAttr(oppSearchText(o))}" style="--stat-color:${STAGE_COLORS[s]}" draggable="true" ondragstart="onDragStart(event,'${o.id}')" onclick="openOpportunityDetail('${o.id}')">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
                   <b>${esc(o.companies?.name||'—')}</b>
                   ${o.companies?.priority==='High'?'<span title="High priority">🔥</span>':''}
@@ -2364,7 +2546,7 @@ function drawPipeline(highlightStage){
                 </div>
                 ${o.next_task?`<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border-subtle);font-size:10px;color:var(--amber)">📅 ${esc(o.next_task.title)}${o.next_task.due_date?' · '+o.next_task.due_date:''}</div>`:''}
               </div>`).join('')}
-            <div style="cursor:pointer;color:var(--muted);font-size:11px;padding:7px 5px;text-align:center;border-radius:6px" onmouseover="this.style.background='var(--surface-2)';this.style.color='var(--primary)'" onmouseout="this.style.background='';this.style.color='var(--muted)'" onclick="openAddCompanyModal('${s}')">+ Add Deal</div>
+            <div class="add-deal" style="cursor:pointer;color:var(--muted);font-size:11px;padding:7px 5px;text-align:center;border-radius:6px" onmouseover="this.style.background='var(--surface-2)';this.style.color='var(--primary)'" onmouseout="this.style.background='';this.style.color='var(--muted)'" onclick="openAddCompanyModal('${s}')">+ Add Deal</div>
           </div>
         </div>`;
       }).join('')}
@@ -2385,6 +2567,7 @@ function drawPipeline(highlightStage){
     main.scrollTop = y;
     const b = document.querySelector('#main .board'); if(b) b.scrollLeft = boardX;
   }
+  applyPipeSpot(false);
 }
 let draggedOppId = null;
 function onDragStart(e, oppId){ draggedOppId = oppId; }
