@@ -277,9 +277,11 @@ tr.row-click:hover{background:var(--surface-2)}
     <h1>Ahoraclario</h1>
     <p>Founder Sales CRM'e giriş yapın.</p>
     <div class="login-err" id="loginErr"></div>
-    <div class="field"><label>Kullanıcı Adı</label><input id="li-user" type="text"></div>
-    <div class="field"><label>Şifre</label><input id="li-pass" type="password"></div>
-    <button class="btn btn-primary" onclick="doLogin()">Giriş Yap</button>
+    <form onsubmit="event.preventDefault(); doLogin();" autocomplete="on">
+      <div class="field"><label>Kullanıcı Adı</label><input id="li-user" type="text" name="username" autocomplete="username" autofocus></div>
+      <div class="field"><label>Şifre</label><input id="li-pass" type="password" name="password" autocomplete="current-password"></div>
+      <button class="btn btn-primary" id="loginBtn" type="submit" style="width:100%">Giriş Yap</button>
+    </form>
   </div>
 </div>
 
@@ -344,6 +346,12 @@ tr.row-click:hover{background:var(--surface-2)}
     </div>
     <div class="fi-row">
       <div class="fi"><label>Website</label><input id="nc-website" type="text"></div>
+    </div>
+    <div class="fi-row">
+      <div class="fi"><label>Şirket E-postası</label><input id="nc-email" type="email" placeholder="info@firma.com"></div>
+      <div class="fi"><label>Şirket Telefonu</label><input id="nc-phone" type="tel" placeholder="0212 000 00 00"></div>
+    </div>
+    <div class="fi-row">
       <div class="fi"><label>Kaynak</label>
         <select id="nc-source">
           <option value="">—</option>
@@ -569,29 +577,38 @@ function closeTopLayer(){
 }
 
 async function api(action, params={}){
+  const sentToken = CU?.token;
   try{
     const res = await fetch(EDGE_FUNCTION_URL, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ action, token: CU?.token, ...params })
+      body: JSON.stringify({ action, token: sentToken, ...params })
     });
     const d = await res.json();
     if(d.success && !READ_ONLY_ACTIONS.has(action) && !action.startsWith('get') && action !== 'exportData'){ dataDirty = true; scheduleNavBadgeRefresh(); }
     if(!d.success){
-      if(d.error?.status === 401){ doLogout(true); }
-      toast('Hata: ' + (d.error?.message || 'Bilinmeyen hata'));
+      if(d.error?.status === 401 && action !== 'login'){
+        if(sentToken && CU?.token === sentToken) doLogout(true);
+        return d;   // eski oturumdan gelen geç yanıt: sessizce yok say
+      }
+      if(action !== 'login') toast('Hata: ' + (d.error?.message || 'Bilinmeyen hata'));
     }
     return d;
   }catch(e){ toast('Bağlantı hatası, internetinizi kontrol edin'); return {success:false}; }
 }
 
+let loginInFlight = false;
 async function doLogin(){
+  if(loginInFlight) return;   // ikinci basış ikinci oturum açıp ilkini geçersiz kılıyordu
   const username = document.getElementById('li-user').value.trim();
   const password = document.getElementById('li-pass').value;
-  const errEl = document.getElementById('loginErr');
+  const errEl = document.getElementById('loginErr'), btn = document.getElementById('loginBtn');
   errEl.style.display='none';
   if(!username || !password){ errEl.textContent='Kullanıcı adı ve şifre zorunludur'; errEl.style.display='block'; return; }
+  loginInFlight = true; btn.disabled = true; btn.textContent = 'Giriş yapılıyor…';
   const d = await api('login', { username, password });
+  loginInFlight = false; btn.disabled = false; btn.textContent = 'Giriş Yap';
   if(!d.success){ errEl.textContent = d.error?.message || 'Giriş yapılamadı'; errEl.style.display='block'; return; }
+  document.getElementById('li-pass').value = '';
   CU = { token: d.token, name: d.user.name, username: d.user.username, email: d.user.email || null };
   sessionStorage.setItem('ahoraclario_session', JSON.stringify(CU));
   enterApp();
@@ -1132,10 +1149,11 @@ async function renderSettings(){
       <div class="ps-head">Profil</div>
       <div class="ps-body">
         <div class="fi-row">
-          <div class="fi"><label>Ad Soyad</label><input value="${escAttr(d.user.name)}" disabled></div>
+          <div class="fi"><label>Ad Soyad</label><input id="st-name" value="${escAttr(d.user.name)}"></div>
           <div class="fi"><label>Kullanıcı Adı</label><input value="${escAttr(d.user.username)}" disabled></div>
         </div>
-        <div class="fi"><label>E-posta</label><input value="${escAttr(d.user.email||'')}" disabled></div>
+        <div class="fi"><label>E-posta (Gmail'de hangi hesabın açılacağını belirler)</label><input id="st-email" type="email" value="${escAttr(d.user.email||'')}" placeholder="ahoraclario@gmail.com"></div>
+        <button class="btn-add" onclick="saveProfile()">Profili Kaydet</button>
       </div>
     </div>
 
@@ -1166,6 +1184,7 @@ async function renderSettings(){
           ? `<p style="font-size:12.5px;margin:0 0 10px">Özet <b>${esc(d.email.digestTo||'—')}</b> adresine gidiyor. ${d.email.cronReady?'Hafta içi her sabah 08:00\'de otomatik gönderilir (zamanlama SQL\'i çalıştırıldıysa).':'<span style="color:var(--amber)">Otomatik gönderim için CRON_SECRET henüz eklenmemiş.</span>'}</p>`
           : `<p style="font-size:12.5px;color:var(--amber);margin:0 0 10px">E-posta henüz ayarlanmamış: Supabase → Edge Functions → Secrets'a RESEND_API_KEY eklenmeli.</p>`}
         <button class="btn-ghost" onclick="sendTestDigest(this)" ${d.email?.configured?'':'disabled'}>📨 Şimdi test özeti gönder</button>
+        <div id="digestResult" style="font-size:12px;margin-top:10px"></div>
       </div>
     </div>
 
@@ -1265,12 +1284,18 @@ async function renderCompanies(searchQuery, sourceFilter, periodFilter){
         <button class="btn-add" onclick="openAddCompanyModal()">+ Yeni Şirket</button>
       </div>
     </div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+      <input id="co-search" placeholder="🔍 Şirket, e-posta, telefon, sektör ara…" oninput="filterCompanyRows()" style="max-width:340px">
+      <span class="co-tab" data-tab="all" onclick="setCompanyTab('all')">Tümü (${companies.length})</span>
+      <span class="co-tab" data-tab="customers" onclick="setCompanyTab('customers')">Müşteriler (${companies.filter(c=>c.is_customer).length})</span>
+      <span class="co-tab" data-tab="prospects" onclick="setCompanyTab('prospects')">Adaylar (${companies.filter(c=>!c.is_customer).length})</span>
+    </div>
     <div class="tbl-wrap">
       <table>
         <thead><tr><th>Şirket</th><th>Sektör</th><th>Ülke</th><th>Kaynak</th><th>Aşama</th><th>Lead Score</th><th>Tahmini MRR</th><th>Durum</th></tr></thead>
         <tbody>${companies.length===0?`<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">${filterLabel?'Sonuç bulunamadı':'Henüz şirket yok'}</td></tr>`:companies.map(c=>`
-          <tr class="row-click" onclick="openCompanyPanel('${c.id}')">
-            <td><b>${esc(c.name)}</b>${c.priority==='High'?' 🔥':''}</td>
+          <tr class="row-click co-row" data-customer="${c.is_customer?1:0}" data-text="${escAttr([c.name,c.email,c.phone,c.industry,c.country,c.website,c.lead_source].filter(Boolean).join(' ').toLocaleLowerCase('tr-TR'))}" onclick="openCompanyPanel('${c.id}')">
+            <td><b>${esc(c.name)}</b>${c.priority==='High'?' 🔥':''}${c.email||c.phone?`<div style="font-size:10.5px;color:var(--muted)">${esc([c.email,c.phone].filter(Boolean).join(' · '))}</div>`:''}</td>
             <td>${esc(c.industry||'—')}</td>
             <td>${esc(c.country||'—')}</td>
             <td>${c.lead_source?`<span class="badge badge-source">${esc(c.lead_source)}</span>`:'—'}</td>
@@ -1282,9 +1307,11 @@ async function renderCompanies(searchQuery, sourceFilter, periodFilter){
             </td>
             <td>${c.is_customer?'<span class="badge" style="background:var(--green-bg);color:var(--green)">Müşteri</span>':'<span class="badge" style="background:var(--surface-2);border:1px solid var(--border);color:var(--muted)">Aday</span>'}</td>
           </tr>`).join('')}
+          <tr id="co-empty" style="display:none"><td colspan="8" style="text-align:center;padding:24px;color:var(--muted)">Eşleşen şirket yok</td></tr>
         </tbody>
       </table>
     </div>`;
+  filterCompanyRows();
 }
 
 function openAddCompanyModal(startStage){
@@ -1305,6 +1332,8 @@ async function submitAddCompany(){
     name, industry: document.getElementById('nc-industry').value.trim(),
     country: document.getElementById('nc-country').value.trim(),
     website: document.getElementById('nc-website').value.trim(),
+    email: document.getElementById('nc-email').value.trim(),
+    phone: document.getElementById('nc-phone').value.trim(),
     lead_source: document.getElementById('nc-source').value,
     priority: document.getElementById('nc-priority').value,
     research_notes: document.getElementById('nc-notes').value.trim(),
@@ -1341,9 +1370,18 @@ async function openCompanyPanel(companyId){
       <button class="panel-close" onclick="closeCompanyPanel()">✕</button>
     </div>
 
+    ${(c.email || waNumber(c.phone)) ? `<div style="display:flex;gap:6px;margin:-4px 0 12px;flex-wrap:wrap">
+      ${emailButton({id:null, full_name:c.name, email:c.email}, c.id, null, c.name)}${whatsappButton({id:'', phone:c.phone}, c.id)}
+      ${c.phone?`<a href="tel:${escAttr(c.phone)}" style="font-size:11px;color:var(--muted);margin-left:6px;text-decoration:none">📞 ${esc(c.phone)}</a>`:''}</div>` : ''}
+
     <div class="ps">
       <div class="ps-head">Şirket Profili</div>
       <div class="ps-body">
+        <div class="fi"><label>Şirket Adı</label><input id="ec-name" value="${escAttr(c.name)}"></div>
+        <div class="fi-row">
+          <div class="fi"><label>Şirket E-postası</label><input id="ec-email" type="email" value="${escAttr(c.email)}" placeholder="info@firma.com"></div>
+          <div class="fi"><label>Şirket Telefonu</label><input id="ec-phone" type="tel" value="${escAttr(c.phone)}" placeholder="0212 000 00 00"></div>
+        </div>
         <div class="fi-row">
           <div class="fi"><label>Sektör</label><input id="ec-industry" value="${escAttr(c.industry)}"></div>
           <div class="fi"><label>Ülke</label><input id="ec-country" value="${escAttr(c.country)}"></div>
@@ -1453,7 +1491,7 @@ async function openCompanyPanel(companyId){
       <div class="ps-body mini-list" id="tasksList">
         ${d.tasks.length===0?'<div style="color:var(--muted);font-size:12px">Görev yok.</div>':d.tasks.map(t=>`
           <div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;${t.status==='Completed'?'opacity:.5':''}">
-            <span>${t.status==='Completed'?'✓ ':''}${esc(t.title)} ${t.due_date?`<span style="color:var(--muted)">· ${t.due_date}</span>`:''}</span>
+            <span>${t.status==='Completed'?'✓ ':''}${esc(t.title)} ${t.status==='Open'?taskDateInput(t):(t.due_date?`<span style="color:var(--muted)">· ${t.due_date}</span>`:'')}</span>
             <span style="display:flex;gap:8px;align-items:center;flex-shrink:0">
               ${t.status==='Open'?`<span style="cursor:pointer;color:var(--green);font-size:11px" onclick="completeTaskQuick('${t.id}','${c.id}')">Tamamla</span>`:''}
               <span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="deleteTaskConfirm('${t.id}','${c.id}')" title="Sil">🗑</span>
@@ -1510,6 +1548,7 @@ async function openCompanyPanel(companyId){
             <div class="fi"><label>Başlangıç</label><input id="nmt-start" type="time"></div>
             <div class="fi"><label>Bitiş</label><input id="nmt-end" type="time"></div>
           </div>
+          <div class="fi"><label>Not / bağlantı (isteğe bağlı)</label><textarea id="nmt-notes" rows="2" placeholder="Zoom/Meet linki, gündem…"></textarea></div>
           <button class="btn-add" style="width:100%" onclick="submitAddMeeting('${c.id}')">Toplantıyı Kaydet</button>
         </div>
       </div>
@@ -1822,7 +1861,12 @@ async function updateCustomerField(companyId, field, value){
 }
 
 async function saveCompanyProfile(companyId){
+  const name = document.getElementById('ec-name').value.trim();
+  if(!name){ toast('Şirket adı boş olamaz'); return; }
   const company = {
+    name,
+    email: document.getElementById('ec-email').value.trim(),
+    phone: document.getElementById('ec-phone').value.trim(),
     industry: document.getElementById('ec-industry').value.trim(),
     country: document.getElementById('ec-country').value.trim(),
     website: document.getElementById('ec-website').value.trim(),
@@ -1836,7 +1880,7 @@ async function saveCompanyProfile(companyId){
     research_notes: document.getElementById('ec-notes').value.trim(),
   };
   const d = await api('updateCompany', { companyId, company });
-  if(d.success){ toast('✓ Kaydedildi'); }
+  if(d.success){ toast('✓ Kaydedildi'); openCompanyPanel(companyId); }
 }
 
 let editingOppId = null, editingOppCompanyId = null;
@@ -1980,6 +2024,7 @@ async function submitAddMeeting(companyId){
     meeting_date: document.getElementById('nmt-date').value,
     start_time: document.getElementById('nmt-start').value || null,
     end_time: document.getElementById('nmt-end').value || null,
+    notes: document.getElementById('nmt-notes').value.trim() || null,
   };
   if(!meeting.title || !meeting.meeting_date){ toast('Başlık ve tarih zorunludur'); return; }
   const d = await api('addMeeting', { companyId, meeting });
@@ -2113,7 +2158,7 @@ async function renderTasks(filter){
     return `<div class="ps"><div class="ps-head" style="color:${color}">${title} (${list.length})</div>
       <div class="ps-body mini-list">${list.map(t=>`
         <div class="mini-item" style="display:flex;justify-content:space-between;align-items:center">
-          <span onclick="openCompanyPanel('${t.company_id}')" style="cursor:pointer"><b>${esc(t.companies?.name||'')}</b> — ${esc(t.title)} ${t.task_type?`<span class="badge" style="background:var(--surface-2);color:var(--muted);margin-left:4px">${trLabel(t.task_type)}</span>`:''} ${t.due_date?`<span style="color:var(--muted)">· ${t.due_date}</span>`:''}</span>
+          <span onclick="openCompanyPanel('${t.company_id}')" style="cursor:pointer"><b>${esc(t.companies?.name||'')}</b> — ${esc(t.title)} ${t.task_type?`<span class="badge" style="background:var(--surface-2);color:var(--muted);margin-left:4px">${trLabel(t.task_type)}</span>`:''}</span> ${taskDateInput(t)}
           <span style="display:flex;gap:8px;flex-shrink:0">
             <span style="cursor:pointer;color:var(--green);font-size:11px" onclick="event.stopPropagation();completeTaskFromList('${t.id}')">Tamamla</span>
             <span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="event.stopPropagation();deleteTaskFromList('${t.id}')" title="Sil">🗑</span>
@@ -2140,7 +2185,7 @@ function downloadBlob(content, filename, type){
 // Excel Türkçe karakterleri doğru açsın diye BOM + noktalı virgül ayraç.
 function exportCompaniesCsv(){
   const cols = [
-    ['Şirket', c=>c.name], ['Sektör', c=>c.industry], ['Ülke', c=>c.country], ['Website', c=>c.website],
+    ['Şirket', c=>c.name], ['Şirket E-postası', c=>c.email], ['Şirket Telefonu', c=>c.phone], ['Sektör', c=>c.industry], ['Ülke', c=>c.country], ['Website', c=>c.website],
     ['Kaynak', c=>c.lead_source], ['Aşama', c=>c.current_stage ? trStage(c.current_stage) : ''],
     ['Tahmini MRR (₺)', c=>c.current_mrr], ['Lead Score', c=>c.lead_score], ['Durum', c=>c.is_customer ? 'Müşteri' : 'Aday'],
     ['Öncelik', c=>({High:'Yüksek',Normal:'Normal',Low:'Düşük'})[c.priority] || c.priority || ''], ['Eklenme', c=>c.created_at ? localDateStr(new Date(c.created_at)) : ''],
@@ -2170,11 +2215,11 @@ function waNumber(phone){
 function whatsappButton(contact, companyId, opportunityId){
   const n = waNumber(contact?.phone);
   if(!n) return '';
-  return `<span style="cursor:pointer;font-size:11px;color:#25D366;white-space:nowrap;margin-left:6px" title="WhatsApp'ta yaz ve aktivite olarak kaydet" onclick="event.stopPropagation();openWhatsApp('${n}','${contact.id}','${companyId}','${opportunityId||''}')">💬 WhatsApp</span>`;
+  return `<span style="cursor:pointer;font-size:11px;color:#25D366;white-space:nowrap;margin-left:6px" title="WhatsApp'ta yaz ve aktivite olarak kaydet" onclick="event.stopPropagation();openWhatsApp('${n}','${contact.id||''}','${companyId}','${opportunityId||''}')">💬 WhatsApp</span>`;
 }
 function openWhatsApp(number, contactId, companyId, opportunityId){
   window.open('https://wa.me/' + number, '_blank', 'noopener');   // açılır pencere engellenmesin diye önce sekme açılır
-  api('addActivity', { companyId, contactId, opportunityId: opportunityId || null, activityType:'whatsapp_message' })
+  api('addActivity', { companyId, contactId: contactId || null, opportunityId: opportunityId || null, activityType:'whatsapp_message' })
     .then(d => { if(d.success){ toast('✓ WhatsApp mesajı aktiviteye kaydedildi'); refreshOpenPanels(); } });
 }
 
@@ -2212,6 +2257,8 @@ const IMPORT_FIELDS = {
   name: ['şirket','şirket adı','firma','firma adı','company','company name','name'],
   industry: ['sektör','industry'], country: ['ülke','country'],
   website: ['website','web','web sitesi','site'], lead_source: ['kaynak','source','lead source'],
+  email: ['şirket e-postası','şirket e-posta','şirket eposta','firma e-posta','company email'],
+  phone: ['şirket telefonu','şirket telefon','firma telefon','company phone'],
   priority: ['öncelik','priority'], research_notes: ['not','notlar','notes','açıklama'],
   stage: ['aşama','stage'], estimated_mrr: ['tahmini mrr (₺)','tahmini mrr','mrr','tutar'],
   contact_name: ['kişi','kişi adı','yetkili','ad soyad','contact','contact name'],
@@ -2262,7 +2309,7 @@ function openImportModal(){
   importRows = [];
   document.getElementById('importBody').innerHTML = `
     <p style="font-size:12.5px;color:var(--muted);margin:0 0 10px">Excel'de dosyanı <b>"CSV UTF-8"</b> olarak kaydedip buradan seç. İlk satır başlık olmalı; en az <b>Şirket</b> sütunu gerekli.
-    Tanınan diğer sütunlar: Sektör, Ülke, Website, Kaynak, Öncelik, Aşama, Tahmini MRR, Not, Kişi, E-posta, Telefon, Pozisyon.
+    Tanınan diğer sütunlar: Şirket E-postası, Şirket Telefonu, Sektör, Ülke, Website, Kaynak, Öncelik, Aşama, Tahmini MRR, Not, Kişi, E-posta, Telefon, Pozisyon (E-posta/Telefon kişiye aittir).
     Aynı isimde kayıtlı şirketler atlanır. "Excel'e Aktar" ile indirdiğin dosya da doğrudan içe aktarılabilir.</p>
     <p style="margin:0 0 14px"><span style="cursor:pointer;color:var(--primary);font-size:12px" onclick="downloadImportTemplate()">⬇ Örnek şablonu indir</span></p>
     <input type="file" accept=".csv,text/csv" onchange="previewImport(this.files[0])">
@@ -2275,8 +2322,8 @@ function openImportModal(){
 }
 function closeImportModal(){ document.getElementById('importModal').classList.remove('open'); }
 function downloadImportTemplate(){
-  const rows = ['Şirket;Sektör;Ülke;Website;Kaynak;Öncelik;Aşama;Tahmini MRR;Kişi;E-posta;Telefon;Pozisyon;Not',
-                'Örnek Vize Danışmanlık;Vize Danışmanlığı;Türkiye;ornekvize.com;LinkedIn;Yüksek;Aday;15000;Ayşe Yılmaz;ayse@ornekvize.com;0532 000 00 00;Kurucu;Excel ile müşteri takibi yapıyor'];
+  const rows = ['Şirket;Şirket E-postası;Şirket Telefonu;Sektör;Ülke;Website;Kaynak;Öncelik;Aşama;Tahmini MRR;Kişi;E-posta;Telefon;Pozisyon;Not',
+                'Örnek Vize Danışmanlık;info@ornekvize.com;0212 000 00 00;Vize Danışmanlığı;Türkiye;ornekvize.com;LinkedIn;Yüksek;Aday;15000;Ayşe Yılmaz;ayse@ornekvize.com;0532 000 00 00;Kurucu;Excel ile müşteri takibi yapıyor'];
   downloadBlob('\uFEFF' + rows.join('\r\n'), 'ahoraclario-ice-aktarma-sablonu.csv', 'text/csv;charset=utf-8');
 }
 async function previewImport(file){
@@ -2351,10 +2398,31 @@ function sendEmailViaGmail(){
 
 // ══ Sabah özeti ══
 async function sendTestDigest(btn){
-  btn.disabled = true;
+  const box = document.getElementById('digestResult');
+  btn.disabled = true; box.innerHTML = '<span style="color:var(--muted)">Gönderiliyor…</span>';
   const d = await api('sendTestDigest');
   btn.disabled = false;
-  if(d.success) toast('✓ Test özeti gönderildi: ' + d.to);
+  box.innerHTML = d.success
+    ? `<span style="color:var(--green)">✓ Resend e-postayı kabul etti → ${esc(d.to)}${d.id?` (kimlik: ${esc(d.id)})`:''}.</span> <span style="color:var(--muted)">Birkaç dakika içinde gelmezse Gmail'de Spam ve "Tanıtımlar" sekmesine bak.</span>`
+    : `<span style="color:var(--red)">✗ Gönderilemedi: ${esc(d.error?.message || 'bilinmeyen hata')}</span>`;
+}
+async function saveProfile(){
+  const name = document.getElementById('st-name').value.trim(), email = document.getElementById('st-email').value.trim();
+  const d = await api('updateProfile', { name, email });
+  if(!d.success) return;
+  CU.name = d.user.name; CU.email = d.user.email;
+  sessionStorage.setItem('ahoraclario_session', JSON.stringify(CU));
+  document.getElementById('sbUserName').textContent = CU.name;
+  document.getElementById('topbarAvatar').textContent = initials(CU.name);
+  toast('✓ Profil kaydedildi');
+}
+function taskDateInput(t){
+  return `<input type="date" value="${escAttr(t.due_date||'')}" title="Tarihi değiştir / ertele" onclick="event.stopPropagation()" onchange="rescheduleTask('${t.id}', this.value)"
+    style="width:auto;padding:2px 6px;font-size:11px;margin-left:6px;${t.due_date && t.due_date < localDateStr() ? 'color:var(--red)' : ''}">`;
+}
+async function rescheduleTask(taskId, due_date){
+  const d = await api('updateTask', { taskId, task:{ due_date: due_date || null } });
+  if(d.success){ toast(due_date ? '✓ Görev tarihi: ' + due_date : '✓ Görevin tarihi kaldırıldı'); if(anySidePanelOpen()) refreshOpenPanels(); else rerenderCurrentPage(); }
 }
 
 // ══ Müşteri CRM bağlantıları ══
@@ -2491,6 +2559,20 @@ async function replyTicket(ticketId, status){
 async function updateTicketField(ticketId, field, value){
   const d = await api('updateTicket', { ticketId, [field]: value });
   if(d.success){ toast('✓ Talep güncellendi'); openTicketPanel(ticketId); }
+}
+
+let companyTab = 'all';
+function setCompanyTab(tab){ companyTab = tab; filterCompanyRows(); }
+function filterCompanyRows(){
+  const q = (document.getElementById('co-search')?.value || '').trim().toLocaleLowerCase('tr-TR');
+  let shown = 0;
+  document.querySelectorAll('.co-row').forEach(r => {
+    const tabOk = companyTab==='all' || (companyTab==='customers') === (r.dataset.customer==='1');
+    const ok = tabOk && (!q || r.dataset.text.includes(q));
+    r.style.display = ok ? '' : 'none'; if(ok) shown++;
+  });
+  document.querySelectorAll('.co-tab').forEach(t => t.classList.toggle('active', t.dataset.tab===companyTab));
+  const empty = document.getElementById('co-empty'); if(empty) empty.style.display = shown ? 'none' : '';
 }
 
 function rerenderCurrentPage(){ if(lastPageArgs) showPage(...lastPageArgs); }
@@ -2666,4 +2748,6 @@ function leadScoreColor(score){
 .file-upload-status{font-size:11.5px;color:var(--muted);margin-bottom:8px}
 #drilldownOverlay{z-index:150}
 button:disabled{opacity:.45;cursor:not-allowed}
+.co-tab{cursor:pointer;font-size:12px;padding:6px 12px;border-radius:20px;background:var(--surface-2);color:var(--muted);border:1px solid var(--border)}
+.co-tab.active{background:var(--primary-bg);color:var(--primary);border-color:transparent}
 </style>
