@@ -1627,9 +1627,7 @@ async function openCompanyPanel(companyId){
       <button class="panel-close" onclick="closeCompanyPanel()">✕</button>
     </div>
 
-    ${(c.email || waNumber(c.phone)) ? `<div style="display:flex;gap:6px;margin:-4px 0 12px;flex-wrap:wrap">
-      ${emailButton({id:null, full_name:c.name, email:c.email}, c.id, null, c.name)}${whatsappButton({id:'', phone:c.phone}, c.id)}
-      ${c.phone?`<a href="tel:${escAttr(c.phone)}" style="font-size:11px;color:var(--muted);margin-left:6px;text-decoration:none">📞 ${esc(c.phone)}</a>`:''}</div>` : ''}
+    ${companyActionBar(c, d.contacts || [])}
 
     <div class="ps">
       <div class="ps-head">Şirket Profili</div>
@@ -2436,7 +2434,7 @@ function waNumber(phone){
 function whatsappButton(contact, companyId, opportunityId){
   const n = waNumber(contact?.phone);
   if(!n) return '';
-  return `<span style="cursor:pointer;font-size:11px;color:#25D366;white-space:nowrap;margin-left:6px" title="WhatsApp'ta yaz ve aktivite olarak kaydet" onclick="event.stopPropagation();openWhatsApp('${n}','${contact.id||''}','${companyId}','${opportunityId||''}')">💬 WhatsApp</span>`;
+  return `<span class="mini-act" style="color:#25D366" title="WhatsApp'ta yaz ve aktivite olarak kaydet" onclick="event.stopPropagation();openWhatsApp('${n}','${contact.id||''}','${companyId}','${opportunityId||''}')">💬 WhatsApp</span>`;
 }
 function openWhatsApp(number, contactId, companyId, opportunityId){
   window.open('https://wa.me/' + number, '_blank', 'noopener');   // açılır pencere engellenmesin diye önce sekme açılır
@@ -2595,9 +2593,28 @@ const EMAIL_TEMPLATES = {
   demo: { label:'Demo sonrası teşekkür', subject:'Demo için teşekkürler', body:'Merhaba {ad},\n\nBugünkü demo için zaman ayırdığınız için teşekkür ederim. Konuştuğumuz konuların özetini ve sonraki adımları aşağıda paylaşıyorum:\n\n- \n\nİyi çalışmalar,\n{ben}' },
 };
 let emailCtx = null;
+// Şirket panelinin üstündeki hızlı işlemler — her zaman görünür; bilgi eksikse ilgili alana götürür.
+function companyActionBar(c, contacts){
+  const primary = contacts.find(p => p.is_decision_maker && p.email) || contacts.find(p => p.email);
+  const emailTarget = c.email ? { id:null, full_name:c.name, email:c.email } : primary;
+  const phoneOwner = waNumber(c.phone) ? { id:'', phone:c.phone } : contacts.find(p => waNumber(p.phone));
+  const tel = c.phone || contacts.find(p => p.phone)?.phone;
+  const missing = (msg, field) => `toast('${msg}'); const f=document.getElementById('${field}'); if(f){ f.scrollIntoView({behavior:'smooth',block:'center'}); f.focus(); }`;
+  const emailClick = emailTarget
+    ? `openEmailModal(${escAttr(JSON.stringify({ contactId: emailTarget.id || null, name: emailTarget.full_name || c.name, email: emailTarget.email, companyId: c.id, opportunityId: null, companyName: c.name }))})`
+    : missing('Önce Şirket E-postası alanını doldurup Kaydet butonuna bas (ya da e-postalı bir kişi ekle)', 'ec-email');
+  const waClick = phoneOwner ? `openWhatsApp('${waNumber(phoneOwner.phone)}','${phoneOwner.id||''}','${c.id}','')` : missing('Önce telefon numarası gir', 'ec-phone');
+  return `<div class="action-bar">
+    <button class="act-btn primary" onclick="${emailClick}" title="${escAttr(emailTarget ? 'Kime: ' + emailTarget.email : 'E-posta adresi yok')}">✉️ E-posta Gönder</button>
+    <button class="act-btn" onclick="${waClick}">💬 WhatsApp</button>
+    ${tel ? `<a class="act-btn" href="tel:${escAttr(tel)}" onclick="logQuickActivity('${c.id}','call')">📞 Ara</a>` : `<button class="act-btn" onclick="${missing('Önce telefon numarası gir','ec-phone')}">📞 Ara</button>`}
+    <button class="act-btn" onclick="openMeetingModal({ companyId:'${c.id}' })">📅 Toplantı Planla</button>
+    <button class="act-btn" onclick="showAddTaskForm('${c.id}'); const f=document.getElementById('addTaskForm-${c.id}'); f.scrollIntoView({behavior:'smooth',block:'center'}); document.getElementById('ntk-title').focus();">✅ Görev Ekle</button>
+  </div>`;
+}
 function emailButton(contact, companyId, opportunityId, companyName){
   if(!contact?.email) return '';
-  return `<span style="cursor:pointer;font-size:11px;color:var(--blue);white-space:nowrap;margin-left:6px" title="E-posta yaz" data-ctx="${escAttr(JSON.stringify({contactId:contact.id, name:contact.full_name||'', email:contact.email, companyId, opportunityId:opportunityId||null, companyName:companyName||''}))}" onclick="event.stopPropagation();openEmailModal(JSON.parse(this.dataset.ctx))">✉️ E-posta</span>`;
+  return `<span class="mini-act" style="color:var(--blue)" title="E-posta yaz" data-ctx="${escAttr(JSON.stringify({contactId:contact.id, name:contact.full_name||'', email:contact.email, companyId, opportunityId:opportunityId||null, companyName:companyName||''}))}" onclick="event.stopPropagation();openEmailModal(JSON.parse(this.dataset.ctx))">✉️ E-posta</span>`;
 }
 function openEmailModal(ctx){
   emailCtx = ctx;
@@ -2610,7 +2627,7 @@ function openEmailModal(ctx){
     direct.classList.toggle('hidden', !ok);
     gm.className = ok ? 'btn-ghost' : 'btn-add';
     gm.textContent = ok ? "Gmail'de Aç" : "Gmail'de Aç ve Kaydet";
-    document.getElementById('em-from').value = (ok ? st.email.gmailUser : CU?.email) || 'ahoraclario@gmail.com';
+    document.getElementById('em-from').value = (ok ? `Ahoraclario <${st.email.gmailUser}>` : CU?.email) || 'ahoraclario@gmail.com';
     info.textContent = ok
       ? '"Gönder" e-postayı CRM\'den doğrudan gönderir (Gmail\'in Gönderilenler klasöründe de görünür). Aktiviteye kaydedilir, +3/+5/+7 gün follow-up görevleri oluşur.'
       : 'Gmail\'de hazır açılır; göndermek için Gmail\'de "Gönder"e basarsın. Doğrudan gönderim için Ayarlar → E-posta Gönderimi.';
@@ -2647,7 +2664,8 @@ function sendEmailViaGmail(){
   const body = document.getElementById('em-body').value;
   if(!subject){ toast('Konu zorunludur'); return; }
   const ctx = emailCtx;
-  const url = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(ctx.email) + '&su=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body) + (CU?.email ? '&authuser=' + encodeURIComponent(CU.email) : '');
+  const acct = /@gmail\.com$/i.test(CU?.email || '') ? CU.email : 'ahoraclario@gmail.com';   // Gmail'i doğru hesapta aç
+  const url = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(ctx.email) + '&su=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body) + '&authuser=' + encodeURIComponent(acct);
   window.open(url, '_blank', 'noopener');     // açılır pencere engellenmesin diye önce sekme açılır
   closeEmailModal();
   api('addActivity', { companyId: ctx.companyId, contactId: ctx.contactId, opportunityId: ctx.opportunityId, activityType:'email_sent', description:`E-posta gönderildi: ${subject}` })
@@ -3200,4 +3218,10 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .cal-ev{font-size:10.5px;padding:2px 6px;border-radius:5px;margin-bottom:2px;background:color-mix(in srgb,var(--ev) 22%,transparent);color:var(--text);border-left:2px solid var(--ev);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cal-ev.done{opacity:.5;text-decoration:line-through}
 .cal-more{font-size:10px;color:var(--muted);padding-left:4px}
+.action-bar{display:flex;gap:8px;flex-wrap:wrap;margin:-2px 0 14px}
+.act-btn{font-size:12px;font-weight:600;padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);cursor:pointer;text-decoration:none;white-space:nowrap}
+.act-btn:hover{border-color:var(--primary);color:var(--primary)}
+.act-btn.primary{background:var(--primary);color:#07110C;border-color:transparent}
+.act-btn.primary:hover{filter:brightness(1.08);color:#07110C}
+.mini-act{cursor:pointer;font-size:11px;font-weight:600;white-space:nowrap;margin-left:6px;padding:3px 8px;border-radius:6px;border:1px solid currentColor}
 </style>
