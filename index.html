@@ -230,7 +230,7 @@ tr.row-click:hover{background:var(--surface-2)}
 .toast.show{display:block}
 .empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:13px}
 
-.dashboard-ref-pipeline{display:grid;grid-template-columns:repeat(7,minmax(112px,1fr));gap:8px;overflow-x:auto;padding:0 2px 6px}
+.dashboard-ref-pipeline{display:grid;grid-template-columns:repeat(7,minmax(150px,1fr));gap:8px;overflow-x:auto;padding:0 2px 8px}
 .dashboard-ref-col{min-width:0;border-radius:9px;overflow:hidden;background:var(--bg);border:1px solid var(--border)}
 .dashboard-ref-col-head{height:39px;padding:0 11px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:800;letter-spacing:-.05px;color:var(--text);border-bottom:1px solid rgba(255,255,255,.05)}
 .dashboard-ref-col-head .ref-count{min-width:24px;height:22px;padding:0 7px;border-radius:7px;background:rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:var(--text)}
@@ -291,6 +291,7 @@ tr.row-click:hover{background:var(--surface-2)}
     <button class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">📊 Dashboard</button>
     <button class="nav-item" data-page="myday" onclick="showPage('myday')">☀️ My Day<span class="nb hidden" id="nbMyDay"></span></button>
     <button class="nav-item" data-page="pipeline" onclick="showPage('pipeline')">🧭 Pipeline</button>
+    <button class="nav-item" data-page="calendar" onclick="showPage('calendar')">📅 Calendar<span class="nb hidden" id="nbCalendar"></span></button>
     <button class="nav-item" data-page="companies" onclick="showPage('companies')">🏢 Şirketler<span class="nb hidden" id="nbCompanies"></span></button>
     <button class="nav-item" data-page="tasks" onclick="showPage('tasks')">✅ Görevler<span class="nb hidden" id="nbTasks"></span></button>
     <button class="nav-item" data-page="tickets" onclick="showPage('tickets')">🎫 Talepler<span class="nb hidden" id="nbTickets"></span></button>
@@ -333,7 +334,7 @@ tr.row-click:hover{background:var(--surface-2)}
   <div class="panel" id="ticketPanel"></div>
 </div>
 <div class="modal-overlay" id="drilldownOverlay" onclick="if(event.target===this) closeDrilldownPanel()">
-  <div class="modal-wide" id="drilldownPanel"></div>
+  <div class="modal-wide" id="drilldownPanel" lang="en"></div>
 </div>
 
 <div class="modal-overlay" id="addCompanyModal">
@@ -417,6 +418,32 @@ tr.row-click:hover{background:var(--surface-2)}
   </div>
 </div>
 
+<div class="modal-overlay" id="meetingModal">
+  <div class="modal" style="max-width:560px">
+    <h3 id="mm-title-h">📅 Toplantı</h3>
+    <div class="fi" id="mm-company-wrap"><label>Şirket *</label><select id="mm-company"></select></div>
+    <div class="fi"><label>Başlık *</label><input id="mm-title" placeholder="örn: Tanışma görüşmesi"></div>
+    <div class="fi-row">
+      <div class="fi"><label>Tür</label><select id="mm-type">
+        <option value="Discovery">Tanışma görüşmesi</option><option value="Demo">Demo</option>
+        <option value="Follow-up">Follow-up</option><option value="Negotiation">Pazarlık</option><option value="Other">Diğer</option>
+      </select></div>
+      <div class="fi"><label>Tarih *</label><input id="mm-date" type="date"></div>
+    </div>
+    <div class="fi-row">
+      <div class="fi"><label>Başlangıç</label><input id="mm-start" type="time"></div>
+      <div class="fi"><label>Bitiş</label><input id="mm-end" type="time"></div>
+    </div>
+    <div class="fi"><label>Toplantı linki</label><input id="mm-link" placeholder="https://meet.google.com/… · Zoom · Teams"></div>
+    <div class="fi"><label>Nerede</label><input id="mm-location" placeholder="Online · ya da adres (örn: Maslak, Sarıyer)"></div>
+    <div class="fi"><label>Not / gündem</label><textarea id="mm-notes" rows="2"></textarea></div>
+    <div id="mm-extra" style="display:flex;gap:10px;flex-wrap:wrap;font-size:12px;margin:-2px 0 6px"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeMeetingModal()">Vazgeç</button>
+      <button class="btn-add" id="mm-save" onclick="saveMeetingModal()">Kaydet</button>
+    </div>
+  </div>
+</div>
 <div class="modal-overlay" id="emailModal">
   <div class="modal" style="max-width:560px">
     <h3>✉️ E-posta Yaz</h3>
@@ -583,6 +610,7 @@ const PAGE_DATA = {
   tickets:   () => [['getTickets',{filter:ticketFilter}]],
   analytics: () => [['getAnalytics',{}]],
   settings:  () => [['getSettings',{}]],
+  calendar:  () => [['getMeetings', calendarRange()]],
 };
 function prefetchPage(page){ (PAGE_DATA[page]?.() || []).forEach(([a,p]) => prefetch(a, p)); }
 // Tüm sayfaların verisini sırayla (sunucuyu boğmadan) hazırlar.
@@ -744,6 +772,7 @@ function closeTopLayer(){
   if(isOpen('lostReasonModal')) return resolveLostReason(null);
   if(isOpen('importModal')) return closeImportModal();
   if(isOpen('emailModal')) return closeEmailModal();
+  if(isOpen('meetingModal')) return closeMeetingModal();
   if(isOpen('apiKeyModal')) return document.getElementById('apiKeyModal').classList.remove('open');
   if(isOpen('editContactModal')) return closeEditContactModal();
   if(isOpen('editOppModal')) return closeEditOppModal();
@@ -825,6 +854,7 @@ async function refreshNavBadges(){
   setBadge('nbCompanies', d.companies);
   setBadge('nbTasks', d.openTasks);
   setBadge('nbTickets', d.openTickets);
+  setBadge('nbCalendar', d.upcomingMeetings);   // bugün + yarın
   document.getElementById('notifDot')?.classList.toggle('hidden', !(d.overdue > 0 || d.upcomingMeetings > 0 || d.openTickets > 0));
 }
 let navBadgeTimer = null;
@@ -916,6 +946,7 @@ if(document.readyState === 'loading') document.addEventListener('DOMContentLoade
 else setTimeout(tryRestoreSession, 0);
 
 async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter, periodFilter){
+  document.getElementById('main').setAttribute('lang', ['dashboard','pipeline','calendar'].includes(page) ? 'en' : 'tr');
   const silent = silentRender, fresh = preferFresh;
   silentRender = false;
   pageSeq++;
@@ -939,6 +970,7 @@ async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter
     else if(page==='analytics') await renderAnalytics();
     else if(page==='tickets') await renderTickets(taskFilter);
     else if(page==='settings') await renderSettings();
+    else if(page==='calendar') await renderCalendar();
     })();
     preferFresh = false;          // rq çağrıları yukarıda senkron başladı; bayrak başka isteklere sızmasın
     await done;
@@ -958,10 +990,11 @@ let dashboardPeriod = 'month';
 let dashboardPipeFilter = 'all';
 let dashboardPipeDateFilter = 'all';
 async function renderDashboard(){
+  document.getElementById('main').setAttribute('lang','en');
   const [d, oppsRes, anaRes, myDay] = await Promise.all([ rq('getDashboard', {period: dashboardPeriod}), rq('getOpportunities'), rq('getAnalytics'), rq('getMyDay') ]);
   if(currentPage !== 'dashboard') return;
   const main = document.getElementById('main');
-  if(!d.success){ main.innerHTML='<div class="empty">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderDashboard()">↻ Tekrar Dene</span></div>'; return; }
+  if(!d.success){ main.innerHTML='<div class="empty">Could not load data.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderDashboard()">↻ Retry</span></div>'; return; }
   try{
   let opps = oppsRes.success ? oppsRes.opportunities : [];
   const analytics = anaRes.success ? anaRes : null;
@@ -1015,15 +1048,15 @@ async function renderDashboard(){
             const initials=(name||'—').split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase();
             const industry=o.companies?.industry||o.companies?.type||'—';
             const country=o.companies?.country||'';
-            const mrr=o.estimated_mrr!=null ? '₺'+Number(o.estimated_mrr).toLocaleString('tr-TR')+'/mo' : 'Fiyat gir';
-            const age=daysSince(o.stage_changed_at)+'g';
+            const mrr=o.estimated_mrr!=null ? '₺'+Number(o.estimated_mrr).toLocaleString('tr-TR')+'/mo' : 'Set price';
+            const age=daysSince(o.stage_changed_at)+'d';
             return `<div class="dashboard-ref-deal" style="--ref-accent:${color}" onclick="openOpportunityDetail('${o.id}')">
               <div class="ref-top"><span class="ref-avatar">${esc(initials)}</span><b>${esc(name)}</b><span style="margin-left:auto;color:#607990">⋮</span></div>
               <div class="ref-sub">${esc(industry)}${country?' · '+esc(country):''}</div>
-              <div class="ref-meta"><span class="ref-mrr" style="cursor:pointer;${o.estimated_mrr==null?'color:var(--primary)':''}" onclick="event.stopPropagation();openEditOpportunityModal('${o.id}','${o.company_id}')" title="Tutarı düzenle">◷ ${esc(mrr)}</span><span class="ref-age">${age}</span></div>
+              <div class="ref-meta"><span class="ref-mrr" style="cursor:pointer;${o.estimated_mrr==null?'color:var(--primary)':''}" onclick="event.stopPropagation();openEditOpportunityModal('${o.id}','${o.company_id}')" title="Edit amount">◷ ${esc(mrr)}</span><span class="ref-age">${age}</span></div>
             </div>`;
-          }).join('') : '<div class="dashboard-ref-empty">Boş</div>'}
-          <div class="dashboard-ref-add" onclick="openAddCompanyModal('${s}')"><span>+</span> Anlaşma Ekle</div>
+          }).join('') : '<div class="dashboard-ref-empty">Empty</div>'}
+          <div class="dashboard-ref-add" onclick="openAddCompanyModal('${s}')"><span>+</span> Add Deal</div>
         </div>
       </div>`;
     }).join('')}
@@ -1031,7 +1064,7 @@ async function renderDashboard(){
 
   const donutColors = ['#39D98A','#22D3EE','#3B82F6','#A78BFA','#F59E0B'];
   const sources = (analytics?.sourcePerformance || []).filter(s=>s.total>0);
-  const donutHtml = sources.length ? donutChart(sources.map((s,i)=>({label:s.source, value:s.total, color:donutColors[i%donutColors.length]}))) : '<div class="empty" style="padding:20px">Henüz kaynak verisi yok</div>';
+  const donutHtml = sources.length ? donutChart(sources.map((s,i)=>({label:s.source, value:s.total, color:donutColors[i%donutColors.length]})), 'Total') : '<div class="empty" style="padding:20px">No source data yet</div>';
   const donutLegend = sources.map((s,i)=>`<div class="donut-legend-row" style="cursor:pointer" data-view="${escAttr('source:'+encodeURIComponent(s.source))}" onclick="renderDrilldown(this.dataset.view)"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
 
   const TASK_TYPE_TAG = {
@@ -1043,8 +1076,8 @@ async function renderDashboard(){
     'Follow-up': { tag:'Follow-up', color:'#39D98A' },
   };
   function tagFor(t, overdue){
-    if(overdue) return { tag:'Gecikti', color:'#F87171' };
-    return TASK_TYPE_TAG[t.task_type] || { tag:'Bugün', color:'#39D98A' };
+    if(overdue) return { tag:'Overdue', color:'#F87171' };
+    return TASK_TYPE_TAG[t.task_type] || { tag:'Today', color:'#39D98A' };
   }
   const actionList = myDay.success ? [
     ...myDay.overdueTasks.map(t=>({...t, ...tagFor(t,true)})),
@@ -1053,100 +1086,101 @@ async function renderDashboard(){
 
   main.innerHTML = `
     <div class="page-head">
-      <div><h1>Merhaba, ${esc(CU.name)} 👋</h1><p>İşte satış operasyonunun özeti.</p></div>
+      <div><h1>Hello, ${esc(CU.name)} 👋</h1><p>Here's your sales overview.</p></div>
       <div style="display:flex;gap:8px;align-items:center">
-        <select onchange="dashboardPeriod=this.value;renderDashboard()" style="width:auto;padding:8px 12px;font-size:12.5px" title="Sadece özet kartlarını etkiler">
-          <option value="today" ${dashboardPeriod==='today'?'selected':''}>Bugün</option>
-          <option value="yesterday" ${dashboardPeriod==='yesterday'?'selected':''}>Dün</option>
-          <option value="week" ${dashboardPeriod==='week'?'selected':''}>Bu Hafta</option>
-          <option value="last7" ${dashboardPeriod==='last7'?'selected':''}>Son 7 Gün</option>
-          <option value="month" ${dashboardPeriod==='month'?'selected':''}>Bu Ay</option>
-          <option value="last30" ${dashboardPeriod==='last30'?'selected':''}>Son 30 Gün</option>
-          <option value="quarter" ${dashboardPeriod==='quarter'?'selected':''}>Bu Çeyrek</option>
-          <option value="year" ${dashboardPeriod==='year'?'selected':''}>Bu Yıl</option>
-          <option value="all" ${dashboardPeriod==='all'?'selected':''}>Tüm Zamanlar</option>
+        <select onchange="dashboardPeriod=this.value;renderDashboard()" style="width:auto;padding:8px 12px;font-size:12.5px" title="Only affects the summary cards">
+          <option value="today" ${dashboardPeriod==='today'?'selected':''}>Today</option>
+          <option value="yesterday" ${dashboardPeriod==='yesterday'?'selected':''}>Yesterday</option>
+          <option value="week" ${dashboardPeriod==='week'?'selected':''}>This Week</option>
+          <option value="last7" ${dashboardPeriod==='last7'?'selected':''}>Last 7 Days</option>
+          <option value="month" ${dashboardPeriod==='month'?'selected':''}>This Month</option>
+          <option value="last30" ${dashboardPeriod==='last30'?'selected':''}>Last 30 Days</option>
+          <option value="quarter" ${dashboardPeriod==='quarter'?'selected':''}>This Quarter</option>
+          <option value="year" ${dashboardPeriod==='year'?'selected':''}>This Year</option>
+          <option value="all" ${dashboardPeriod==='all'?'selected':''}>All Time</option>
         </select>
-        <button class="btn-ghost" onclick="showPage('myday')">☀️ My Day'e Git</button>
-        <button class="btn-add" onclick="showPage('companies');setTimeout(openAddCompanyModal,80)">+ Yeni Şirket</button>
+        <button class="btn-ghost" onclick="showPage('myday')">☀️ Go to My Day</button>
+        <button class="btn-add" onclick="showPage('companies');setTimeout(openAddCompanyModal,80)">+ New Company</button>
       </div>
     </div>
     <div class="stats">
-      ${statCard('💰','#39D98A','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Değeri (açık fırsatlar, aylık)', d.trends?.pipelineValue, "renderDrilldown('pipelineValue')",
-        `${d.openOpportunities||0} açık fırsat${d.openWithoutValue?` · <span style="color:var(--amber)">${d.openWithoutValue} tanesinin tutarı girilmemiş</span>`:''}`)}
-      ${statCard('👥','#3B82F6',d.newProspects||0,'Yeni Adaylar', d.trends?.newProspects, "renderDrilldown('newProspectsMonth')")}
-      ${statCard('📅','#A78BFA',d.followUpsToday||0,'Follow-up', d.trends?.followUps, "renderDrilldown('followUpsToday')")}
-      ${statCard('🖥️','#22D3EE',d.demosThisWeek||0,'Demo', d.trends?.demos, "renderDrilldown('demosWeek')")}
-      ${statCard('📄','#F59E0B',d.openProposals||0,'Bekleyen Teklifler', d.trends?.openProposals, "renderDrilldown('openProposals')")}
-      ${statCard('🏆','#39D98A','₺'+(d.wonThisMonthRevenue||0).toLocaleString('tr-TR'),'Kazanılan (aylık gelir)', d.trends?.wonRevenue, "renderDrilldown('wonMonth')",
-        `${d.wonThisMonth||0} anlaşma kazanıldı`)}
+      ${statCard('💰','#39D98A','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Value', d.trends?.pipelineValue, "renderDrilldown('pipelineValue')",
+        `Monthly · ${d.openOpportunities||0} open deal${d.openOpportunities===1?'':'s'}${d.openWithoutValue?` · <span style="color:var(--amber)">${d.openWithoutValue} without an amount</span>`:''}`)}
+      ${statCard('👥','#3B82F6',d.newProspects||0,'New Leads', d.trends?.newProspects, "renderDrilldown('newProspectsMonth')")}
+      ${statCard('📅','#A78BFA',d.followUpsToday||0,'Follow-ups', d.trends?.followUps, "renderDrilldown('followUpsToday')")}
+      ${statCard('🖥️','#22D3EE',d.demosThisWeek||0,'Demos', d.trends?.demos, "renderDrilldown('demosWeek')")}
+      ${statCard('📄','#F59E0B',d.openProposals||0,'Open Proposals', d.trends?.openProposals, "renderDrilldown('openProposals')")}
+      ${statCard('🏆','#39D98A','₺'+(d.wonThisMonthRevenue||0).toLocaleString('tr-TR'),'Won Revenue', d.trends?.wonRevenue, "renderDrilldown('wonMonth')",
+        `Monthly · ${d.wonThisMonth||0} deal${d.wonThisMonth===1?'':'s'} won`)}
     </div>
 
     <div class="dash-grid">
       <div class="dash-main">
         <div class="ps">
-          <div class="ps-head">Satış Pipeline'ı
+          <div class="ps-head">Sales Pipeline
             <span style="display:flex;align-items:center;gap:10px">
-              <select onchange="dashboardPipeDateFilter=this.value;renderDashboard()" style="width:auto;padding:4px 9px;font-size:11px" title="Sadece bu bölümü etkiler">
-                <option value="all" ${dashboardPipeDateFilter==='all'?'selected':''}>Her Tarihten</option>
-                <option value="today" ${dashboardPipeDateFilter==='today'?'selected':''}>Bugün Eklenen</option>
-                <option value="week" ${dashboardPipeDateFilter==='week'?'selected':''}>Bu Hafta Eklenen</option>
-                <option value="month" ${dashboardPipeDateFilter==='month'?'selected':''}>Bu Ay Eklenen</option>
+              <select onchange="dashboardPipeDateFilter=this.value;renderDashboard()" style="width:auto;padding:4px 9px;font-size:11px" title="Only affects this section">
+                <option value="all" ${dashboardPipeDateFilter==='all'?'selected':''}>All Dates</option>
+                <option value="today" ${dashboardPipeDateFilter==='today'?'selected':''}>Added Today</option>
+                <option value="week" ${dashboardPipeDateFilter==='week'?'selected':''}>Added This Week</option>
+                <option value="month" ${dashboardPipeDateFilter==='month'?'selected':''}>Added This Month</option>
               </select>
-              <select onchange="dashboardPipeFilter=this.value;renderDashboard()" style="width:auto;padding:4px 9px;font-size:11px" title="Sadece bu bölümü etkiler">
-                <option value="all" ${dashboardPipeFilter==='all'?'selected':''}>Tüm Anlaşmalar</option>
-                <option value="high" ${dashboardPipeFilter==='high'?'selected':''}>🔥 Yüksek Öncelikli</option>
+              <select onchange="dashboardPipeFilter=this.value;renderDashboard()" style="width:auto;padding:4px 9px;font-size:11px" title="Only affects this section">
+                <option value="all" ${dashboardPipeFilter==='all'?'selected':''}>All Deals</option>
+                <option value="high" ${dashboardPipeFilter==='high'?'selected':''}>🔥 High Priority</option>
               </select>
-              <span style="cursor:pointer" onclick="showPage('pipeline')">Tümünü Gör →</span>
+              <span style="cursor:pointer" onclick="showPage('pipeline')">View All →</span>
             </span>
           </div>
           <div class="ps-body">${miniKanban}</div>
         </div>
 
         <div class="ps">
-          <div class="ps-head">Satış Hunisi<span style="cursor:pointer" onclick="showPage('analytics')">Rapor →</span></div>
-          <div class="ps-body">${analytics ? renderFunnelChevron(analytics.funnel) : '<div class="empty">Yükleniyor...</div>'}</div>
+          <div class="ps-head">Sales Funnel<span style="cursor:pointer" onclick="showPage('analytics')">Report →</span></div>
+          <div class="ps-body">${analytics ? renderFunnelChevron(analytics.funnel) : '<div class="empty">Loading...</div>'}</div>
         </div>
 
         <div class="ps">
-          <div class="ps-head">Müşteri Kaynakları<span style="cursor:pointer" onclick="showPage('analytics')">Rapor →</span></div>
-          <div class="ps-body"><div class="donut-wrap">${donutHtml}<div class="donut-legend">${donutLegend || '<div style="color:var(--muted)">Henüz veri yok</div>'}</div></div></div>
+          <div class="ps-head">Lead Sources<span style="cursor:pointer" onclick="showPage('analytics')">Report →</span></div>
+          <div class="ps-body"><div class="donut-wrap">${donutHtml}<div class="donut-legend">${donutLegend || '<div style="color:var(--muted)">No data yet</div>'}</div></div></div>
         </div>
       </div>
 
       <div class="dash-side">
         <div class="side-card">
-          <div class="side-card-head">⚡ Bugünün Aksiyonları<a onclick="showPage('myday')">Tümünü Gör →</a></div>
+          <div class="side-card-head">⚡ Today's Actions<a onclick="showPage('myday')">View All →</a></div>
           ${actionList.length ? actionList.map(t=>`
             <div class="action-item" onclick="openCompanyPanel('${t.company_id}')">
               <div class="chk"></div>
               <div class="at-body"><b>${esc(t.title)}</b><div class="at-time">${esc(t.companies?.name||'')}${t.due_date?' · '+t.due_date:''}</div></div>
               <span class="action-tag" style="background:${t.color}22;color:${t.color}">${t.tag}</span>
-            </div>`).join('') : '<div class="empty" style="padding:16px 0">Bugün için aksiyon yok 🎉</div>'}
+            </div>`).join('') : '<div class="empty" style="padding:16px 0">No actions for today 🎉</div>'}
         </div>
 
         <div class="side-card">
-          <div class="side-card-head">📅 Yaklaşan Toplantılar<a onclick="showPage('companies')">Tümünü Gör →</a></div>
+          <div class="side-card-head">📅 Upcoming Meetings<a onclick="showPage('calendar')">Calendar →</a></div>
           ${(d.upcomingMeetings&&d.upcomingMeetings.length) ? d.upcomingMeetings.map(m=>`
             <div class="action-item" onclick="openCompanyPanel('${m.company_id}')">
               <div class="chk" style="border-color:var(--purple)"></div>
-              <div class="at-body"><b>${esc(m.companies?.name||'—')}</b><div class="at-time">${trLabel(m.type)} · ${m.meeting_date}${m.start_time?' '+m.start_time:''}</div></div>
-            </div>`).join('') : '<div class="empty" style="padding:16px 0">Planlanmış toplantı yok.</div>'}
+              <div class="at-body"><b>${esc(m.companies?.name||'—')}</b><div class="at-time">${MEETING_TYPE_EN[m.type]||esc(m.type)} · ${m.meeting_date}${m.start_time?' '+String(m.start_time).slice(0,5):''}</div></div>
+              ${m.meeting_link?`<a href="${escAttr(m.meeting_link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="join-btn">Join</a>`:''}
+            </div>`).join('') : '<div class="empty" style="padding:16px 0">No meetings scheduled.</div>'}
         </div>
 
         <div class="side-card">
-          <div class="side-card-head">🕐 Son Aktivite</div>
+          <div class="side-card-head">🕐 Recent Activity</div>
           ${(d.recentActivities&&d.recentActivities.length) ? d.recentActivities.map(a=>`
             <div class="activity-item">
               <div class="activity-dot" style="background:var(--primary)"></div>
               <div><b style="font-weight:600">${esc(a.companies?.name||'')}</b><br><span style="color:var(--muted)">${esc(a.description||a.type)}</span></div>
               <span class="ai-time">${timeAgo(a.created_at)}</span>
-            </div>`).join('') : '<div class="empty" style="padding:16px 0">Henüz aktivite yok</div>'}
+            </div>`).join('') : '<div class="empty" style="padding:16px 0">No activity yet</div>'}
         </div>
       </div>
     </div>`;
   }catch(err){
     console.error('Dashboard render hatası:', err);
-    main.innerHTML = `<div class="empty" style="padding:40px">Bir hata oluştu.<br><span style="color:var(--faint);font-size:11px">${esc(err.message||String(err))}</span><br><span style="cursor:pointer;color:var(--primary)" onclick="renderDashboard()">↻ Tekrar Dene</span></div>`;
+    main.innerHTML = `<div class="empty" style="padding:40px">Something went wrong.<br><span style="color:var(--faint);font-size:11px">${esc(err.message||String(err))}</span><br><span style="cursor:pointer;color:var(--primary)" onclick="renderDashboard()">↻ Tekrar Dene</span></div>`;
   }
 }
 
@@ -1168,7 +1202,8 @@ function sparkline(data, color){
   </svg>`;
 }
 
-function donutChart(segments){
+const MEETING_TYPE_EN = { Discovery:'Intro Call', 'Follow-up':'Follow-up', Demo:'Demo', Negotiation:'Negotiation', Other:'Other' };
+function donutChart(segments, totalLabel){
   const total = segments.reduce((s,x)=>s+x.value,0) || 1;
   let acc = 0;
   const stops = segments.map(seg=>{
@@ -1177,7 +1212,7 @@ function donutChart(segments){
     return `${seg.color} ${start.toFixed(1)}deg ${end.toFixed(1)}deg`;
   }).join(', ');
   return `<div class="donut" style="background:conic-gradient(${stops})">
-    <div class="donut-center"><b style="font-size:19px">${total}</b><span style="font-size:9px;color:var(--muted)">Toplam</span></div>
+    <div class="donut-center"><b style="font-size:19px">${total}</b><span style="font-size:9px;color:var(--muted)">${totalLabel||'Toplam'}</span></div>
   </div>`;
 }
 
@@ -1201,7 +1236,7 @@ function renderFunnelChevron(funnel){
       const next = defs[i+1]?.color || d.color;
       return `<div class="ref-fseg" onclick="renderDrilldown('stage:${d.key}')" title="${esc(d.label)} — ${reached}">
         <div class="ref-fshape" style="background:linear-gradient(105deg,${d.color} 0%,${next} 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)"></div>
-        <div class="ref-fcontent"><span class="ref-fnum">${reached}</span><span class="ref-fpct">${i===0?'':'%'+pct}</span></div>
+        <div class="ref-fcontent"><span class="ref-fnum">${reached}</span><span class="ref-fpct">${i===0?'':pct+'%'}</span></div>
         <div class="ref-flabel">${esc(d.label)}</div>
       </div>`;
     }).join('')}
@@ -1212,10 +1247,10 @@ function timeAgo(iso){
   const diffMs = Date.now() - new Date(iso).getTime();
   const mins = Math.floor(diffMs/60000);
   if(mins<1) return 'now';
-  if(mins<60) return mins+'dk';
+  if(mins<60) return mins+'m';
   const hrs = Math.floor(mins/60);
-  if(hrs<24) return hrs+'sa';
-  return Math.floor(hrs/24)+'g';
+  if(hrs<24) return hrs+'h';
+  return Math.floor(hrs/24)+'d';
 }
 
 // ── MY DAY ──
@@ -1235,7 +1270,7 @@ async function renderMyDay(){
   function demoMeetingRow(m){
     return `<div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;border-left:3px solid #A78BFA">
       <span onclick="openCompanyPanel('${m.company_id}')" style="cursor:pointer"><b>${esc(m.companies?.name||'')}</b> — ${esc(m.title)} ${m.start_time?`<span style="color:var(--muted)">· ${m.start_time}</span>`:''}</span>
-      <span style="cursor:pointer;color:var(--green);font-size:11px;flex-shrink:0;margin-left:10px" onclick="updateMeeting('${m.id}','Completed','')">Tamamla</span>
+      <span style="display:flex;gap:8px;align-items:center;flex-shrink:0;margin-left:10px">${joinLink(m)}<span style="cursor:pointer;color:var(--green);font-size:11px" onclick="updateMeeting('${m.id}','Completed')">Tamamla</span></span>
     </div>`;
   }
   function section(title, color, bodyHtml, count){
@@ -1421,25 +1456,25 @@ async function renderDrilldown(view, fresh){
   lastDrilldownView = view;
   const panel = document.getElementById('drilldownPanel');
   const params = { view, period: dashboardPeriod };
-  if(!qcache.has(qkey('getDrilldown', params))) panel.innerHTML = '<div class="empty" style="padding:40px">Yükleniyor...</div>';
+  if(!qcache.has(qkey('getDrilldown', params))) panel.innerHTML = '<div class="empty" style="padding:40px">Loading...</div>';
   document.getElementById('drilldownOverlay').classList.add('open');
   const d = await rq('getDrilldown', params, { fresh: !!fresh });
   if(lastDrilldownView !== view) return;
-  if(!d.success){ panel.innerHTML = `<div class="panel-top"><h2>Hata</h2><button class="panel-close" onclick="closeDrilldownPanel()">✕</button></div><div class="empty" style="padding:40px">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" data-view="${escAttr(view)}" onclick="renderDrilldown(this.dataset.view)">↻ Tekrar Dene</span></div>`; return; }
+  if(!d.success){ panel.innerHTML = `<div class="panel-top"><h2>Error</h2><button class="panel-close" onclick="closeDrilldownPanel()">✕</button></div><div class="empty" style="padding:40px">Could not load data.<br><span style="cursor:pointer;color:var(--primary)" data-view="${escAttr(view)}" onclick="renderDrilldown(this.dataset.view)">↻ Retry</span></div>`; return; }
   const records = d.records || [];
   panel.innerHTML = `
     <div class="panel-top">
-      <div><h2 style="margin:0 0 4px">${esc(d.title)}</h2><div style="font-size:12px;color:var(--muted)">${records.length} kayıt</div></div>
+      <div><h2 style="margin:0 0 4px">${esc(d.title)}</h2><div style="font-size:12px;color:var(--muted)">${records.length} record${records.length===1?'':'s'}</div></div>
       <button class="panel-close" onclick="closeDrilldownPanel()">✕</button>
     </div>
     <div class="ps"><div class="ps-body" style="padding:0">
-      ${records.length===0 ? '<div class="empty" style="padding:40px">Bu görünümle eşleşen kayıt yok.</div>' : `
+      ${records.length===0 ? '<div class="empty" style="padding:40px">No records match this view.</div>' : `
       <table>
-        <thead><tr><th></th><th>İsim</th><th>Detay</th><th>Tutar</th><th>Tarih</th></tr></thead>
+        <thead><tr><th></th><th>Name</th><th>Details</th><th>Amount</th><th>Date</th></tr></thead>
         <tbody>
           ${records.map(r=>`
             <tr class="row-click" onclick="openDrilldownRecord('${r.type}','${r.id}','${r.companyId}')">
-              <td><span class="badge" style="background:${r.badgeColor}22;color:${r.badgeColor}">${esc(trLabel(trStage(r.badge||'')))}</span></td>
+              <td><span class="badge" style="background:${r.badgeColor}22;color:${r.badgeColor}">${esc(trStage(r.badge||''))}</span></td>
               <td><b>${esc(r.title)}</b></td>
               <td style="color:var(--muted)">${esc(r.subtitle||'')}</td>
               <td style="color:var(--green);font-weight:700">${r.value?'₺'+Number(r.value).toLocaleString('tr-TR'):'—'}</td>
@@ -1724,42 +1759,7 @@ async function openCompanyPanel(companyId){
       </div>
     </div>
 
-    <div class="ps">
-      <div class="ps-head">Toplantılar (${(d.meetings||[]).filter(m=>m.status==='Scheduled').length} planlandı)<span style="cursor:pointer;color:var(--primary)" onclick="showAddMeetingForm('${c.id}')">+ Ekle</span></div>
-      <div class="ps-body mini-list">
-        ${(d.meetings||[]).length===0?'<div style="color:var(--muted);font-size:12px">Planlanmış toplantı yok.</div>':d.meetings.map(m=>`
-          <div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;${m.status!=='Scheduled'?'opacity:.5':''}">
-            <span><span class="badge" style="background:var(--purple-bg);color:var(--purple);margin-right:5px">${trLabel(m.type)}</span>${esc(m.title)} <span style="color:var(--muted)">· ${m.meeting_date}${m.start_time?' '+m.start_time:''}</span></span>
-            ${m.status==='Scheduled'?`<span style="display:flex;gap:6px;align-items:center">
-              ${calendarButtons(m, c.name)}
-              <span style="cursor:pointer;color:var(--green);font-size:11px" onclick="updateMeeting('${m.id}','Completed','${c.id}')">Tamamlandı</span>
-              <span style="cursor:pointer;color:var(--red);font-size:11px" onclick="updateMeeting('${m.id}','Cancelled','${c.id}')">Vazgeç</span>
-              <span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="deleteMeetingConfirm('${m.id}','${c.id}')" title="Sil">🗑</span>
-            </span>`:`<span style="display:flex;align-items:center;gap:8px"><span style="font-size:10.5px;color:var(--muted)">${trLabel(m.status)}</span><span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="deleteMeetingConfirm('${m.id}','${c.id}')" title="Sil">🗑</span></span>`}
-          </div>`).join('')}
-        <div id="addMeetingForm-${c.id}" class="hidden" style="margin-top:6px">
-          <div class="fi"><input id="nmt-title" placeholder="Toplantı başlığı — örn: Keşif görüşmesi"></div>
-          <div class="fi-row">
-            <div class="fi"><label>Tür</label>
-              <select id="nmt-type">
-                <option value="Discovery">Discovery</option>
-                <option value="Demo">Demo</option>
-                <option value="Follow-up">Follow-up</option>
-                <option value="Negotiation">Negotiation</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
-            <div class="fi"><label>Tarih</label><input id="nmt-date" type="date"></div>
-          </div>
-          <div class="fi-row">
-            <div class="fi"><label>Başlangıç</label><input id="nmt-start" type="time"></div>
-            <div class="fi"><label>Bitiş</label><input id="nmt-end" type="time"></div>
-          </div>
-          <div class="fi"><label>Not / bağlantı (isteğe bağlı)</label><textarea id="nmt-notes" rows="2" placeholder="Zoom/Meet linki, gündem…"></textarea></div>
-          <button class="btn-add" style="width:100%" onclick="submitAddMeeting('${c.id}')">Toplantıyı Kaydet</button>
-        </div>
-      </div>
-    </div>
+    ${meetingsSection(d.meetings||[], c.id, c.name, null)}
 
     <div class="ps">
       <div class="ps-head">Teklifler (${(d.proposals||[]).length})<span style="cursor:pointer;color:var(--primary)" onclick="showAddProposalForm('${c.id}')">+ Ekle</span></div>
@@ -1968,13 +1968,7 @@ async function openOpportunityDetail(opportunityId){
       </div>
     </div>
 
-    <div class="ps">
-      <div class="ps-head">Toplantılar (${d.meetings.length})</div>
-      <div class="ps-body mini-list">
-        ${d.meetings.length===0?'<div style="color:var(--muted);font-size:12px">Planlanmış toplantı yok.</div>':d.meetings.map(m=>`
-          <div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;${m.status!=='Scheduled'?'opacity:.5':''}"><span><span class="badge" style="background:var(--purple-bg);color:var(--purple);margin-right:5px">${trLabel(m.type)}</span>${esc(m.title)} <span style="color:var(--muted)">· ${m.meeting_date}${m.start_time?' '+String(m.start_time).slice(0,5):''}</span></span>${m.status==='Scheduled'?`<span style="display:flex;gap:6px;align-items:center">${calendarButtons(m, co.name)}</span>`:`<span style="font-size:10.5px;color:var(--muted)">${trLabel(m.status)}</span>`}</div>`).join('')}
-      </div>
-    </div>
+    ${meetingsSection(d.meetings||[], co.id, co.name, o.id)}
 
     ${companyFilesSection(co.id, d.files || [], o.id)}
 
@@ -2223,26 +2217,12 @@ async function deleteTaskConfirm(taskId, companyId){
   if(d.success){ toast('🗑 Görev silindi'); openCompanyPanel(companyId); }
 }
 
-function showAddMeetingForm(companyId){ document.getElementById('addMeetingForm-'+companyId).classList.remove('hidden'); }
-async function submitAddMeeting(companyId){
-  const meeting = {
-    title: document.getElementById('nmt-title').value.trim(),
-    type: document.getElementById('nmt-type').value,
-    meeting_date: document.getElementById('nmt-date').value,
-    start_time: document.getElementById('nmt-start').value || null,
-    end_time: document.getElementById('nmt-end').value || null,
-    notes: document.getElementById('nmt-notes').value.trim() || null,
-  };
-  if(!meeting.title || !meeting.meeting_date){ toast('Başlık ve tarih zorunludur'); return; }
-  const d = await api('addMeeting', { companyId, meeting });
-  if(d.success){ toast('✓ Toplantı planlandı'); openCompanyPanel(companyId); }
-}
-async function updateMeeting(meetingId, status, companyId){
+function showAddMeetingForm(companyId){ openMeetingModal({ companyId }); }
+async function updateMeeting(meetingId, status){
   const d = await api('updateMeetingStatus', { meetingId, status });
   if(d.success){
-    toast(status==='Completed' ? '✓ Toplantı tamamlandı' : '✓ Toplantı iptal edildi');
-    if(companyId){ openCompanyPanel(companyId); }
-    else if(currentPage==='myday'){ renderMyDay(); }
+    toast(status==='Completed' ? '✓ Toplantı tamamlandı' : status==='Scheduled' ? '✓ Toplantı yeniden planlandı' : '✓ Toplantı iptal edildi');
+    afterMeetingChange();
   }
 }
 
@@ -2262,10 +2242,10 @@ async function updateProposal(proposalId, status, companyId){
   const d = await api('updateProposalStatus', { proposalId, status });
   if(d.success){ toast('✓ Teklif güncellendi: ' + trLabel(status)); openCompanyPanel(companyId); }
 }
-async function deleteMeetingConfirm(meetingId, companyId){
+async function deleteMeetingConfirm(meetingId){
   if(!confirm('Bu toplantıyı sil?')) return;
   const d = await api('deleteMeeting', { meetingId });
-  if(d.success){ toast('🗑 Toplantı silindi'); openCompanyPanel(companyId); }
+  if(d.success){ toast('🗑 Toplantı silindi'); closeMeetingModal(); afterMeetingChange(); }
 }
 async function deleteProposalConfirm(proposalId, companyId){
   if(!confirm('Bu teklifi sil?')) return;
@@ -2284,7 +2264,7 @@ async function renderPipeline(highlightStage){
   const d = await rq('getOpportunities');
   if(currentPage !== 'pipeline') return;
   const main = document.getElementById('main');
-  if(!d.success){ main.innerHTML='<div class="empty">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderPipeline()">↻ Tekrar Dene</span></div>'; return; }
+  if(!d.success){ main.innerHTML='<div class="empty">Could not load data.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderPipeline()">↻ Retry</span></div>'; return; }
   opportunities = d.opportunities || [];
   main.innerHTML = `
     <div class="page-head"><div><h1>Pipeline</h1><p>Kartları sürükleyerek ilerlet. Sonuçlanan fırsatları alttaki kutulara bırak. Başlıkların üzerine gelince açıklama görünür.</p></div></div>
@@ -2299,7 +2279,7 @@ async function renderPipeline(highlightStage){
               <div class="kcard" style="--stat-color:${STAGE_COLORS[s]}" draggable="true" ondragstart="onDragStart(event,'${o.id}')" onclick="openOpportunityDetail('${o.id}')">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
                   <b>${esc(o.companies?.name||'—')}</b>
-                  ${o.companies?.priority==='High'?'<span title="Yüksek öncelik">🔥</span>':''}
+                  ${o.companies?.priority==='High'?'<span title="High priority">🔥</span>':''}
                 </div>
                 <div style="color:var(--muted);font-size:10.5px">${esc(o.companies?.industry||'')}${o.companies?.industry&&o.companies?.country?' · ':''}${esc(o.companies?.country||'')}</div>
                 ${o.primary_contact_name?`<div style="font-size:10.5px;color:var(--muted);margin-top:4px">👤 ${esc(o.primary_contact_name)}</div>`:''}
@@ -2312,7 +2292,7 @@ async function renderPipeline(highlightStage){
                 </div>
                 ${o.next_task?`<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border-subtle);font-size:10px;color:var(--amber)">📅 ${esc(o.next_task.title)}${o.next_task.due_date?' · '+o.next_task.due_date:''}</div>`:''}
               </div>`).join('')}
-            <div style="cursor:pointer;color:var(--muted);font-size:11px;padding:7px 5px;text-align:center;border-radius:6px" onmouseover="this.style.background='var(--surface-2)';this.style.color='var(--primary)'" onmouseout="this.style.background='';this.style.color='var(--muted)'" onclick="openAddCompanyModal('${s}')">+ Anlaşma Ekle</div>
+            <div style="cursor:pointer;color:var(--muted);font-size:11px;padding:7px 5px;text-align:center;border-radius:6px" onmouseover="this.style.background='var(--surface-2)';this.style.color='var(--primary)'" onmouseout="this.style.background='';this.style.color='var(--muted)'" onclick="openAddCompanyModal('${s}')">+ Add Deal</div>
           </div>
         </div>`;
       }).join('')}
@@ -2455,9 +2435,11 @@ function meetingTitle(m, companyName){ return `${trLabel(m.type)} — ${companyN
 function calendarButtons(m, companyName){
   const t = meetingTimes(m);
   const dates = t.allDay ? `${t.date}/${t.next}` : `${t.start}/${t.end}`;
-  const g = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(meetingTitle(m, companyName)) + '&dates=' + dates + (m.notes ? '&details=' + encodeURIComponent(m.notes) : '');
+  const details = [m.meeting_link ? 'Toplantı linki: ' + m.meeting_link : '', m.notes || ''].filter(Boolean).join('\n\n');
+  const g = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(meetingTitle(m, companyName)) + '&dates=' + dates
+    + (details ? '&details=' + encodeURIComponent(details) : '') + ((m.location || m.meeting_link) ? '&location=' + encodeURIComponent(m.location || m.meeting_link) : '');
   return `<a href="${escAttr(g)}" target="_blank" rel="noopener" title="Google Takvim'e ekle" style="font-size:12px;text-decoration:none">📅</a>`
-    + `<span style="cursor:pointer;font-size:11px;color:var(--muted)" title="Outlook / Apple Takvim için .ics indir" data-m="${escAttr(JSON.stringify({id:m.id,meeting_date:m.meeting_date,start_time:m.start_time,end_time:m.end_time,title:m.title,type:m.type,notes:m.notes||''}))}" data-c="${escAttr(companyName||'')}" onclick="downloadIcs(this)">.ics</span>`;
+    + `<span style="cursor:pointer;font-size:11px;color:var(--muted)" title="Outlook / Apple Takvim için .ics indir" data-m="${escAttr(JSON.stringify({id:m.id,meeting_date:m.meeting_date,start_time:m.start_time,end_time:m.end_time,title:m.title,type:m.type,notes:m.notes||'',location:m.location||'',meeting_link:m.meeting_link||''}))}" data-c="${escAttr(companyName||'')}" onclick="downloadIcs(this)">.ics</span>`;
 }
 function downloadIcs(el){
   const m = JSON.parse(el.dataset.m), t = meetingTimes(m);
@@ -2465,7 +2447,10 @@ function downloadIcs(el){
   const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Ahoraclario//CRM//TR','BEGIN:VEVENT',
     `UID:${m.id}@ahoraclario`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g,'').slice(0,15)}Z`,
     ...(t.allDay ? [`DTSTART;VALUE=DATE:${t.date}`, `DTEND;VALUE=DATE:${t.next}`] : [`DTSTART:${t.start}`, `DTEND:${t.end}`]),
-    `SUMMARY:${esc2(meetingTitle(m, el.dataset.c))}`, ...(m.notes ? [`DESCRIPTION:${esc2(m.notes)}`] : []),
+    `SUMMARY:${esc2(meetingTitle(m, el.dataset.c))}`,
+    ...((m.notes || m.meeting_link) ? [`DESCRIPTION:${esc2([m.meeting_link ? 'Toplantı linki: ' + m.meeting_link : '', m.notes].filter(Boolean).join('\n\n'))}`] : []),
+    ...((m.location || m.meeting_link) ? [`LOCATION:${esc2(m.location || m.meeting_link)}`] : []),
+    ...(m.meeting_link ? [`URL:${m.meeting_link}`] : []),
     'END:VEVENT','END:VCALENDAR'];
   downloadBlob(lines.join('\r\n'), `toplanti-${m.meeting_date}.ics`, 'text/calendar;charset=utf-8');
 }
@@ -2798,6 +2783,169 @@ function filterCompanyRows(){
   const empty = document.getElementById('co-empty'); if(empty) empty.style.display = shown ? 'none' : '';
 }
 
+// ══ Toplantılar (ortak satır + ekle/düzenle penceresi) ══
+const MEETING_MAP = {};   // id → toplantı (düzenleme penceresi için)
+const MEETING_TYPE_TR = { Discovery:'Tanışma', Demo:'Demo', 'Follow-up':'Follow-up', Negotiation:'Pazarlık', Other:'Diğer' };
+const MEETING_COLORS = { Discovery:'#818CF8', Demo:'#A78BFA', 'Follow-up':'#22D3EE', Negotiation:'#F59E0B', Other:'#8B9AAF' };
+function joinLink(m, label){
+  return m.meeting_link ? `<a href="${escAttr(m.meeting_link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="join-btn" title="${escAttr(m.meeting_link)}">🔗 ${label||'Katıl'}</a>` : '';
+}
+function meetingRow(m, companyName){
+  MEETING_MAP[m.id] = { ...m, companyName };
+  const done = m.status !== 'Scheduled';
+  const time = m.start_time ? ' ' + String(m.start_time).slice(0,5) + (m.end_time ? '–' + String(m.end_time).slice(0,5) : '') : '';
+  return `<div class="mini-item" style="${done?'opacity:.55':''}">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <span><span class="badge" style="background:${MEETING_COLORS[m.type]||'#8B9AAF'}22;color:${MEETING_COLORS[m.type]||'#8B9AAF'};margin-right:5px">${MEETING_TYPE_TR[m.type]||esc(m.type)}</span><b>${esc(m.title)}</b>
+        <span style="color:var(--muted)">· ${m.meeting_date}${time}</span>${done?` <span style="font-size:10.5px;color:var(--muted)">(${trLabel(m.status)})</span>`:''}</span>
+      <span style="display:flex;gap:8px;align-items:center;flex-shrink:0">
+        ${done ? '' : joinLink(m)}
+        ${done ? '' : calendarButtons(m, companyName)}
+        <span style="cursor:pointer;color:var(--muted);font-size:12px" onclick="openMeetingModal({ meetingId:'${m.id}' })" title="Düzenle">✎</span>
+      </span>
+    </div>
+    ${m.location||m.notes ? `<div style="font-size:11px;color:var(--muted);margin-top:4px">${m.location?'📍 '+esc(m.location):''}${m.location&&m.notes?' · ':''}${m.notes?esc(m.notes):''}</div>` : ''}
+    ${done ? '' : `<div style="display:flex;gap:10px;margin-top:6px;font-size:11px">
+      <span style="cursor:pointer;color:var(--green)" onclick="updateMeeting('${m.id}','Completed')">✓ Tamamlandı</span>
+      <span style="cursor:pointer;color:var(--red)" onclick="updateMeeting('${m.id}','Cancelled')">İptal</span>
+      ${m.meeting_link ? '' : `<span style="cursor:pointer;color:var(--primary)" onclick="openMeetingModal({ meetingId:'${m.id}', focus:'mm-link' })">+ Link ekle</span>`}
+    </div>`}
+  </div>`;
+}
+function meetingsSection(meetings, companyId, companyName, opportunityId){
+  const upcoming = meetings.filter(m => m.status === 'Scheduled').length;
+  const ctx = `{ companyId:'${companyId}'${opportunityId?`, opportunityId:'${opportunityId}'`:''} }`;
+  return `<div class="ps">
+    <div class="ps-head">📅 Toplantılar (${upcoming} planlandı)<span style="cursor:pointer;color:var(--primary)" onclick="openMeetingModal(${ctx})">+ Ekle</span></div>
+    <div class="ps-body mini-list">
+      ${meetings.length ? meetings.map(m => meetingRow(m, companyName)).join('') : '<div style="color:var(--muted);font-size:12px">Planlanmış toplantı yok.</div>'}
+    </div>
+  </div>`;
+}
+let meetingCtx = null;
+async function openMeetingModal(opts = {}){
+  const m = opts.meetingId ? MEETING_MAP[opts.meetingId] : null;
+  meetingCtx = { meetingId: m?.id || null, companyId: m?.company_id || opts.companyId || null, opportunityId: m?.opportunity_id || opts.opportunityId || null };
+  const set = (id, v) => { document.getElementById(id).value = v ?? ''; };
+  document.getElementById('mm-title-h').textContent = m ? '📅 Toplantıyı Düzenle' : '📅 Yeni Toplantı';
+  set('mm-title', m?.title); set('mm-type', m?.type || 'Discovery'); set('mm-date', m?.meeting_date || opts.date || localDateStr());
+  set('mm-start', m?.start_time ? String(m.start_time).slice(0,5) : ''); set('mm-end', m?.end_time ? String(m.end_time).slice(0,5) : '');
+  set('mm-link', m?.meeting_link); set('mm-location', m?.location); set('mm-notes', m?.notes);
+  // Şirket: panelden/düzenlemeden geliyorsa sabit, takvimden yeni toplantıda seçilir
+  const wrap = document.getElementById('mm-company-wrap'), sel = document.getElementById('mm-company');
+  if(meetingCtx.companyId){ wrap.classList.add('hidden'); }
+  else {
+    wrap.classList.remove('hidden');
+    sel.innerHTML = '<option value="">Yükleniyor…</option>';
+    rq('getCompanies').then(d => {
+      const list = (d.companies||[]).slice().sort((a,b)=>a.name.localeCompare(b.name,'tr'));
+      sel.innerHTML = '<option value="">— Şirket seç —</option>' + list.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
+    });
+  }
+  document.getElementById('mm-extra').innerHTML = m ? `
+    ${m.companyName||m.companies?.name ? `<span style="cursor:pointer;color:var(--primary)" onclick="closeMeetingModal();openCompanyPanel('${m.company_id}')">🏢 ${esc(m.companyName||m.companies?.name)}</span>` : ''}
+    ${m.status==='Scheduled' ? `<span style="cursor:pointer;color:var(--green)" onclick="closeMeetingModal();updateMeeting('${m.id}','Completed')">✓ Tamamlandı</span>
+      <span style="cursor:pointer;color:var(--amber)" onclick="closeMeetingModal();updateMeeting('${m.id}','Cancelled')">İptal et</span>`
+      : `<span style="color:var(--muted)">Durum: ${trLabel(m.status)}</span> <span style="cursor:pointer;color:var(--primary)" onclick="closeMeetingModal();updateMeeting('${m.id}','Scheduled')">Yeniden planla</span>`}
+    <span style="cursor:pointer;color:var(--red);margin-left:auto" onclick="deleteMeetingConfirm('${m.id}')">🗑 Sil</span>` : '';
+  document.getElementById('meetingModal').classList.add('open');
+  setTimeout(() => document.getElementById(opts.focus || 'mm-title')?.focus(), 50);
+}
+function closeMeetingModal(){ document.getElementById('meetingModal').classList.remove('open'); meetingCtx = null; }
+async function saveMeetingModal(){
+  const v = id => document.getElementById(id).value.trim();
+  const meeting = { title:v('mm-title'), type:v('mm-type'), meeting_date:v('mm-date'), start_time:v('mm-start')||null, end_time:v('mm-end')||null,
+    meeting_link:v('mm-link'), location:v('mm-location'), notes:v('mm-notes') };
+  const companyId = meetingCtx.companyId || v('mm-company');
+  if(!companyId){ toast('Şirket seçin'); return; }
+  if(!meeting.title || !meeting.meeting_date){ toast('Başlık ve tarih zorunludur'); return; }
+  const btn = document.getElementById('mm-save'); btn.disabled = true;
+  const d = meetingCtx.meetingId
+    ? await api('updateMeeting', { meetingId: meetingCtx.meetingId, meeting })
+    : await api('addMeeting', { companyId, opportunityId: meetingCtx.opportunityId, meeting });
+  btn.disabled = false;
+  if(!d.success) return;
+  toast(meetingCtx.meetingId ? '✓ Toplantı güncellendi' : '✓ Toplantı planlandı');
+  closeMeetingModal();
+  afterMeetingChange();
+}
+function afterMeetingChange(){ if(anySidePanelOpen()) refreshOpenPanels(); else refreshPageFresh(); }
+
+// ══ Calendar ══
+let calMonth = localDateStr().slice(0,7);   // "YYYY-MM"
+function calendarRange(){
+  const [y,m] = calMonth.split('-').map(Number);
+  const first = new Date(y, m-1, 1), last = new Date(y, m, 0);
+  const start = new Date(first); start.setDate(1 - ((first.getDay()+6)%7));            // haftanın pazartesisi
+  const end = new Date(last); end.setDate(last.getDate() + (6 - (last.getDay()+6)%7)); // haftanın pazarı
+  const endWeek = new Date(end); const today = new Date(); const agendaEnd = new Date(today); agendaEnd.setDate(today.getDate()+7);
+  return { from: localDateStr(start < today ? start : today), to: localDateStr(endWeek > agendaEnd ? endWeek : agendaEnd) };
+}
+function shiftCalendar(delta){
+  if(delta === 0) calMonth = localDateStr().slice(0,7);
+  else { const [y,m] = calMonth.split('-').map(Number); const d = new Date(y, m-1+delta, 1); calMonth = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+  showPage('calendar');
+}
+async function renderCalendar(){
+  const range = calendarRange();
+  const d = await rq('getMeetings', range);
+  if(currentPage !== 'calendar') return;
+  const main = document.getElementById('main');
+  if(!d.success){ main.innerHTML = '<div class="empty">Could not load meetings. Was schema_faz12.sql run?<br><span style="cursor:pointer;color:var(--primary)" onclick="showPage(\'calendar\')">↻ Retry</span></div>'; return; }
+  const meetings = (d.meetings || []).slice().sort((a,b) => (a.meeting_date + (a.start_time||'')).localeCompare(b.meeting_date + (b.start_time||'')));
+  meetings.forEach(m => { MEETING_MAP[m.id] = { ...m, companyName: m.companies?.name }; });
+  const byDay = {}; meetings.forEach(m => { (byDay[m.meeting_date] ||= []).push(m); });
+  const [y,mo] = calMonth.split('-').map(Number);
+  const first = new Date(y, mo-1, 1), last = new Date(y, mo, 0);
+  const gridStart = new Date(first); gridStart.setDate(1 - ((first.getDay()+6)%7));
+  const weeks = Math.ceil((((first.getDay()+6)%7) + last.getDate()) / 7);
+  const today = localDateStr();
+  const monthName = first.toLocaleDateString('en-US', { month:'long', year:'numeric' });
+  const hhmm = t => t ? String(t).slice(0,5) : '';
+  const cells = [];
+  for(let i=0; i<weeks*7; i++){
+    const day = new Date(gridStart); day.setDate(gridStart.getDate()+i);
+    const ds = localDateStr(day), inMonth = day.getMonth() === mo-1, list = byDay[ds] || [];
+    cells.push(`<div class="cal-cell${inMonth?'':' out'}${ds===today?' today':''}" onclick="if(event.target===this||event.target.classList.contains('cal-num')) openMeetingModal({ date:'${ds}' })" title="Bu güne toplantı ekle">
+      <div class="cal-num">${day.getDate()}</div>
+      ${list.slice(0,4).map(m => `<div class="cal-ev${m.status!=='Scheduled'?' done':''}" style="--ev:${MEETING_COLORS[m.type]||'#8B9AAF'}" onclick="openMeetingModal({ meetingId:'${m.id}' })" title="${escAttr((m.companies?.name||'')+' — '+m.title)}">
+        ${m.meeting_link && m.status==='Scheduled' ? '🔗 ' : ''}${hhmm(m.start_time)} ${esc(m.companies?.name || m.title)}</div>`).join('')}
+      ${list.length>4 ? `<div class="cal-more">+${list.length-4} more</div>` : ''}
+    </div>`);
+  }
+  const agendaEnd = localDateStr(new Date(Date.now()+7*86400000));
+  const agenda = meetings.filter(m => m.status==='Scheduled' && m.meeting_date >= today && m.meeting_date <= agendaEnd);
+  const dayLabel = ds => ds===today ? 'Today' : new Date(ds+'T12:00:00').toLocaleDateString('en-US', { weekday:'short', day:'numeric', month:'short' });
+  main.innerHTML = `
+    <div class="page-head">
+      <div><h1>📅 Calendar</h1><p>Tüm toplantıların. Boş bir güne tıklayıp toplantı ekleyebilir, toplantıya tıklayıp düzenleyebilirsin.</p></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn-ghost" onclick="shiftCalendar(-1)" title="Previous month">‹</button>
+        <button class="btn-ghost" onclick="shiftCalendar(0)">Today</button>
+        <button class="btn-ghost" onclick="shiftCalendar(1)" title="Next month">›</button>
+        <button class="btn-add" onclick="openMeetingModal({})">+ New Meeting</button>
+      </div>
+    </div>
+    <div class="cal-layout">
+      <div class="ps" style="margin:0"><div class="ps-head">${monthName}</div>
+        <div class="cal-grid">
+          ${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(x=>`<div class="cal-dow">${x}</div>`).join('')}
+          ${cells.join('')}
+        </div>
+      </div>
+      <div class="ps" style="margin:0"><div class="ps-head">Next 7 Days (${agenda.length})</div>
+        <div class="ps-body mini-list">
+          ${agenda.length ? agenda.map(m => `<div class="mini-item" style="cursor:pointer;border-left:3px solid ${MEETING_COLORS[m.type]||'#8B9AAF'}" onclick="openMeetingModal({ meetingId:'${m.id}' })">
+            <div style="display:flex;justify-content:space-between;gap:8px;align-items:center">
+              <div><b>${esc(m.companies?.name||'—')}</b><div style="font-size:11px;color:var(--muted)">${dayLabel(m.meeting_date)}${m.start_time?' · '+hhmm(m.start_time):''} · ${esc(m.title)}</div>
+                ${m.location?`<div style="font-size:10.5px;color:var(--muted)">📍 ${esc(m.location)}</div>`:''}</div>
+              ${joinLink(m, 'Join')}
+            </div></div>`).join('') : '<div style="color:var(--muted);font-size:12px">No meetings in the next 7 days.</div>'}
+        </div>
+      </div>
+    </div>`;
+}
+
 function rerenderCurrentPage(){ refreshPageFresh(); }
 async function completeTaskFromList(taskId){
   const d = await api('completeTask', { taskId });
@@ -2979,4 +3127,18 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .outcome-drop small{grid-column:1/-1;color:var(--muted);font-size:10.5px}
 .outcome-drop.dragover{background:color-mix(in srgb,var(--oc) 20%,transparent);border-style:solid}
 @media(max-width:900px){.outcome-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.join-btn{font-size:11px;font-weight:700;color:#07110C;background:var(--primary);padding:3px 9px;border-radius:6px;text-decoration:none;white-space:nowrap}
+.join-btn:hover{filter:brightness(1.1)}
+.cal-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media(max-width:1100px){.cal-layout{grid-template-columns:1fr}}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--border-subtle);border-top:1px solid var(--border-subtle)}
+.cal-dow{background:var(--surface);font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;padding:7px 8px}
+.cal-cell{background:var(--surface);min-height:96px;padding:5px 6px;cursor:pointer;overflow:hidden}
+.cal-cell:hover{background:var(--surface-2)}
+.cal-cell.out{opacity:.4}
+.cal-num{font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:3px}
+.cal-cell.today .cal-num{display:inline-block;background:var(--primary);color:#07110C;border-radius:10px;padding:0 7px}
+.cal-ev{font-size:10.5px;padding:2px 6px;border-radius:5px;margin-bottom:2px;background:color-mix(in srgb,var(--ev) 22%,transparent);color:var(--text);border-left:2px solid var(--ev);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-ev.done{opacity:.5;text-decoration:line-through}
+.cal-more{font-size:10px;color:var(--muted);padding-left:4px}
 </style>
