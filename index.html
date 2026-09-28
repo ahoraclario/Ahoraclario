@@ -177,7 +177,7 @@ tr.row-click:hover{background:var(--surface-2)}
 .btn-danger{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,81,73,.25);border-radius:8px;padding:9px 15px;font-size:12.5px;font-weight:700}
 
 .board{display:flex;gap:12px;overflow-x:auto;padding-bottom:14px}
-.col{flex:0 0 240px;display:flex;flex-direction:column}
+.col{flex:1 1 0;min-width:138px;display:flex;flex-direction:column}
 .col-head{padding:10px 13px;border-radius:10px 10px 0 0;font-size:12px;font-weight:700;display:flex;justify-content:space-between;color:#07110C;letter-spacing:.01em}
 .col-head .count{background:rgba(10,14,26,.22);border-radius:20px;padding:1px 8px;font-size:10.5px}
 .col-body{background:var(--surface);border:1px solid var(--border-subtle);border-top:none;border-radius:0 0 10px 10px;flex:1;min-height:100px;padding:9px;display:flex;flex-direction:column;gap:8px}
@@ -230,7 +230,7 @@ tr.row-click:hover{background:var(--surface-2)}
 .toast.show{display:block}
 .empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:13px}
 
-.dashboard-ref-pipeline{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;overflow:hidden;padding:0 2px 2px}
+.dashboard-ref-pipeline{display:grid;grid-template-columns:repeat(7,minmax(112px,1fr));gap:8px;overflow-x:auto;padding:0 2px 6px}
 .dashboard-ref-col{min-width:0;border-radius:9px;overflow:hidden;background:var(--bg);border:1px solid var(--border)}
 .dashboard-ref-col-head{height:39px;padding:0 11px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:800;letter-spacing:-.05px;color:var(--text);border-bottom:1px solid rgba(255,255,255,.05)}
 .dashboard-ref-col-head .ref-count{min-width:24px;height:22px;padding:0 7px;border-radius:7px;background:rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:var(--text)}
@@ -266,7 +266,7 @@ tr.row-click:hover{background:var(--surface-2)}
 .dash-main>.ps>.ps-body{padding:10px 11px}
 .dash-side .side-card{background:var(--bg-raised);border-color:var(--border);border-radius:10px}
 
-@media(max-width:1050px){.dashboard-ref-pipeline{grid-template-columns:repeat(5,180px);overflow-x:auto}.dashboard-ref-funnel{min-width:720px;overflow-x:auto}.dash-main>.ps{overflow:hidden}}
+@media(max-width:1050px){.dashboard-ref-pipeline{grid-template-columns:repeat(7,170px);overflow-x:auto}.dashboard-ref-funnel{min-width:720px;overflow-x:auto}.dash-main>.ps{overflow:hidden}}
 </style>
 </head>
 <body>
@@ -371,14 +371,13 @@ tr.row-click:hover{background:var(--surface-2)}
     </div>
     <div class="fi"><label>Başlangıç Aşaması</label>
       <select id="nc-stage">
-        <option value="Prospect">Aday</option>
-        <option value="Researched">Araştırıldı</option>
-        <option value="Contacted">İletişime Geçildi</option>
-        <option value="Replied">Cevap Verdi</option>
-        <option value="Discovery Call">Keşif Görüşmesi</option>
+        <option value="Lead">Lead — yeni aday</option>
+        <option value="Contacted">Contacted — ulaşıldı</option>
+        <option value="Qualified">Qualified — ilgileniyor</option>
+        <option value="Meeting">Meeting — görüşme</option>
         <option value="Demo">Demo</option>
-        <option value="Proposal">Teklif</option>
-        <option value="Negotiation">Pazarlık</option>
+        <option value="Proposal">Proposal — teklif gönderildi</option>
+        <option value="Negotiation">Negotiation — pazarlık</option>
       </select>
     </div>
     <div class="fi"><label>Not</label><textarea id="nc-notes" rows="2"></textarea></div>
@@ -463,13 +462,24 @@ tr.row-click:hover{background:var(--surface-2)}
 <script>
 const EDGE_FUNCTION_URL = 'https://tuozgfnjxxwrcuyfrwxq.supabase.co/functions/v1/rapid-service';
 
-const STAGES = ["Prospect","Researched","Contacted","Replied","Discovery Call","Demo","Proposal","Negotiation","Won"];
-const STAGE_COLORS = {Prospect:"#64748B",Researched:"#3B82F6",Contacted:"#22D3EE",Replied:"#38BDF8",
-  "Discovery Call":"#818CF8","Demo":"#A78BFA","Proposal":"#C084FC","Negotiation":"#F59E0B","Won":"#39D98A"};
-const OUTCOME_COLORS = {Lost:"#F87171","No Response":"#596579","Not a Fit":"#596579"};
+// Satış aşamaları (sırayla ilerler) ve sonuçlar (her aşamadan seçilebilir).
+const STAGES = ["Lead","Contacted","Qualified","Meeting","Demo","Proposal","Negotiation","Won"];
+const OUTCOMES = ["Not Interested","No Response","Not a Fit","Lost"];
+const STAGE_COLORS = {Lead:"#64748B",Contacted:"#3B82F6",Qualified:"#22D3EE",Meeting:"#818CF8",
+  Demo:"#A78BFA",Proposal:"#C084FC",Negotiation:"#F59E0B",Won:"#39D98A"};
+const OUTCOME_COLORS = {"Not Interested":"#FB923C","No Response":"#596579","Not a Fit":"#596579",Lost:"#F87171"};
+// Üzerine gelince görünen kısa Türkçe açıklamalar
+const STAGE_HINTS = {
+  Lead:'Yeni aday — henüz ulaşılmadı', Contacted:'Mesaj / e-posta / arama yapıldı, cevap bekleniyor',
+  Qualified:'Cevap verdi, ilgileniyor ve hedef müşteri', Meeting:'İlk tanışma görüşmesi yapıldı veya planlandı',
+  Demo:'Ürün gösterildi', Proposal:'Fiyat teklifi gönderildi', Negotiation:'Fiyat / şartlar konuşuluyor',
+  Won:'Anlaşma yapıldı, müşteri oldu',
+  'Not Interested':'Ulaşıldı ama ilgilenmedi', 'No Response':'Hiç cevap vermedi',
+  'Not a Fit':'Hedef müşteri değil', Lost:'Teklif / pazarlık aşamasında kaybedildi',
+};
 
 const TR_LABELS = {
-  Discovery:'Keşif', 'Follow-up':'Follow-up', Negotiation:'Negotiation', Other:'Diğer',
+  Discovery:'Tanışma', 'Follow-up':'Follow-up', Negotiation:'Pazarlık', Other:'Diğer',
   Scheduled:'Planlandı', Completed:'Tamamlandı', Cancelled:'İptal Edildi',
   Call:'Arama', Meeting:'Toplantı', Research:'Araştırma',
   Draft:'Taslak', Sent:'Gönderildi', Viewed:'Görüntülendi', Negotiating:'Pazarlıkta',
@@ -481,11 +491,8 @@ const TR_LABELS = {
 };
 const LOST_REASONS = ['Too expensive','No need','No budget','Using another CRM','Bad timing','No response','Not decision maker','Competitor','Other'];
 function trLabel(v){ return TR_LABELS[v] || v; }
-const STAGE_LABELS_TR = {
-  Prospect:'Aday', Researched:'Araştırıldı', Contacted:'İletişime Geçildi', Replied:'Cevap Verdi',
-  'Discovery Call':'Keşif Görüşmesi', Demo:'Demo', Proposal:'Teklif', Negotiation:'Pazarlık', Won:'Kazanıldı',
-  Lost:'Kaybedildi', 'No Response':'Cevap Yok', 'Not a Fit':'Uygun Değil',
-};
+// Aşamalar ekranda İngilizce adlarıyla gösterilir; eski adlar (eski kayıtlar/aktiviteler) yeni karşılığına çevrilir.
+const STAGE_LABELS_TR = { Prospect:'Lead', Researched:'Lead', Replied:'Qualified', 'Discovery Call':'Meeting' };
 function trStage(v){ return STAGE_LABELS_TR[v] || v; }
 
 let CU = null;
@@ -980,25 +987,26 @@ async function renderDashboard(){
     if(firstHalf===0) return secondHalf>0 ? 100 : 0;
     return Math.round(((secondHalf-firstHalf)/firstHalf)*100);
   }
-  function statCard(icon, color, value, label, trendArr, onClick){
+  function statCard(icon, color, value, label, trendArr, onClick, sub){
     const pct = trendPct(trendArr);
     const trendHtml = trendArr ? `<span class="trend ${pct>0?'up':'flat'}">${pct>0?'↑'+pct+'%':'—'}</span>` : '';
     return `<div class="stat" style="--stat-color:${color};${onClick?'cursor:pointer':''}" ${onClick?`onclick="${onClick}"`:''}>
       <div class="icon" style="background:${color}30;color:${color}">${icon}</div>
       <div class="l">${label}</div>
       <div class="value-row"><span class="n">${value}</span>${trendHtml}</div>
+      ${sub ? `<div style="font-size:10.5px;color:var(--muted);margin-top:2px">${sub}</div>` : ''}
       ${trendArr ? `<div class="spark-wrap">${sparkline(trendArr, color)}</div>` : ''}
     </div>`;
   }
 
-  const dashboardPipelineStages = ['Prospect','Contacted','Replied','Discovery Call','Demo'];
+  const dashboardPipelineStages = STAGES.filter(s => s !== 'Won');
   const miniKanban = `<div class="dashboard-ref-pipeline">
     ${dashboardPipelineStages.map(s=>{
       const items = opps.filter(o=>o.stage===s).slice(0,3);
       const count = opps.filter(o=>o.stage===s).length;
       const color = STAGE_COLORS[s] || '#3B82F6';
       return `<div class="dashboard-ref-col">
-        <div class="dashboard-ref-col-head" style="background:linear-gradient(180deg,${color}22 0%,${color}10 100%);border-top:1px solid ${color}55;color:${color};cursor:pointer" onclick="renderDrilldown('stage:${s}')">
+        <div class="dashboard-ref-col-head" title="${escAttr(STAGE_HINTS[s]||'')}" style="background:linear-gradient(180deg,${color}22 0%,${color}10 100%);border-top:1px solid ${color}55;color:${color};cursor:pointer" onclick="renderDrilldown('stage:${s}')">
           <span>${esc(trStage(s))}</span><span class="ref-count">${count}</span>
         </div>
         <div class="dashboard-ref-col-body">
@@ -1063,12 +1071,14 @@ async function renderDashboard(){
       </div>
     </div>
     <div class="stats">
-      ${statCard('💰','#39D98A','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Değeri', d.trends?.pipelineValue, "renderDrilldown('pipelineValue')")}
+      ${statCard('💰','#39D98A','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Değeri (açık fırsatlar, aylık)', d.trends?.pipelineValue, "renderDrilldown('pipelineValue')",
+        `${d.openOpportunities||0} açık fırsat${d.openWithoutValue?` · <span style="color:var(--amber)">${d.openWithoutValue} tanesinin tutarı girilmemiş</span>`:''}`)}
       ${statCard('👥','#3B82F6',d.newProspects||0,'Yeni Adaylar', d.trends?.newProspects, "renderDrilldown('newProspectsMonth')")}
       ${statCard('📅','#A78BFA',d.followUpsToday||0,'Follow-up', d.trends?.followUps, "renderDrilldown('followUpsToday')")}
       ${statCard('🖥️','#22D3EE',d.demosThisWeek||0,'Demo', d.trends?.demos, "renderDrilldown('demosWeek')")}
       ${statCard('📄','#F59E0B',d.openProposals||0,'Bekleyen Teklifler', d.trends?.openProposals, "renderDrilldown('openProposals')")}
-      ${statCard('🏆','#39D98A',d.wonThisMonth||0,'Kazanılan', d.trends?.wonRevenue, "renderDrilldown('wonMonth')")}
+      ${statCard('🏆','#39D98A','₺'+(d.wonThisMonthRevenue||0).toLocaleString('tr-TR'),'Kazanılan (aylık gelir)', d.trends?.wonRevenue, "renderDrilldown('wonMonth')",
+        `${d.wonThisMonth||0} anlaşma kazanıldı`)}
     </div>
 
     <div class="dash-grid">
@@ -1174,15 +1184,15 @@ function donutChart(segments){
 function renderFunnelChevron(funnel){
   const byStage = Object.fromEntries((funnel||[]).map(x=>[x.stage,x]));
   const defs = [
-    {label:'Aday', key:'Prospect', color:'#3B82F6'},
-    {label:'İletişime Geçildi', key:'Contacted', color:'#22D3EE'},
-    {label:'Cevap Verdi', key:'Replied', color:'#818CF8'},
-    {label:'Toplantı', key:'Discovery Call', color:'#A78BFA'},
-    {label:'Demo', key:'Demo', color:'#39D98A'},
-    {label:'Teklif', key:'Proposal', color:'#F59E0B'},
-    {label:'Kazanıldı', key:'Won', color:'#64748B'}
+    {label:'Lead', key:'Lead', color:'#64748B'},
+    {label:'Contacted', key:'Contacted', color:'#3B82F6'},
+    {label:'Qualified', key:'Qualified', color:'#22D3EE'},
+    {label:'Meeting', key:'Meeting', color:'#818CF8'},
+    {label:'Demo', key:'Demo', color:'#A78BFA'},
+    {label:'Proposal', key:'Proposal', color:'#F59E0B'},
+    {label:'Won', key:'Won', color:'#39D98A'}
   ];
-  const first = byStage['Prospect']?.reached || 0;
+  const first = byStage['Lead']?.reached || 0;
   return `<div class="dashboard-ref-funnel">
     ${defs.map((d,i)=>{
       const source = byStage[d.key];
@@ -1513,14 +1523,14 @@ async function renderCompanies(searchQuery, sourceFilter, periodFilter){
 
 function openAddCompanyModal(startStage){
   document.getElementById('addCompanyModal').classList.add('open');
-  document.getElementById('nc-stage').value = startStage || 'Prospect';
+  document.getElementById('nc-stage').value = startStage || 'Lead';
 }
 function closeAddCompanyModal(){
   document.getElementById('addCompanyModal').classList.remove('open');
   ['name','industry','country','website','notes'].forEach(k=>document.getElementById('nc-'+k).value='');
   document.getElementById('nc-source').value='';
   document.getElementById('nc-priority').value='Normal';
-  document.getElementById('nc-stage').value='Prospect';
+  document.getElementById('nc-stage').value='Lead';
 }
 async function submitAddCompany(){
   const name = document.getElementById('nc-name').value.trim();
@@ -1535,7 +1545,7 @@ async function submitAddCompany(){
     priority: document.getElementById('nc-priority').value,
     research_notes: document.getElementById('nc-notes').value.trim(),
   };
-  const startStage = document.getElementById('nc-stage').value || 'Prospect';
+  const startStage = document.getElementById('nc-stage').value || 'Lead';
   const d = await api('addCompany', { company, stage: startStage });
   if(d.success){
     toast('✓ Şirket eklendi');
@@ -1651,7 +1661,7 @@ async function openCompanyPanel(companyId){
             </div>
             ${o.plan || o.expected_close_date ? `<div style="font-size:10.5px;color:var(--muted);margin-top:3px">${o.plan?esc(o.plan):''}${o.plan && o.expected_close_date?' · ':''}${o.expected_close_date?'Kapanış: '+o.expected_close_date:''}</div>` : ''}
             <div class="stage-track">
-              ${STAGES.concat(['Lost','No Response','Not a Fit']).map(s=>`<span class="stage-pill" onclick="moveOpportunityStage('${o.id}','${s}','${c.id}')" style="background:${o.stage===s?(STAGE_COLORS[s]||OUTCOME_COLORS[s]||'#666'):'var(--surface-2)'};color:${o.stage===s?'#07110C':'var(--muted)'};border-color:${o.stage===s?'transparent':'var(--border)'}">${trStage(s)}</span>`).join('')}
+              ${STAGES.concat(OUTCOMES).map(s=>`${s===OUTCOMES[0]?'<span style="flex-basis:100%;height:0"></span>':''}<span class="stage-pill" title="${escAttr(STAGE_HINTS[s]||'')}" onclick="moveOpportunityStage('${o.id}','${s}','${c.id}')" style="background:${o.stage===s?(STAGE_COLORS[s]||OUTCOME_COLORS[s]||'#666'):'var(--surface-2)'};color:${o.stage===s?'#07110C':'var(--muted)'};border-color:${o.stage===s?'transparent':'var(--border)'}">${trStage(s)}</span>`).join('')}
             </div>
           </div>`).join('')}
       </div>
@@ -1989,7 +1999,7 @@ async function openOpportunityDetail(opportunityId){
       <div class="ps-head">Aşama Değiştir</div>
       <div class="ps-body">
         <div class="stage-track">
-          ${STAGES.concat(['Lost','No Response','Not a Fit']).map(s=>`<span class="stage-pill" onclick="moveOppFromDetail('${o.id}','${s}','${co.id}')" style="background:${o.stage===s?(STAGE_COLORS[s]||OUTCOME_COLORS[s]||'#666'):'var(--surface-2)'};color:${o.stage===s?'#07110C':'var(--muted)'};border-color:${o.stage===s?'transparent':'var(--border)'}">${trStage(s)}</span>`).join('')}
+          ${STAGES.concat(OUTCOMES).map(s=>`${s===OUTCOMES[0]?'<span style="flex-basis:100%;height:0"></span>':''}<span class="stage-pill" title="${escAttr(STAGE_HINTS[s]||'')}" onclick="moveOppFromDetail('${o.id}','${s}','${co.id}')" style="background:${o.stage===s?(STAGE_COLORS[s]||OUTCOME_COLORS[s]||'#666'):'var(--surface-2)'};color:${o.stage===s?'#07110C':'var(--muted)'};border-color:${o.stage===s?'transparent':'var(--border)'}">${trStage(s)}</span>`).join('')}
         </div>
         <div style="display:flex;gap:8px;margin-top:12px">
           <button class="btn-add" style="flex:1;background:var(--green)" onclick="moveOppFromDetail('${o.id}','Won','${co.id}')">Kazanıldı İşaretle</button>
@@ -2083,7 +2093,7 @@ async function saveCompanyProfile(companyId){
 let editingOppId = null, editingOppCompanyId = null;
 
 async function quickAddOpportunity(companyId){
-  const d = await api('addOpportunity', { companyId, opportunity:{stage:'Prospect'} });
+  const d = await api('addOpportunity', { companyId, opportunity:{stage:'Lead'} });
   if(d.success){
     toast('✓ Fırsat eklendi');
     openCompanyPanel(companyId);
@@ -2097,7 +2107,7 @@ async function moveOpportunityStage(opportunityId, newStage, companyId){
 
 async function quickSetPrice(companyId, opportunityId){
   if(!opportunityId){
-    const d = await api('addOpportunity', { companyId, opportunity:{stage:'Prospect'} });
+    const d = await api('addOpportunity', { companyId, opportunity:{stage:'Lead'} });
     if(!d.success) return;
     opportunityId = d.opportunity.id;
   }
@@ -2277,13 +2287,13 @@ async function renderPipeline(highlightStage){
   if(!d.success){ main.innerHTML='<div class="empty">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderPipeline()">↻ Tekrar Dene</span></div>'; return; }
   opportunities = d.opportunities || [];
   main.innerHTML = `
-    <div class="page-head"><div><h1>Pipeline</h1><p>Kartları sürükleyip bırakarak aşama değiştirebilirsiniz.</p></div></div>
+    <div class="page-head"><div><h1>Pipeline</h1><p>Kartları sürükleyerek ilerlet. Sonuçlanan fırsatları alttaki kutulara bırak. Başlıkların üzerine gelince açıklama görünür.</p></div></div>
     <div class="board">
       ${STAGES.map(s=>{
         const items = opportunities.filter(o=>o.stage===s);
         const isTarget = highlightStage && s===highlightStage;
         return `<div class="col" id="${isTarget?'pipeline-target-col':''}" style="${isTarget?'box-shadow:0 0 0 2px '+STAGE_COLORS[s]+';border-radius:11px':''}">
-          <div class="col-head" style="background:linear-gradient(135deg, ${STAGE_COLORS[s]}, ${STAGE_COLORS[s]}CC)">${trStage(s)}<span class="count">${items.length}</span></div>
+          <div class="col-head" title="${escAttr(STAGE_HINTS[s]||'')}" style="background:linear-gradient(135deg, ${STAGE_COLORS[s]}, ${STAGE_COLORS[s]}CC)">${trStage(s)}<span class="count">${items.length}</span></div>
           <div class="col-body" data-stage="${s}" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')" ondrop="onDropCard(event,'${s}')">
             ${items.map(o=>`
               <div class="kcard" style="--stat-color:${STAGE_COLORS[s]}" draggable="true" ondragstart="onDragStart(event,'${o.id}')" onclick="openOpportunityDetail('${o.id}')">
@@ -2305,6 +2315,15 @@ async function renderPipeline(highlightStage){
             <div style="cursor:pointer;color:var(--muted);font-size:11px;padding:7px 5px;text-align:center;border-radius:6px" onmouseover="this.style.background='var(--surface-2)';this.style.color='var(--primary)'" onmouseout="this.style.background='';this.style.color='var(--muted)'" onclick="openAddCompanyModal('${s}')">+ Anlaşma Ekle</div>
           </div>
         </div>`;
+      }).join('')}
+    </div>
+    <div class="outcome-row">
+      ${OUTCOMES.map(s=>{
+        const n = opportunities.filter(o=>o.stage===s).length, c = OUTCOME_COLORS[s];
+        return `<div class="outcome-drop" style="--oc:${c}" title="${escAttr(STAGE_HINTS[s])}"
+          ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')"
+          ondrop="onDropCard(event,'${s}')" onclick="renderDrilldown('stage:${s}')">
+          <b>${s}</b><span>${n}</span><small>${esc(STAGE_HINTS[s])}</small></div>`;
       }).join('')}
     </div>`;
   if(highlightStage){
@@ -2492,13 +2511,17 @@ function mapImportRows(table){
     const idx = header.findIndex(h => names.includes(h));
     if(idx >= 0) colOf[field] = idx;
   }
-  const stageByLabel = {}; Object.entries(STAGE_LABELS_TR).forEach(([k,v]) => { stageByLabel[v.toLocaleLowerCase('tr-TR')] = k; stageByLabel[k.toLowerCase()] = k; });
+  const stageByLabel = {};
+  STAGES.forEach(k => { stageByLabel[k.toLowerCase()] = k; });
+  Object.entries({ prospect:'Lead', aday:'Lead', researched:'Lead', 'araştırıldı':'Lead', 'iletişime geçildi':'Contacted',
+    replied:'Qualified', 'cevap verdi':'Qualified', 'discovery call':'Meeting', 'keşif görüşmesi':'Meeting', 'toplantı':'Meeting',
+    teklif:'Proposal', 'pazarlık':'Negotiation', 'kazanıldı':'Won' }).forEach(([k,v]) => { stageByLabel[k] = v; });
   const prio = v => ({'yüksek':'High','high':'High','düşük':'Low','low':'Low'})[String(v||'').trim().toLocaleLowerCase('tr-TR')] || 'Normal';
   const rows = table.slice(1).map(r => {
     const o = {};
     for(const [f, i] of Object.entries(colOf)) o[f] = (r[i] ?? '').trim();
     if(o.priority !== undefined) o.priority = prio(o.priority);
-    if(o.stage !== undefined) o.stage = stageByLabel[String(o.stage).toLocaleLowerCase('tr-TR')] || 'Prospect';
+    if(o.stage !== undefined) o.stage = stageByLabel[String(o.stage).toLocaleLowerCase('tr-TR')] || 'Lead';
     return o;
   }).filter(o => o.name);
   return { rows, found: Object.keys(colOf) };
@@ -2522,7 +2545,7 @@ function openImportModal(){
 function closeImportModal(){ document.getElementById('importModal').classList.remove('open'); }
 function downloadImportTemplate(){
   const rows = ['Şirket;Şirket E-postası;Şirket Telefonu;Sektör;Ülke;Website;Kaynak;Öncelik;Aşama;Tahmini MRR;Kişi;E-posta;Telefon;Pozisyon;Not',
-                'Örnek Vize Danışmanlık;info@ornekvize.com;0212 000 00 00;Vize Danışmanlığı;Türkiye;ornekvize.com;LinkedIn;Yüksek;Aday;15000;Ayşe Yılmaz;ayse@ornekvize.com;0532 000 00 00;Kurucu;Excel ile müşteri takibi yapıyor'];
+                'Örnek Vize Danışmanlık;info@ornekvize.com;0212 000 00 00;Vize Danışmanlığı;Türkiye;ornekvize.com;LinkedIn;Yüksek;Lead;15000;Ayşe Yılmaz;ayse@ornekvize.com;0532 000 00 00;Kurucu;Excel ile müşteri takibi yapıyor'];
   downloadBlob('\uFEFF' + rows.join('\r\n'), 'ahoraclario-ice-aktarma-sablonu.csv', 'text/csv;charset=utf-8');
 }
 async function previewImport(file){
@@ -2537,7 +2560,7 @@ async function previewImport(file){
   importRows = rows;
   box.innerHTML = `<div style="font-size:12.5px;margin-bottom:8px"><b>${rows.length}</b> satır okundu${dup?` · <span style="color:var(--amber)">${dup} şirket zaten kayıtlı, atlanacak</span>`:''}</div>
     <div class="tbl-wrap" style="max-height:220px;overflow:auto"><table><thead><tr><th>Şirket</th><th>Sektör</th><th>Aşama</th><th>Kişi</th><th>Telefon</th></tr></thead><tbody>
-    ${rows.slice(0,8).map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${esc(r.industry||'—')}</td><td>${esc(trStage(r.stage||'Prospect'))}</td><td>${esc(r.contact_name||'—')}</td><td>${esc(r.contact_phone||'—')}</td></tr>`).join('')}
+    ${rows.slice(0,8).map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${esc(r.industry||'—')}</td><td>${esc(trStage(r.stage||'Lead'))}</td><td>${esc(r.contact_name||'—')}</td><td>${esc(r.contact_phone||'—')}</td></tr>`).join('')}
     </tbody></table></div>${rows.length>8?`<div style="font-size:11px;color:var(--muted);margin-top:4px">… ve ${rows.length-8} satır daha</div>`:''}`;
   go.disabled = rows.length - dup <= 0;
   go.textContent = `${Math.max(0, rows.length - dup)} Şirketi İçe Aktar`;
@@ -2950,4 +2973,10 @@ function leadScoreColor(score){
 button:disabled{opacity:.45;cursor:not-allowed}
 .co-tab{cursor:pointer;font-size:12px;padding:6px 12px;border-radius:20px;background:var(--surface-2);color:var(--muted);border:1px solid var(--border)}
 .co-tab.active{background:var(--primary-bg);color:var(--primary);border-color:transparent}
+.outcome-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:4px}
+.outcome-drop{border:1.5px dashed var(--oc);border-radius:10px;padding:10px 12px;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:2px 8px;background:color-mix(in srgb,var(--oc) 6%,transparent)}
+.outcome-drop b{color:var(--oc);font-size:12.5px}.outcome-drop span{font-weight:800;color:var(--oc)}
+.outcome-drop small{grid-column:1/-1;color:var(--muted);font-size:10.5px}
+.outcome-drop.dragover{background:color-mix(in srgb,var(--oc) 20%,transparent);border-style:solid}
+@media(max-width:900px){.outcome-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
