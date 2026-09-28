@@ -447,14 +447,18 @@ tr.row-click:hover{background:var(--surface-2)}
 <div class="modal-overlay" id="emailModal">
   <div class="modal" style="max-width:560px">
     <h3>✉️ E-posta Yaz</h3>
-    <div class="fi"><label>Kime</label><input id="em-to" readonly></div>
+    <div class="fi-row">
+      <div class="fi"><label>Kimden</label><input id="em-from" readonly></div>
+      <div class="fi"><label>Kime</label><input id="em-to" readonly></div>
+    </div>
     <div class="fi"><label>Şablon</label><select id="em-tpl" onchange="applyEmailTemplate(this.value)"></select></div>
     <div class="fi"><label>Konu</label><input id="em-subject"></div>
     <div class="fi"><label>Mesaj</label><textarea id="em-body" rows="9"></textarea></div>
-    <div style="font-size:11px;color:var(--muted);margin:-4px 0 10px">Gmail'de hazır olarak açılır; göndermek için Gmail'de "Gönder"e basarsın. CRM bunu aktivite olarak kaydeder ve +3/+5/+7 gün follow-up görevlerini oluşturur.</div>
+    <div id="em-info" style="font-size:11px;color:var(--muted);margin:-4px 0 10px"></div>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeEmailModal()">Vazgeç</button>
-      <button class="btn-add" onclick="sendEmailViaGmail()">Gmail'de Aç ve Kaydet</button>
+      <button class="btn-ghost" id="em-gmail" onclick="sendEmailViaGmail()">Gmail'de Aç</button>
+      <button class="btn-add" id="em-send" onclick="sendEmailDirect(this)">📨 Gönder</button>
     </div>
   </div>
 </div>
@@ -1428,6 +1432,17 @@ async function renderSettings(){
     </div>
 
     <div class="ps">
+      <div class="ps-head">✉️ E-posta Gönderimi (müşterilere)</div>
+      <div class="ps-body">
+        ${d.email?.gmailConfigured
+          ? `<p style="font-size:12.5px;margin:0 0 10px">E-postalar <b>${esc(d.email.gmailUser)}</b> adresinden doğrudan gönderiliyor.</p>`
+          : `<p style="font-size:12.5px;color:var(--amber);margin:0 0 10px">Doğrudan gönderim kapalı: Supabase → Edge Functions → Secrets'a GMAIL_USER ve GMAIL_APP_PASSWORD eklenmeli. O zamana kadar e-postalar Gmail'de hazır açılır.</p>`}
+        <button class="btn-ghost" onclick="sendTestEmail(this)" ${d.email?.gmailConfigured?'':'disabled'}>📨 Kendime test e-postası gönder</button>
+        <div id="testEmailResult" style="font-size:12px;margin-top:10px"></div>
+      </div>
+    </div>
+
+    <div class="ps">
       <div class="ps-head">🔌 Müşteri CRM Bağlantıları (Destek Talepleri)<span style="cursor:pointer;color:var(--primary)" onclick="toggleNewProjectForm()">+ Yeni Bağlantı</span></div>
       <div class="ps-body">
         <p style="font-size:12px;color:var(--muted);margin:0 0 10px">Kurduğun her müşteri CRM'i için bir bağlantı oluştur. Verilen API anahtarını o CRM'in Supabase ayarlarına eklediğinde, oradan açılan talepler "Talepler" sayfana düşer.</p>
@@ -1678,6 +1693,14 @@ async function openCompanyPanel(companyId){
       </div></div>` : ''}
 
     ${companyFilesSection(c.id, d.files || [])}
+    ${(d.emails||[]).length ? `<div class="ps"><div class="ps-head">✉️ Gönderilen E-postalar (${d.emails.length})</div>
+      <div class="ps-body mini-list">${d.emails.map(e=>`<details class="mini-item" style="cursor:pointer">
+        <summary style="display:flex;justify-content:space-between;gap:8px;list-style:none">
+          <span><b>${esc(e.subject)}</b> <span style="color:var(--muted)">→ ${esc(e.to_name||e.to_email)}</span></span>
+          <span style="font-size:10.5px;white-space:nowrap;color:${e.status==='sent'?'var(--muted)':'var(--red)'}">${e.status==='sent'?'':'✗ gönderilemedi · '}${fmtDT(e.created_at)}</span>
+        </summary>
+        <div style="white-space:pre-wrap;font-size:12px;color:var(--muted);margin-top:8px;border-top:1px solid var(--border-subtle);padding-top:8px">${esc(e.body||'')}${e.error?`\n\n⚠ ${esc(e.error)}`:''}</div>
+      </details>`).join('')}</div></div>` : ''}
     ${(d.tickets||[]).length ? `<div class="ps"><div class="ps-head">🎫 Destek Talepleri (${d.tickets.filter(t=>TICKET_OPEN.includes(t.status)).length} açık)</div>
       <div class="ps-body mini-list">${d.tickets.map(t=>`<div class="mini-item row-click" style="cursor:pointer;display:flex;justify-content:space-between;gap:8px" onclick="openTicketPanel('${t.id}')">
         <span><b>#${t.ticket_no}</b> ${esc(t.title)}</span>${ticketStatusBadge(t.status)}</div>`).join('')}</div></div>` : ''}
@@ -2581,7 +2604,35 @@ function openEmailModal(ctx){
   document.getElementById('em-to').value = `${ctx.name} <${ctx.email}>`;
   document.getElementById('em-tpl').innerHTML = Object.entries(EMAIL_TEMPLATES).map(([k,t])=>`<option value="${k}">${t.label}</option>`).join('');
   applyEmailTemplate('blank');
+  const direct = document.getElementById('em-send'), gm = document.getElementById('em-gmail'), info = document.getElementById('em-info');
+  const setMode = st => {
+    const ok = !!st?.email?.gmailConfigured;
+    direct.classList.toggle('hidden', !ok);
+    gm.className = ok ? 'btn-ghost' : 'btn-add';
+    gm.textContent = ok ? "Gmail'de Aç" : "Gmail'de Aç ve Kaydet";
+    document.getElementById('em-from').value = (ok ? st.email.gmailUser : CU?.email) || 'ahoraclario@gmail.com';
+    info.textContent = ok
+      ? '"Gönder" e-postayı CRM\'den doğrudan gönderir (Gmail\'in Gönderilenler klasöründe de görünür). Aktiviteye kaydedilir, +3/+5/+7 gün follow-up görevleri oluşur.'
+      : 'Gmail\'de hazır açılır; göndermek için Gmail\'de "Gönder"e basarsın. Doğrudan gönderim için Ayarlar → E-posta Gönderimi.';
+  };
+  setMode(null);
+  rq('getSettings').then(setMode);
   document.getElementById('emailModal').classList.add('open');
+}
+async function sendEmailDirect(btn){
+  const subject = document.getElementById('em-subject').value.trim();
+  const body = document.getElementById('em-body').value;
+  if(!subject){ toast('Konu zorunludur'); return; }
+  if(!body.trim()){ toast('Mesaj boş olamaz'); return; }
+  const ctx = emailCtx;
+  btn.disabled = true; btn.textContent = 'Gönderiliyor…';
+  const d = await api('sendCustomerEmail', { companyId: ctx.companyId, contactId: ctx.contactId || null, opportunityId: ctx.opportunityId || null,
+    to: ctx.email, toName: ctx.name, subject, body });
+  btn.disabled = false; btn.textContent = '📨 Gönder';
+  if(!d.success) return;   // hata mesajı zaten gösterildi; pencere açık kalır, yazılanlar kaybolmaz
+  closeEmailModal();
+  toast(`✓ E-posta gönderildi → ${ctx.email}${d.followUpsCreated ? ` · ${d.followUpsCreated} follow-up planlandı` : ''}`);
+  refreshOpenPanels();
 }
 function applyEmailTemplate(key){
   const t = EMAIL_TEMPLATES[key] || EMAIL_TEMPLATES.blank;
@@ -2612,6 +2663,14 @@ async function sendTestDigest(btn){
   box.innerHTML = d.success
     ? `<span style="color:var(--green)">✓ Resend e-postayı kabul etti → ${esc(d.to)}${d.id?` (kimlik: ${esc(d.id)})`:''}.</span> <span style="color:var(--muted)">Birkaç dakika içinde gelmezse Gmail'de Spam ve "Tanıtımlar" sekmesine bak.</span>`
     : `<span style="color:var(--red)">✗ Gönderilemedi: ${esc(d.error?.message || 'bilinmeyen hata')}</span>`;
+}
+async function sendTestEmail(btn){
+  const box = document.getElementById('testEmailResult');
+  btn.disabled = true; box.innerHTML = '<span style="color:var(--muted)">Gönderiliyor…</span>';
+  const d = await api('sendTestEmail');
+  btn.disabled = false;
+  box.innerHTML = d.success ? `<span style="color:var(--green)">✓ Gönderildi → ${esc(d.to)}. Gelen kutunu kontrol et.</span>`
+    : `<span style="color:var(--red)">✗ ${esc(d.error?.message || 'Gönderilemedi')}</span>`;
 }
 async function saveProfile(){
   const name = document.getElementById('st-name').value.trim(), email = document.getElementById('st-email').value.trim();
