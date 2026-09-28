@@ -6,7 +6,6 @@
 <title>Ahoraclario — Sales CRM</title>
 <style>
 :root{
-  /* AHORACLARIO — GPT'nin "Reference-Match" paletiyle hizalandı (tek, tutarlı kaynak) */
   --bg:#061522; --bg-raised:#071522;
   --surface-secondary:#06131F; --surface:#0A1B2A; --surface-2:#0B1F30;
   --opp-card:#081725;
@@ -25,13 +24,10 @@
   --red:#F87171; --red-bg:rgba(248,113,113,0.14); --red-glow:rgba(248,113,113,0.10);
   --glow-primary:0 0 0 1px rgba(57,217,138,0.15), 0 8px 24px rgba(57,217,138,0.10);
   --glow-blue:0 0 0 1px rgba(59,130,246,0.15), 0 8px 24px rgba(59,130,246,0.10);
-  /* Pipeline stage colors */
   --stage-prospect:#64748B; --stage-researched:#3B82F6; --stage-contacted:#22D3EE;
   --stage-replied:#38BDF8; --stage-discovery:#818CF8; --stage-demo:#A78BFA;
   --stage-proposal:#C084FC; --stage-negotiation:#F59E0B; --stage-won:#39D98A; --stage-lost:#F87171;
-  /* Chart colors */
   --chart-green:#39D98A; --chart-cyan:#22D3EE; --chart-blue:#3B82F6; --chart-purple:#A78BFA; --chart-amber:#F59E0B;
-  /* eski isimlerle geriye dönük uyum */
   --ink:var(--text); --line:var(--border); --card:var(--surface);
 }
 *{box-sizing:border-box}
@@ -45,7 +41,6 @@ a{color:var(--blue);text-decoration:none}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:6px}
 ::-webkit-scrollbar-track{background:transparent}
 
-/* ---- Login ---- */
 #login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:var(--bg)}
 #login-screen::before{
   content:'';position:absolute;inset:0;
@@ -72,7 +67,6 @@ a{color:var(--blue);text-decoration:none}
 .btn-primary:hover{background:var(--primary-dark)}
 .login-err{color:var(--red);background:var(--red-bg);border:1px solid rgba(248,81,73,.3);padding:9px 12px;border-radius:8px;font-size:12.5px;margin-bottom:14px;display:none}
 
-/* ---- App shell ---- */
 #app{display:none}
 #app.open{display:flex;min-height:100vh}
 .sidebar{width:236px;flex-shrink:0;background:var(--bg-raised);border-right:1px solid var(--border-subtle);padding:18px 14px;display:flex;flex-direction:column}
@@ -118,7 +112,6 @@ a{color:var(--blue);text-decoration:none}
 .page-head h1{font-size:21px;margin:0 0 4px;color:var(--text);letter-spacing:-.2px}
 .page-head p{color:var(--muted);font-size:13px;margin:0}
 
-/* ---- Stat cards ---- */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:11px;margin-bottom:22px}
 .stat{background:linear-gradient(165deg, var(--surface) 0%, var(--bg-raised) 100%);border:1px solid var(--border-subtle);border-radius:11px;padding:13px 14px 11px;transition:border-color .15s,transform .15s,box-shadow .15s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:7px}
 .stat:hover{border-color:var(--border);border-color:color-mix(in srgb, var(--stat-color, var(--primary)) 45%, var(--border));transform:translateY(-2px);box-shadow:0 10px 30px -10px rgba(0,0,0,.5)}
@@ -132,7 +125,6 @@ a{color:var(--blue);text-decoration:none}
 .stat .spark-wrap{margin-top:1px;line-height:0}
 .stat .spark-wrap svg{width:100%;height:26px;display:block}
 
-/* ---- Table ---- */
 .tbl-wrap{background:var(--surface);border:1px solid var(--border-subtle);border-radius:10px;overflow:hidden}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;padding:11px 14px;background:var(--bg-raised);color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.03em;border-bottom:1px solid var(--border-subtle)}
@@ -143,7 +135,6 @@ tr.row-click:hover{background:var(--surface-2)}
 .badge{display:inline-block;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px}
 .badge-source{background:var(--blue-bg);color:var(--blue)}
 
-/* ---- Dashboard: 2 sütunlu layout, sparkline, donut, yan panel ---- */
 .dash-grid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
 @media (max-width:1100px){.dash-grid{grid-template-columns:1fr}}
 .dash-main{min-width:0}
@@ -179,14 +170,12 @@ tr.row-click:hover{background:var(--surface-2)}
 .activity-dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0}
 .activity-item .ai-time{color:var(--faint);font-size:10px;margin-left:auto;flex-shrink:0;padding-left:8px}
 
-/* ---- Buttons ---- */
 .btn-add{background:var(--primary);color:#07110C;border:none;border-radius:8px;height:36px;padding:0 18px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;justify-content:center}
 .btn-add:hover{background:var(--primary-dark)}
 .btn-ghost{background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:9px 15px;font-size:12.5px;font-weight:700}
 .btn-ghost:hover{border-color:var(--faint)}
 .btn-danger{background:var(--red-bg);color:var(--red);border:1px solid rgba(248,81,73,.25);border-radius:8px;padding:9px 15px;font-size:12.5px;font-weight:700}
 
-/* ---- Kanban ---- */
 .board{display:flex;gap:12px;overflow-x:auto;padding-bottom:14px}
 .col{flex:0 0 240px;display:flex;flex-direction:column}
 .col-head{padding:10px 13px;border-radius:10px 10px 0 0;font-size:12px;font-weight:700;display:flex;justify-content:space-between;color:#07110C;letter-spacing:.01em}
@@ -200,7 +189,6 @@ tr.row-click:hover{background:var(--surface-2)}
 .kcard .meta{color:var(--muted);font-size:10.5px;display:flex;justify-content:space-between;margin-top:5px}
 .kcard .mrr{color:var(--green);font-weight:700}
 
-/* ---- Panel (slide-over) ---- */
 .overlay{position:fixed;inset:0;background:rgba(1,4,9,.65);display:none;align-items:center;justify-content:flex-end;z-index:200;backdrop-filter:blur(2px)}
 .overlay.open{display:flex}
 .panel{background:var(--bg);height:100%;width:100%;max-width:560px;overflow-y:auto;padding:26px;border-left:1px solid var(--border-subtle)}
@@ -230,7 +218,6 @@ tr.row-click:hover{background:var(--surface-2)}
 .stage-pill{font-size:9.5px;padding:3px 8px;border-radius:12px;cursor:pointer;font-weight:700;border:1px solid transparent;transition:transform .1s}
 .stage-pill:hover{transform:translateY(-1px)}
 
-/* ---- Modal ---- */
 .modal-overlay{position:fixed;inset:0;background:rgba(1,4,9,.65);display:none;align-items:center;justify-content:center;z-index:300;padding:20px}
 .modal-overlay.open{display:flex}
 .modal{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;width:100%;max-width:440px;max-height:88vh;overflow-y:auto;box-shadow:0 30px 80px rgba(0,0,0,.5)}
@@ -243,10 +230,6 @@ tr.row-click:hover{background:var(--surface-2)}
 .toast.show{display:block}
 .empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:13px}
 
-/* ============================================================
-   REFERENCE-MATCH DASHBOARD OVERRIDES
-   Visual-only: preserves existing data/API/business logic.
-   ============================================================ */
 .dashboard-ref-pipeline{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;overflow:hidden;padding:0 2px 2px}
 .dashboard-ref-col{min-width:0;border-radius:9px;overflow:hidden;background:var(--bg);border:1px solid var(--border)}
 .dashboard-ref-col-head{height:39px;padding:0 11px;display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:800;letter-spacing:-.05px;color:var(--text);border-bottom:1px solid rgba(255,255,255,.05)}
@@ -278,19 +261,16 @@ tr.row-click:hover{background:var(--surface-2)}
 .dashboard-ref-funnel .ref-fseg:hover .ref-fshape{filter:brightness(1.1)}
 .dashboard-ref-funnel .ref-fseg:hover .ref-fnum{color:#fff}
 
-/* Exact reference-like dashboard panels */
 .dash-main>.ps{background:var(--bg-raised);border-color:var(--border);border-radius:10px}
 .dash-main>.ps>.ps-head{height:47px;padding:0 17px;background:var(--bg-raised);border-color:var(--border);font-size:13px;color:var(--text)}
 .dash-main>.ps>.ps-body{padding:10px 11px}
 .dash-side .side-card{background:var(--bg-raised);border-color:var(--border);border-radius:10px}
 
 @media(max-width:1050px){.dashboard-ref-pipeline{grid-template-columns:repeat(5,180px);overflow-x:auto}.dashboard-ref-funnel{min-width:720px;overflow-x:auto}.dash-main>.ps{overflow:hidden}}
-
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-box">
     <div class="login-logo">A</div>
@@ -303,7 +283,6 @@ tr.row-click:hover{background:var(--surface-2)}
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
   <div class="sidebar">
     <div class="sb-logo"><div class="mark">A</div><b>Ahoraclario</b></div>
@@ -312,6 +291,7 @@ tr.row-click:hover{background:var(--surface-2)}
     <button class="nav-item" data-page="pipeline" onclick="showPage('pipeline')">🧭 Pipeline</button>
     <button class="nav-item" data-page="companies" onclick="showPage('companies')">🏢 Şirketler<span class="nb hidden" id="nbCompanies"></span></button>
     <button class="nav-item" data-page="tasks" onclick="showPage('tasks')">✅ Görevler<span class="nb hidden" id="nbTasks"></span></button>
+    <button class="nav-item" data-page="tickets" onclick="showPage('tickets')">🎫 Talepler<span class="nb hidden" id="nbTickets"></span></button>
     <button class="nav-item" data-page="analytics" onclick="showPage('analytics')">📈 Raporlar</button>
     <button class="nav-item" data-page="settings" onclick="showPage('settings')">⚙️ Ayarlar</button>
     <div class="sb-bottom">
@@ -329,7 +309,7 @@ tr.row-click:hover{background:var(--surface-2)}
           <button class="icon-btn" title="Bildirimler" onclick="toggleNotifications()">🔔<span id="notifDot" class="notif-dot hidden"></span></button>
           <div id="notifDropdown" class="search-dropdown hidden" style="right:0;left:auto;width:320px"></div>
         </div>
-        <div class="user-chip" onclick="doLogout()" title="Çıkış yap">
+        <div class="user-chip" onclick="if(confirm('Çıkış yapmak istiyor musun?')) doLogout()" title="Çıkış yap">
           <div class="avatar" id="topbarAvatar" style="background:var(--primary-bg);color:var(--primary)"></div>
           <div><b id="sbUserName"></b><span>Kurucu · Çıkış</span></div>
         </div>
@@ -339,22 +319,21 @@ tr.row-click:hover{background:var(--surface-2)}
   </div>
 </div>
 
-<!-- Company Detay Paneli -->
 <div class="overlay" id="companyOverlay" onclick="if(event.target===this) closeCompanyPanel()">
   <div class="panel" id="companyPanel"></div>
 </div>
 
-<!-- Opportunity Detail Paneli -->
 <div class="overlay" id="oppOverlay" onclick="if(event.target===this) closeOppPanel()">
   <div class="panel" id="oppPanel"></div>
 </div>
 
-<!-- Drilldown Paneli (kart/grafik tıklamalarının GERÇEK varış noktası — üstte açılır, kapatınca alttaki sayfa aynen kalır) -->
+<div class="overlay" id="ticketOverlay" onclick="if(event.target===this) closeTicketPanel()">
+  <div class="panel" id="ticketPanel"></div>
+</div>
 <div class="modal-overlay" id="drilldownOverlay" onclick="if(event.target===this) closeDrilldownPanel()">
   <div class="modal-wide" id="drilldownPanel"></div>
 </div>
 
-<!-- New Company Modal -->
 <div class="modal-overlay" id="addCompanyModal">
   <div class="modal">
     <h3>+ Yeni Şirket</h3>
@@ -402,7 +381,6 @@ tr.row-click:hover{background:var(--surface-2)}
   </div>
 </div>
 
-<!-- Fırsat Düzenle Modal (tutar / plan / kapanış tarihi) -->
 <div class="modal-overlay" id="editOppModal">
   <div class="modal">
     <h3>Anlaşma Detayları</h3>
@@ -416,7 +394,6 @@ tr.row-click:hover{background:var(--surface-2)}
   </div>
 </div>
 
-<!-- Kişi Düzenle Modal -->
 <div class="modal-overlay" id="editContactModal">
   <div class="modal">
     <h3>Kişiyi Düzenle</h3>
@@ -433,10 +410,49 @@ tr.row-click:hover{background:var(--surface-2)}
   </div>
 </div>
 
+<div class="modal-overlay" id="emailModal">
+  <div class="modal" style="max-width:560px">
+    <h3>✉️ E-posta Yaz</h3>
+    <div class="fi"><label>Kime</label><input id="em-to" readonly></div>
+    <div class="fi"><label>Şablon</label><select id="em-tpl" onchange="applyEmailTemplate(this.value)"></select></div>
+    <div class="fi"><label>Konu</label><input id="em-subject"></div>
+    <div class="fi"><label>Mesaj</label><textarea id="em-body" rows="9"></textarea></div>
+    <div style="font-size:11px;color:var(--muted);margin:-4px 0 10px">Gmail'de hazır olarak açılır; göndermek için Gmail'de "Gönder"e basarsın. CRM bunu aktivite olarak kaydeder ve +3/+5/+7 gün follow-up görevlerini oluşturur.</div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeEmailModal()">Vazgeç</button>
+      <button class="btn-add" onclick="sendEmailViaGmail()">Gmail'de Aç ve Kaydet</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="apiKeyModal">
+  <div class="modal" style="max-width:560px">
+    <h3>🔑 API Anahtarı</h3>
+    <div id="apiKeyBody"></div>
+    <div class="modal-actions"><button class="btn-add" onclick="document.getElementById('apiKeyModal').classList.remove('open')">Kaydettim, kapat</button></div>
+  </div>
+</div>
+<div class="modal-overlay" id="importModal">
+  <div class="modal" style="max-width:640px">
+    <h3>⬆ Excel / CSV'den Şirket Aktar</h3>
+    <div id="importBody"></div>
+  </div>
+</div>
+<div class="modal-overlay" id="lostReasonModal">
+  <div class="modal">
+    <h3>Fırsat neden kaybedildi?</h3>
+    <div class="fi"><label>Neden</label>
+      <select id="lr-reason" onchange="document.getElementById('lr-other-wrap').classList.toggle('hidden', this.value!=='Other')"></select>
+    </div>
+    <div class="fi hidden" id="lr-other-wrap"><label>Açıklama</label><input id="lr-other" type="text" placeholder="Kısaca yazın"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="resolveLostReason(null)">Vazgeç</button>
+      <button class="btn-add" onclick="submitLostReason()">Kaybedildi Olarak İşaretle</button>
+    </div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
-// 🔧 DEĞİŞTİRİN: Supabase Edge Function adresiniz
 const EDGE_FUNCTION_URL = 'https://tuozgfnjxxwrcuyfrwxq.supabase.co/functions/v1/rapid-service';
 
 const STAGES = ["Prospect","Researched","Contacted","Replied","Discovery Call","Demo","Proposal","Negotiation","Won"];
@@ -444,24 +460,19 @@ const STAGE_COLORS = {Prospect:"#64748B",Researched:"#3B82F6",Contacted:"#22D3EE
   "Discovery Call":"#818CF8","Demo":"#A78BFA","Proposal":"#C084FC","Negotiation":"#F59E0B","Won":"#39D98A"};
 const OUTCOME_COLORS = {Lost:"#F87171","No Response":"#596579","Not a Fit":"#596579"};
 
-// DB'de saklanan değerler İngilizce kalıyor (backend bunları bekliyor), sadece EKRANDA
-// gösterilen etiket Türkçe'ye çevriliyor — trLabel('Scheduled') -> 'Planlandı' gibi.
 const TR_LABELS = {
-  // Meeting type
   Discovery:'Keşif', 'Follow-up':'Follow-up', Negotiation:'Negotiation', Other:'Diğer',
-  // Meeting status / genel durum
   Scheduled:'Planlandı', Completed:'Tamamlandı', Cancelled:'İptal Edildi',
-  // Task type
   Call:'Arama', Meeting:'Toplantı', Research:'Araştırma',
-  // Proposal status
   Draft:'Taslak', Sent:'Gönderildi', Viewed:'Görüntülendi', Negotiating:'Pazarlıkta',
   Accepted:'Kabul Edildi', Rejected:'Reddedildi', Expired:'Süresi Doldu',
-  // Customer
   Active:'Aktif', Inactive:'Pasif', Pending:'Beklemede', 'In Progress':'Devam Ediyor', Done:'Bitti',
+  'Too expensive':'Fiyat yüksek', 'No need':'İhtiyaç yok', 'No budget':'Bütçe yok', 'Using another CRM':'Başka CRM kullanıyor',
+  'Bad timing':'Zamanlama uygun değil', 'No response':'Cevap vermedi', 'Not decision maker':'Karar verici değil',
+  Competitor:'Rakibi seçti', Other:'Diğer',
 };
+const LOST_REASONS = ['Too expensive','No need','No budget','Using another CRM','Bad timing','No response','Not decision maker','Competitor','Other'];
 function trLabel(v){ return TR_LABELS[v] || v; }
-// Pipeline aşama adları — DB'de "Won","Lost" vb. İngilizce kalıyor (mantık bunlara bağlı),
-// sadece Kanban/huni/etiketlerde gösterilen METİN Türkçe.
 const STAGE_LABELS_TR = {
   Prospect:'Aday', Researched:'Araştırıldı', Contacted:'İletişime Geçildi', Replied:'Cevap Verdi',
   'Discovery Call':'Keşif Görüşmesi', Demo:'Demo', Proposal:'Teklif', Negotiation:'Pazarlık', Won:'Kazanıldı',
@@ -469,7 +480,7 @@ const STAGE_LABELS_TR = {
 };
 function trStage(v){ return STAGE_LABELS_TR[v] || v; }
 
-let CU = null; // { token, name, username }
+let CU = null;
 let heartbeatInterval = null;
 let companies = [], opportunities = [], tasks = [];
 let currentPage = 'dashboard';
@@ -480,37 +491,80 @@ function toast(msg){
   setTimeout(()=>t.classList.remove('show'), 2600);
 }
 
-// ══════════════════════════════════════════════
-// PENCERE KATMANLARI (alttan üste):
-//   sayfa → drilldown listesi (z150) → sağ paneller: şirket / fırsat (z200) → form pencereleri (z300)
-// Üstteki kapanınca alttaki AYNEN açık kalır. Panelde veri değiştiyse, son panel kapanınca
-// arkadaki liste ve sayfa sessizce tazelenir (silinmiş/eski kayıt görünmesin).
-// ══════════════════════════════════════════════
 const READ_ONLY_ACTIONS = new Set(['login','logout','heartbeat','globalSearch']);
-let dataDirty = false;          // panelde veri değişti mi?
-let lastPageArgs = null;        // arkadaki sayfayı AYNI filtrelerle yeniden çizmek için
-let lastDrilldownView = null;   // arkadaki listeyi yenilemek için
+let dataDirty = false;
+let lastPageArgs = null;
+let lastDrilldownView = null;
 let currentOppPanelId = null, currentCompanyPanelId = null;
+const SIDE_PANELS = ['companyOverlay','oppOverlay','ticketOverlay'];
+let sideZ = 200;
+// Sağdan açılan paneller aynı katmanda: son açılan üste gelir (form pencereleri 300'ün altında kalır).
+function openSidePanel(id){
+  const el = document.getElementById(id);
+  if(!SIDE_PANELS.some(p => p !== id && isOpen(p))) sideZ = 200;
+  sideZ = Math.min(sideZ + 1, 299);
+  el.style.zIndex = sideZ;
+  el.classList.add('open');
+}
+function topSidePanel(){
+  return SIDE_PANELS.filter(isOpen).sort((a,b) => (+document.getElementById(b).style.zIndex||200) - (+document.getElementById(a).style.zIndex||200))[0];
+}
 function isOpen(id){ return document.getElementById(id)?.classList.contains('open'); }
-function anySidePanelOpen(){ return isOpen('companyOverlay') || isOpen('oppOverlay'); }
+function anySidePanelOpen(){ return isOpen('companyOverlay') || isOpen('oppOverlay') || isOpen('ticketOverlay'); }
 function refreshBackgroundIfDirty(){
   if(!dataDirty || anySidePanelOpen()) return;
   dataDirty = false;
   if(isOpen('drilldownOverlay') && lastDrilldownView) renderDrilldown(lastDrilldownView);
   if(lastPageArgs) showPage(...lastPageArgs);
 }
-// Açık panelleri taze veriyle yeniden çiz (form penceresinde kayıt yapıldıktan sonra).
 function refreshOpenPanels(){
   if(isOpen('companyOverlay') && currentCompanyPanelId) openCompanyPanel(currentCompanyPanelId);
   if(isOpen('oppOverlay') && currentOppPanelId) openOpportunityDetail(currentOppPanelId);
+  if(isOpen('ticketOverlay') && currentTicketId) openTicketPanel(currentTicketId);
 }
-// ESC → sadece EN ÜSTTEKİ pencereyi kapatır.
+let lostReasonResolver = null;
+function askLostReason(){
+  const sel = document.getElementById('lr-reason');
+  sel.innerHTML = LOST_REASONS.map(r=>`<option value="${r}">${trLabel(r)}</option>`).join('');
+  document.getElementById('lr-other').value = '';
+  document.getElementById('lr-other-wrap').classList.add('hidden');
+  document.getElementById('lostReasonModal').classList.add('open');
+  return new Promise(res => { lostReasonResolver = res; });
+}
+function resolveLostReason(value){
+  document.getElementById('lostReasonModal').classList.remove('open');
+  const r = lostReasonResolver; lostReasonResolver = null;
+  if(r) r(value);
+}
+function submitLostReason(){
+  const v = document.getElementById('lr-reason').value;
+  const other = document.getElementById('lr-other').value.trim();
+  resolveLostReason(v === 'Other' && other ? other : v);
+}
+// Aşama değişimi — tüm ekranlar bunu kullanır. Kayıp seçildiyse neden sorulur; vazgeçilirse null döner.
+async function changeOpportunityStage(opportunityId, newStage){
+  let lostReason = null;
+  if(newStage === 'Lost'){
+    lostReason = await askLostReason();
+    if(lostReason === null) return null;
+  }
+  const d = await api('updateOpportunityStage', { opportunityId, stage:newStage, lostReason });
+  if(d.success) toast('✓ Aşama güncellendi: ' + trStage(newStage));
+  return d;
+}
+
 function closeTopLayer(){
+  if(isOpen('lostReasonModal')) return resolveLostReason(null);
+  if(isOpen('importModal')) return closeImportModal();
+  if(isOpen('emailModal')) return closeEmailModal();
+  if(isOpen('apiKeyModal')) return document.getElementById('apiKeyModal').classList.remove('open');
   if(isOpen('editContactModal')) return closeEditContactModal();
   if(isOpen('editOppModal')) return closeEditOppModal();
   if(isOpen('addCompanyModal')) return closeAddCompanyModal();
-  if(isOpen('oppOverlay')) return closeOppPanel();
-  if(isOpen('companyOverlay')) return closeCompanyPanel();
+  const top = topSidePanel();
+  if(top === 'ticketOverlay') return closeTicketPanel();
+  if(top === 'oppOverlay') return closeOppPanel();
+  if(top === 'companyOverlay') return closeCompanyPanel();
   if(isOpen('drilldownOverlay')) return closeDrilldownPanel();
 }
 
@@ -521,25 +575,24 @@ async function api(action, params={}){
       body: JSON.stringify({ action, token: CU?.token, ...params })
     });
     const d = await res.json();
-    if(d.success && !READ_ONLY_ACTIONS.has(action) && !action.startsWith('get')) dataDirty = true;
+    if(d.success && !READ_ONLY_ACTIONS.has(action) && !action.startsWith('get') && action !== 'exportData'){ dataDirty = true; scheduleNavBadgeRefresh(); }
     if(!d.success){
       if(d.error?.status === 401){ doLogout(true); }
       toast('Hata: ' + (d.error?.message || 'Bilinmeyen hata'));
     }
     return d;
-  }catch(e){ toast('Connection error'); return {success:false}; }
+  }catch(e){ toast('Bağlantı hatası, internetinizi kontrol edin'); return {success:false}; }
 }
 
-// ── GİRİŞ ──
 async function doLogin(){
   const username = document.getElementById('li-user').value.trim();
   const password = document.getElementById('li-pass').value;
   const errEl = document.getElementById('loginErr');
   errEl.style.display='none';
-  if(!username || !password){ errEl.textContent='Username and password are required'; errEl.style.display='block'; return; }
+  if(!username || !password){ errEl.textContent='Kullanıcı adı ve şifre zorunludur'; errEl.style.display='block'; return; }
   const d = await api('login', { username, password });
-  if(!d.success){ errEl.textContent = d.error?.message || 'Login failed'; errEl.style.display='block'; return; }
-  CU = { token: d.token, name: d.user.name, username: d.user.username };
+  if(!d.success){ errEl.textContent = d.error?.message || 'Giriş yapılamadı'; errEl.style.display='block'; return; }
+  CU = { token: d.token, name: d.user.name, username: d.user.username, email: d.user.email || null };
   sessionStorage.setItem('ahoraclario_session', JSON.stringify(CU));
   enterApp();
 }
@@ -559,26 +612,25 @@ function enterApp(){
   document.getElementById('topbarAvatar').textContent = initials(CU.name);
   showPage('dashboard');
   refreshNavBadges();
-  // Sekme açık kaldığı sürece 15 dakikada bir oturumu canlı tutar — daha önce bu mekanizma
-  // hiç çağrılmıyordu, kullanıcı hiçbir uyarı olmadan oturumu bitmiş buluyordu.
   if(heartbeatInterval) clearInterval(heartbeatInterval);
   heartbeatInterval = setInterval(() => { if(CU) api('heartbeat'); }, 15*60*1000);
 }
 async function refreshNavBadges(){
-  const d = await api('getDashboard');
+  if(!CU) return;
+  const d = await api('getNavCounts');
   if(!d.success) return;
   const setBadge = (id, n) => {
     const el = document.getElementById(id);
     if(n>0){ el.textContent = n; el.classList.remove('hidden'); } else { el.classList.add('hidden'); }
   };
-  setBadge('nbMyDay', (d.followUpsToday||0) + (d.tasksOverdue||0));
-  setBadge('nbCompanies', d.totalCompanies||0);
-  setBadge('nbTasks', d.openTasksCount||0);
-  // Bildirim kırmızı noktası — geciken görev veya yaklaşan toplantı varsa göster.
-  const hasAlerts = (d.tasksOverdue||0) > 0 || (d.upcomingMeetings && d.upcomingMeetings.length > 0);
-  document.getElementById('notifDot')?.classList.toggle('hidden', !hasAlerts);
+  setBadge('nbMyDay', d.myDay);
+  setBadge('nbCompanies', d.companies);
+  setBadge('nbTasks', d.openTasks);
+  setBadge('nbTickets', d.openTickets);
+  document.getElementById('notifDot')?.classList.toggle('hidden', !(d.overdue > 0 || d.upcomingMeetings > 0 || d.openTickets > 0));
 }
-// ── Global Arama (Şirket + Kişi + Fırsat, canlı dropdown) ──
+let navBadgeTimer = null;
+function scheduleNavBadgeRefresh(){ clearTimeout(navBadgeTimer); navBadgeTimer = setTimeout(refreshNavBadges, 700); }
 let searchDebounce = null;
 function onGlobalSearchInput(){
   clearTimeout(searchDebounce);
@@ -598,11 +650,11 @@ function renderSearchResults(d){
   let html = '';
   if(d.companies.length){
     html += '<div class="search-group-label">Şirketler</div>';
-    html += d.companies.map(c=>`<div class="search-result-row" onclick="closeSearchAndOpen('${c.id}')"><b>${esc(c.name)}</b><span class="meta">${esc(c.industry||c.country||'Company')}</span></div>`).join('');
+    html += d.companies.map(c=>`<div class="search-result-row" onclick="closeSearchAndOpen('${c.id}')"><b>${esc(c.name)}</b><span class="meta">${esc(c.industry||c.country||'Şirket')}</span></div>`).join('');
   }
   if(d.contacts.length){
     html += '<div class="search-group-label">Kişiler</div>';
-    html += d.contacts.map(c=>`<div class="search-result-row" onclick="closeSearchAndOpen('${c.company_id}')"><b>${esc(c.full_name)}</b><span class="meta">${esc(c.companies?.name||c.position||'Contact')}</span></div>`).join('');
+    html += d.contacts.map(c=>`<div class="search-result-row" onclick="closeSearchAndOpen('${c.company_id}')"><b>${esc(c.full_name)}</b><span class="meta">${esc(c.companies?.name||c.position||'Kişi')}</span></div>`).join('');
   }
   if(d.opportunities.length){
     html += '<div class="search-group-label">Fırsatlar</div>';
@@ -628,38 +680,34 @@ document.addEventListener('keydown', e => {
   }
 });
 
-// ── Bildirimler (gerçek CRM olaylarından: geciken görev, yaklaşan toplantı, bekleyen teklif) ──
 async function toggleNotifications(){
   const dd = document.getElementById('notifDropdown');
   if(!dd.classList.contains('hidden')){ dd.classList.add('hidden'); return; }
   dd.innerHTML = '<div class="search-empty">Yükleniyor...</div>';
   dd.classList.remove('hidden');
-  const [myDayRes, dashRes] = await Promise.all([ api('getMyDay'), api('getDashboard') ]);
+  const [myDayRes, dashRes, tkRes] = await Promise.all([ api('getMyDay'), api('getDashboard'), api('getTickets', { filter:'open' }) ]);
   const items = [];
+  if(tkRes.success) (tkRes.tickets||[]).filter(t=>t.status==='Open').slice(0,5).forEach(t => items.push({ color:'var(--blue)', text:`🎫 Yeni talep #${t.ticket_no}: ${t.title}`, sub:t.companies?.name, ticketId:t.id }));
   if(myDayRes.success){
-    myDayRes.overdueTasks.forEach(t => items.push({ color:'var(--red)', text:`Overdue: ${t.title}`, sub:t.companies?.name, companyId:t.company_id }));
-    myDayRes.openProposals.forEach(o => items.push({ color:'var(--purple)', text:`Proposal awaiting response`, sub:o.companies?.name, companyId:o.company_id }));
+    (myDayRes.overdueTasks||[]).forEach(t => items.push({ color:'var(--red)', text:`Geciken görev: ${t.title}`, sub:t.companies?.name, companyId:t.company_id }));
+    (myDayRes.openProposals||[]).forEach(o => items.push({ color:'var(--purple)', text:'Teklif cevap bekliyor', sub:o.companies?.name, companyId:o.company_id }));
   }
   if(dashRes.success){
-    (dashRes.upcomingMeetings||[]).slice(0,3).forEach(m => items.push({ color:'var(--blue)', text:`${m.type} meeting · ${m.meeting_date}${m.start_time?' '+m.start_time:''}`, sub:m.companies?.name, companyId:m.company_id }));
-    // Deal Won/Lost bildirimleri — son 48 saat içindeki gerçek aktivitelerden (spec Part 28).
+    (dashRes.upcomingMeetings||[]).slice(0,3).forEach(m => items.push({ color:'var(--blue)', text:`${trLabel(m.type)} toplantısı · ${m.meeting_date}${m.start_time?' '+m.start_time:''}`, sub:m.companies?.name, companyId:m.company_id }));
     const recentCutoff = Date.now() - 48*3600*1000;
     (dashRes.recentActivities||[]).forEach(a => {
       if(new Date(a.created_at).getTime() < recentCutoff) return;
-      if(a.type === 'won') items.push({ color:'var(--green)', text:'🎉 Deal won', sub:a.companies?.name, companyId:a.company_id });
-      else if(a.type === 'stage_changed' && /→ Lost/.test(a.description||'')) items.push({ color:'var(--red)', text:'📉 Deal lost', sub:a.companies?.name, companyId:a.company_id });
+      if(a.type === 'won') items.push({ color:'var(--green)', text:'🎉 Anlaşma kazanıldı', sub:a.companies?.name, companyId:a.company_id });
+      else if(a.type === 'stage_changed' && /→ (Lost|Kaybedildi)/.test(a.description||'')) items.push({ color:'var(--red)', text:'📉 Anlaşma kaybedildi', sub:a.companies?.name, companyId:a.company_id });
     });
   }
   document.getElementById('notifDot').classList.toggle('hidden', items.length===0);
   dd.innerHTML = items.length ? items.map(i=>`
-    <div class="notif-item" onclick="closeSearchAndOpen('${i.companyId}');document.getElementById('notifDropdown').classList.add('hidden')">
+    <div class="notif-item" onclick="${i.ticketId?`openTicketPanel('${i.ticketId}')`:`closeSearchAndOpen('${i.companyId}')`};document.getElementById('notifDropdown').classList.add('hidden')">
       <div class="nd" style="background:${i.color}"></div>
       <div><div>${esc(i.text)}</div><div style="color:var(--muted);font-size:10.5px">${esc(i.sub||'')}</div></div>
-    </div>`).join('') : '<div class="search-empty">You\'re all caught up 🎉</div>';
+    </div>`).join('') : '<div class="search-empty">Her şey yolunda, bildirim yok 🎉</div>';
 }
-// Oturum geri yükleme, script'in TAMAMI çalıştıktan SONRA yapılır. Önceden burada anında
-// çalışıyordu: sayfa açık oturumla yenilenince dashboard, aşağıda tanımlı `let dashboardPeriod`
-// vb. değişkenler henüz oluşmadan çiziliyor ve "Cannot access ... before initialization" veriyordu.
 function tryRestoreSession(){
   try{
     const raw = sessionStorage.getItem('ahoraclario_session');
@@ -669,7 +717,6 @@ function tryRestoreSession(){
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', tryRestoreSession);
 else setTimeout(tryRestoreSession, 0);
 
-// ── SAYFA YÖNLENDİRME ──
 async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter, periodFilter){
   currentPage = page;
   lastPageArgs = [page, searchQuery, sourceFilter, stageFilter, taskFilter, periodFilter];
@@ -684,18 +731,15 @@ async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter
     else if(page==='companies') await renderCompanies(searchQuery, sourceFilter, periodFilter);
     else if(page==='tasks') await renderTasks(taskFilter);
     else if(page==='analytics') await renderAnalytics();
+    else if(page==='tickets') await renderTickets(taskFilter);
     else if(page==='settings') await renderSettings();
   }catch(err){
-    // Beklenmedik bir JS hatası olursa sonsuza dek "Yükleniyor..." yazmasın —
-    // gerçek hatayı göster ki hem kullanıcı sıkışmasın hem sorunu teşhis edebilelim.
     console.error('Sayfa render hatası:', err);
     main.innerHTML = `<div class="empty" style="padding:40px">Bir hata oluştu.<br><span style="color:var(--faint);font-size:11px">${esc(err.message||String(err))}</span><br><span style="cursor:pointer;color:var(--primary)" onclick="showPage('${page}')">↻ Tekrar Dene</span></div>`;
   }
 }
 
-// ══════════════════════════════════════════════
-// DASHBOARD
-// ══════════════════════════════════════════════
+// ── DASHBOARD ──
 let dashboardPeriod = 'month';
 let dashboardPipeFilter = 'all';
 let dashboardPipeDateFilter = 'all';
@@ -706,7 +750,6 @@ async function renderDashboard(){
   try{
   let opps = oppsRes.success ? oppsRes.opportunities : [];
   const analytics = anaRes.success ? anaRes : null;
-  // Sales Pipeline (mini önizleme) filtresi — SADECE o bölümdeki kartları etkiler, özet kartlarına dokunmaz.
   if(dashboardPipeFilter === 'high') opps = opps.filter(o => o.companies?.priority === 'High');
   if(dashboardPipeDateFilter !== 'all'){
     const todayStr = localDateStr();
@@ -740,9 +783,6 @@ async function renderDashboard(){
     </div>`;
   }
 
-  // ── Reference-matched dashboard pipeline preview ──
-  // The dashboard preview intentionally shows the same five visual columns as the reference.
-  // It still reads real Opportunity records; no mock data is introduced.
   const dashboardPipelineStages = ['Prospect','Contacted','Replied','Discovery Call','Demo'];
   const miniKanban = `<div class="dashboard-ref-pipeline">
     ${dashboardPipelineStages.map(s=>{
@@ -773,13 +813,11 @@ async function renderDashboard(){
     }).join('')}
   </div>`;
 
-  // ── Lead Sources donut (gerçek veri, CSS conic-gradient — kütüphane yok) ──
   const donutColors = ['#39D98A','#22D3EE','#3B82F6','#A78BFA','#F59E0B'];
   const sources = (analytics?.sourcePerformance || []).filter(s=>s.total>0);
   const donutHtml = sources.length ? donutChart(sources.map((s,i)=>({label:s.source, value:s.total, color:donutColors[i%donutColors.length]}))) : '<div class="empty" style="padding:20px">Henüz kaynak verisi yok</div>';
-  const donutLegend = sources.map((s,i)=>`<div class="donut-legend-row" style="cursor:pointer" onclick="renderDrilldown('source:'+encodeURIComponent('${escAttr(s.source)}'))"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
+  const donutLegend = sources.map((s,i)=>`<div class="donut-legend-row" style="cursor:pointer" data-view="${escAttr('source:'+encodeURIComponent(s.source))}" onclick="renderDrilldown(this.dataset.view)"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
 
-  // ── Sağ panel: Today's Actions — kaynak dokümandaki action-call/email/followup/demo/overdue renk şemasına göre (myDay artık yukarıdaki paralel çağrıdan geliyor) ──
   const TASK_TYPE_TAG = {
     Call: { tag:'Call', color:'#3B82F6' },
     Meeting: { tag:'Meeting', color:'#3B82F6' },
@@ -789,8 +827,8 @@ async function renderDashboard(){
     'Follow-up': { tag:'Follow-up', color:'#39D98A' },
   };
   function tagFor(t, overdue){
-    if(overdue) return { tag:'Overdue', color:'#F87171' };
-    return TASK_TYPE_TAG[t.task_type] || { tag:'Today', color:'#39D98A' };
+    if(overdue) return { tag:'Gecikti', color:'#F87171' };
+    return TASK_TYPE_TAG[t.task_type] || { tag:'Bugün', color:'#39D98A' };
   }
   const actionList = myDay.success ? [
     ...myDay.overdueTasks.map(t=>({...t, ...tagFor(t,true)})),
@@ -865,7 +903,7 @@ async function renderDashboard(){
               <div class="chk"></div>
               <div class="at-body"><b>${esc(t.title)}</b><div class="at-time">${esc(t.companies?.name||'')}${t.due_date?' · '+t.due_date:''}</div></div>
               <span class="action-tag" style="background:${t.color}22;color:${t.color}">${t.tag}</span>
-            </div>`).join('') : '<div class="empty" style="padding:16px 0">No actions for today 🎉</div>'}
+            </div>`).join('') : '<div class="empty" style="padding:16px 0">Bugün için aksiyon yok 🎉</div>'}
         </div>
 
         <div class="side-card">
@@ -895,10 +933,10 @@ async function renderDashboard(){
 }
 
 function sparkline(data, color){
-  const w=100,h=32;   // viewBox koordinat sistemi — CSS ile %100 genişliğe esner (preserveAspectRatio="none")
+  const w=100,h=32;
   const max = Math.max(1, ...data);
   const hasSignal = data.some(v=>v>0);
-  const c = hasSignal ? color : '#596579';   // hiç veri yoksa soluk gri çizgi (var(--faint) ile birebir), göz yormasın
+  const c = hasSignal ? color : '#596579';
   const pts = data.map((v,i)=>{
     const x = data.length>1 ? (i/(data.length-1))*w : w/2;
     const y = h - (v/max)*h*0.78 - 3;
@@ -926,8 +964,6 @@ function donutChart(segments){
 }
 
 function renderFunnelChevron(funnel){
-  // Reference visual: 7 segments. Each displayed segment remains backed by
-  // real analytics data from the closest corresponding CRM stage.
   const byStage = Object.fromEntries((funnel||[]).map(x=>[x.stage,x]));
   const defs = [
     {label:'Aday', key:'Prospect', color:'#3B82F6'},
@@ -964,9 +1000,7 @@ function timeAgo(iso){
   return Math.floor(hrs/24)+'g';
 }
 
-// ══════════════════════════════════════════════
-// MY DAY
-// ══════════════════════════════════════════════
+// ── MY DAY ──
 async function renderMyDay(){
   const [d, settingsRes] = await Promise.all([ api('getMyDay'), api('getSettings') ]);
   const main = document.getElementById('main');
@@ -989,10 +1023,10 @@ async function renderMyDay(){
     return `<div class="ps"><div class="ps-head" style="color:${color}">${title}${count!==undefined?` (${count})`:''}</div><div class="ps-body mini-list">${bodyHtml}</div></div>`;
   }
 
-  // Aktivite sayaçları artık Settings'te tanımlı GERÇEK hedeflere göre ilerleme gösteriyor (hardcoded değil).
   const activitySummary = [
-    ['email_sent','📧 E-postalar','emails'], ['linkedin_message','💼 LinkedIn','linkedin'], ['call','📞 Aramalar','calls'],
-    ['reply_received','↩️ Cevaplar',null], ['demo_completed','🖥️ Demolar','demos'], ['proposal_sent','📄 Teklifler',null],
+    ['call','📞 Aramalar','calls'], ['email_sent','📧 E-postalar','emails'], ['linkedin_message','💼 LinkedIn','linkedin'],
+    ['tasks_completed','📩 Follow-up','followUps'], ['meeting_completed','📅 Toplantılar','meetings'], ['demo_completed','🖥️ Demolar','demos'],
+    ['whatsapp_message','💬 WhatsApp',null], ['reply_received','↩️ Cevaplar',null], ['proposal_sent','📄 Teklifler',null],
   ].map(([type,label,targetKey]) => {
     const n = d.activityCounts?.[type]||0;
     const target = targetKey ? targets[targetKey] : null;
@@ -1004,9 +1038,9 @@ async function renderMyDay(){
     <div class="page-head"><div><h1>☀️ My Day</h1><p>Bugün odaklanman gereken her şey burada.</p></div></div>
 
     ${d.overdueTasks.length ? section('🔴 Geciken Follow-up\'lar', 'var(--red)', d.overdueTasks.map(t=>taskRow(t,'#F87171')).join(''), d.overdueTasks.length) : ''}
-    ${section('📩 Follow-ups Today', 'var(--amber)', d.todayTasks.length?d.todayTasks.map(t=>taskRow(t,'#F59E0B')).join(''):'<div style="color:var(--muted);font-size:12px">Bugün için görev yok.</div>', d.todayTasks.length)}
+    ${section('📩 Bugünkü Follow-up\'lar', 'var(--amber)', d.todayTasks.length?d.todayTasks.map(t=>taskRow(t,'#F59E0B')).join(''):'<div style="color:var(--muted);font-size:12px">Bugün için görev yok.</div>', d.todayTasks.length)}
 
-    ${d.demosToday.length ? section('🖥️ Today\'s Demos', 'var(--purple)', d.demosToday.map(m=>demoMeetingRow(m)).join(''), d.demosToday.length) : ''}
+    ${d.demosToday.length ? section('🖥️ Bugünkü Demolar', 'var(--purple)', d.demosToday.map(m=>demoMeetingRow(m)).join(''), d.demosToday.length) : ''}
 
     ${section('🎯 Henüz İletişime Geçilmemiş Adaylar', 'var(--blue)',
       d.notContacted.length?d.notContacted.map(c=>`<div class="mini-item" style="cursor:pointer" onclick="openCompanyPanel('${c.companyId}')"><b>${esc(c.companyName||'—')}</b> <span style="color:var(--muted)">— hiç iletişim kaydı yok</span></div>`).join(''):'<div style="color:var(--muted);font-size:12px">Harika, hepsiyle iletişime geçilmiş!</div>',
@@ -1022,9 +1056,7 @@ async function renderMyDay(){
   `;
 }
 
-// ══════════════════════════════════════════════
-// RAPORLAR / ANALİTİK
-// ══════════════════════════════════════════════
+// ── RAPORLAR / ANALİTİK ──
 async function renderAnalytics(){
   const d = await api('getAnalytics');
   const main = document.getElementById('main');
@@ -1033,16 +1065,16 @@ async function renderAnalytics(){
   const donutColors = ['#39D98A','#22D3EE','#3B82F6','#A78BFA','#F59E0B'];
   const sourcesWithData = d.sourcePerformance.filter(s=>s.total>0);
   const donutHtml = sourcesWithData.length ? donutChart(sourcesWithData.map((s,i)=>({label:s.source, value:s.total, color:donutColors[i%donutColors.length]}))) : '<div class="empty" style="padding:20px">Henüz veri yok</div>';
-  const donutLegend = sourcesWithData.map((s,i)=>`<div class="donut-legend-row" style="cursor:pointer" onclick="renderDrilldown('source:'+encodeURIComponent('${escAttr(s.source)}'))"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
+  const donutLegend = sourcesWithData.map((s,i)=>`<div class="donut-legend-row" style="cursor:pointer" data-view="${escAttr('source:'+encodeURIComponent(s.source))}" onclick="renderDrilldown(this.dataset.view)"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
 
   const sourceRows = d.sourcePerformance.map(s=>`
-    <tr class="row-click" onclick="renderDrilldown('source:'+encodeURIComponent('${escAttr(s.source)}'))"><td><b>${esc(s.source)}</b></td><td>${s.total}</td><td>${s.won}</td>
+    <tr class="row-click" data-view="${escAttr('source:'+encodeURIComponent(s.source))}" onclick="renderDrilldown(this.dataset.view)"><td><b>${esc(s.source)}</b></td><td>${s.total}</td><td>${s.won}</td>
       <td><span style="color:${s.conversionRate>=20?'var(--green)':'var(--muted)'};font-weight:700">%${s.conversionRate}</span></td>
       <td style="color:var(--green);font-weight:700">₺${s.wonMrr.toLocaleString('tr-TR')}</td></tr>`).join('');
 
   const lostRows = Object.entries(d.lostReasons).sort((a,b)=>b[1]-a[1]).map(([reason,count])=>`
-    <div class="row-click" style="cursor:pointer;display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border-subtle);font-size:12.5px" onclick="renderDrilldown('lostReason:'+encodeURIComponent('${escAttr(reason)}'))">
-      <span>${esc(reason)}</span><b style="color:var(--red)">${count}</b>
+    <div class="row-click" style="cursor:pointer;display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border-subtle);font-size:12.5px" data-view="${escAttr('lostReason:'+encodeURIComponent(reason))}" onclick="renderDrilldown(this.dataset.view)">
+      <span>${esc(trLabel(reason))}</span><b style="color:var(--red)">${count}</b>
     </div>`).join('') || '<div style="color:var(--muted);font-size:12px">Henüz kayıp fırsat yok.</div>';
 
   main.innerHTML = `
@@ -1063,7 +1095,7 @@ async function renderAnalytics(){
           return `<div style="flex:1;min-width:150px;background:var(--surface-secondary);border:1px solid var(--border-subtle);border-radius:10px;padding:12px">
             <div style="font-size:11px;color:var(--muted);margin-bottom:6px">${esc(s.label)}</div>
             <div style="font-size:20px;font-weight:800;color:${color}">%${s.rate}</div>
-            <div style="font-size:10px;color:var(--faint);margin-top:3px">${s.toCount} of ${s.fromCount}</div>
+            <div style="font-size:10px;color:var(--faint);margin-top:3px">${s.fromCount} fırsattan ${s.toCount}</div>
           </div>`;
         }).join('')}
       </div>
@@ -1073,7 +1105,7 @@ async function renderAnalytics(){
 
     <div class="ps"><div class="ps-head">Kaynak Performansı</div>
       <div class="ps-body" style="padding:0">
-        <table><thead><tr><th>Kaynak</th><th>Toplam</th><th>Won</th><th>Dönüşüm</th><th>Kazanılan MRR</th></tr></thead>
+        <table><thead><tr><th>Kaynak</th><th>Toplam</th><th>Kazanılan</th><th>Dönüşüm</th><th>Kazanılan MRR</th></tr></thead>
         <tbody>${sourceRows || '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted)">Henüz veri yok</td></tr>'}</tbody></table>
       </div>
     </div>
@@ -1082,11 +1114,10 @@ async function renderAnalytics(){
   `;
 }
 
-// ══════════════════════════════════════════════
-// SETTINGS
-// ══════════════════════════════════════════════
+// ── SETTINGS ──
 async function renderSettings(){
   const d = await api('getSettings');
+  setTimeout(loadClientProjects, 0);
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML='<div class="empty">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderSettings()">↻ Tekrar Dene</span></div>'; return; }
   const t = d.dailyTargets || {};
@@ -1127,22 +1158,49 @@ async function renderSettings(){
         <button class="btn-add" onclick="saveDailyTargets()">Hedefleri Kaydet</button>
       </div>
     </div>
+
+    <div class="ps">
+      <div class="ps-head">☀️ Sabah Özeti E-postası</div>
+      <div class="ps-body">
+        ${d.email?.configured
+          ? `<p style="font-size:12.5px;margin:0 0 10px">Özet <b>${esc(d.email.digestTo||'—')}</b> adresine gidiyor. ${d.email.cronReady?'Hafta içi her sabah 08:00\'de otomatik gönderilir (zamanlama SQL\'i çalıştırıldıysa).':'<span style="color:var(--amber)">Otomatik gönderim için CRON_SECRET henüz eklenmemiş.</span>'}</p>`
+          : `<p style="font-size:12.5px;color:var(--amber);margin:0 0 10px">E-posta henüz ayarlanmamış: Supabase → Edge Functions → Secrets'a RESEND_API_KEY eklenmeli.</p>`}
+        <button class="btn-ghost" onclick="sendTestDigest(this)" ${d.email?.configured?'':'disabled'}>📨 Şimdi test özeti gönder</button>
+      </div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">🔌 Müşteri CRM Bağlantıları (Destek Talepleri)<span style="cursor:pointer;color:var(--primary)" onclick="toggleNewProjectForm()">+ Yeni Bağlantı</span></div>
+      <div class="ps-body">
+        <p style="font-size:12px;color:var(--muted);margin:0 0 10px">Kurduğun her müşteri CRM'i için bir bağlantı oluştur. Verilen API anahtarını o CRM'in Supabase ayarlarına eklediğinde, oradan açılan talepler "Talepler" sayfana düşer.</p>
+        <div id="newProjectForm" class="hidden" style="margin-bottom:12px">
+          <div class="fi-row">
+            <div class="fi"><label>Müşteri şirket</label><select id="np-company"><option value="">Yükleniyor…</option></select></div>
+            <div class="fi"><label>Proje adı</label><input id="np-name" placeholder="örn: VizeCRM — Yedikıta"></div>
+          </div>
+          <button class="btn-add" onclick="createClientProject()">Bağlantıyı Oluştur</button>
+        </div>
+        <div id="projectsList"><div style="color:var(--muted);font-size:12px">Yükleniyor…</div></div>
+      </div>
+    </div>
+
+    <div class="ps">
+      <div class="ps-head">Yedekleme</div>
+      <div class="ps-body">
+        <p style="font-size:12.5px;color:var(--muted);margin:0 0 12px">Tüm CRM verilerini (şirketler, kişiler, fırsatlar, görevler, toplantılar, teklifler, aktiviteler) tek bir dosya olarak indirir. Ayda bir indirip saklamanı öneririm. Yüklenen dosyaların kendisi bu yedeğe dahil değildir, sadece listesi dahildir.</p>
+        <button class="btn-add" onclick="downloadFullBackup(this)">⬇ Tam Yedek İndir (.json)</button>
+      </div>
+    </div>
   `;
 }
 
-// ══════════════════════════════════════════════
-// DRILLDOWN — her tıklanabilir kart/grafiğin ortak, gerçek varış noktası.
-// VizeCRM'deki "Detay için tıkla" mantığı: hangi metriğe tıklarsan, o metriğin
-// arkasındaki GERÇEK kayıtlar burada, alakasız bir sayfaya değil.
-// ══════════════════════════════════════════════
 async function renderDrilldown(view){
   lastDrilldownView = view;
   const panel = document.getElementById('drilldownPanel');
   panel.innerHTML = '<div class="empty" style="padding:40px">Yükleniyor...</div>';
   document.getElementById('drilldownOverlay').classList.add('open');
-  // Dönem her zaman gönderiliyor; backend sadece döneme bağlı görünümlerde (yeni aday, follow-up, demo, kazanılan) kullanıyor.
   const d = await api('getDrilldown', { view, period: dashboardPeriod });
-  if(!d.success){ panel.innerHTML = `<div class="panel-top"><h2>Hata</h2><button class="panel-close" onclick="closeDrilldownPanel()">✕</button></div><div class="empty" style="padding:40px">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" onclick="renderDrilldown('${view}')">↻ Tekrar Dene</span></div>`; return; }
+  if(!d.success){ panel.innerHTML = `<div class="panel-top"><h2>Hata</h2><button class="panel-close" onclick="closeDrilldownPanel()">✕</button></div><div class="empty" style="padding:40px">Veri yüklenemedi.<br><span style="cursor:pointer;color:var(--primary)" data-view="${escAttr(view)}" onclick="renderDrilldown(this.dataset.view)">↻ Tekrar Dene</span></div>`; return; }
   const records = d.records || [];
   panel.innerHTML = `
     <div class="panel-top">
@@ -1187,9 +1245,7 @@ async function saveDailyTargets(){
   if(d.success){ toast('✓ Hedefler kaydedildi'); }
 }
 
-// ══════════════════════════════════════════════
-// ŞİRKETLER
-// ══════════════════════════════════════════════
+// ── ŞİRKETLER ──
 async function renderCompanies(searchQuery, sourceFilter, periodFilter){
   const params = {};
   if(searchQuery) params.search = searchQuery;
@@ -1203,7 +1259,11 @@ async function renderCompanies(searchQuery, sourceFilter, periodFilter){
   main.innerHTML = `
     <div class="page-head">
       <div><h1>Şirketler</h1><p>${companies.length} aday/müşteri${filterLabel?` · ${filterLabel} <span style="color:var(--primary);cursor:pointer" onclick="showPage('companies')">✕ temizle</span>`:''}</p></div>
-      <button class="btn-add" onclick="openAddCompanyModal()">+ Yeni Şirket</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-ghost" onclick="openImportModal()">⬆ İçe Aktar</button>
+        <button class="btn-ghost" onclick="exportCompaniesCsv()" ${companies.length?'':'disabled'}>⬇ Excel'e Aktar</button>
+        <button class="btn-add" onclick="openAddCompanyModal()">+ Yeni Şirket</button>
+      </div>
     </div>
     <div class="tbl-wrap">
       <table>
@@ -1250,19 +1310,16 @@ async function submitAddCompany(){
     research_notes: document.getElementById('nc-notes').value.trim(),
   };
   const startStage = document.getElementById('nc-stage').value || 'Prospect';
-  const d = await api('addCompany', { company });
+  const d = await api('addCompany', { company, stage: startStage });
   if(d.success){
     toast('✓ Şirket eklendi');
     closeAddCompanyModal();
-    // İlk fırsatı, seçilen başlangıç aşamasında otomatik oluşturuyoruz ki hemen o sütunda görünsün.
-    await api('addOpportunity', { companyId: d.company.id, opportunity:{stage:startStage} });
     if(currentPage==='companies') renderCompanies();
     else if(currentPage==='pipeline') renderPipeline();
     else if(currentPage==='dashboard') renderDashboard();
   }
 }
 
-// ── Company Detay Paneli ──
 async function openCompanyPanel(companyId){
   const d = await api('getCompanyDetail', { companyId });
   if(!d.success) return;
@@ -1321,7 +1378,7 @@ async function openCompanyPanel(companyId){
       </div>
     </div>
 
-    ${d.customer ? `<div class="ps"><div class="ps-head" style="background:var(--green-bg);color:var(--green)">✓ Customer</div>
+    ${d.customer ? `<div class="ps"><div class="ps-head" style="background:var(--green-bg);color:var(--green)">✓ Müşteri</div>
       <div class="ps-body">
         <div style="font-size:12.5px;margin-bottom:10px">
           Müşteri olma tarihi <b>${d.customer.customer_since||'—'}</b> · Plan: <b>${esc(d.customer.plan||'—')}</b> · MRR: <b>₺${d.customer.mrr?Number(d.customer.mrr).toLocaleString('tr-TR'):'0'}</b> · ARR: <b>₺${d.customer.arr?Number(d.customer.arr).toLocaleString('tr-TR'):'0'}</b>
@@ -1341,6 +1398,9 @@ async function openCompanyPanel(companyId){
       </div></div>` : ''}
 
     ${companyFilesSection(c.id, d.files || [])}
+    ${(d.tickets||[]).length ? `<div class="ps"><div class="ps-head">🎫 Destek Talepleri (${d.tickets.filter(t=>TICKET_OPEN.includes(t.status)).length} açık)</div>
+      <div class="ps-body mini-list">${d.tickets.map(t=>`<div class="mini-item row-click" style="cursor:pointer;display:flex;justify-content:space-between;gap:8px" onclick="openTicketPanel('${t.id}')">
+        <span><b>#${t.ticket_no}</b> ${esc(t.title)}</span>${ticketStatusBadge(t.status)}</div>`).join('')}</div></div>` : ''}
 
     <div class="ps">
       <div class="ps-head">Fırsatlar (${d.opportunities.length})<span style="cursor:pointer;color:var(--primary)" onclick="quickAddOpportunity('${c.id}')">+ Ekle</span></div>
@@ -1348,13 +1408,13 @@ async function openCompanyPanel(companyId){
         ${d.opportunities.length===0?'<div style="color:var(--muted);font-size:12px">Henüz fırsat yok.</div>':d.opportunities.map(o=>`
           <div class="mini-item">
             <div style="display:flex;justify-content:space-between;align-items:center">
-              <b style="color:${STAGE_COLORS[o.stage]||'#666'}">${esc(o.stage)}</b>
+              <b style="color:${STAGE_COLORS[o.stage]||OUTCOME_COLORS[o.stage]||'#666'}">${esc(trStage(o.stage))}</b>
               <span style="display:flex;align-items:center;gap:7px">
-                <span style="color:${o.estimated_mrr?'var(--green)':'var(--faint)'};font-weight:700">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):'No value set'}</span>
-                <span style="cursor:pointer;color:var(--muted);font-size:12px" onclick="openEditOpportunityModal('${o.id}','${c.id}')" title="Edit deal value">✎</span>
+                <span style="color:${o.estimated_mrr?'var(--green)':'var(--faint)'};font-weight:700">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):'Tutar girilmedi'}</span>
+                <span style="cursor:pointer;color:var(--muted);font-size:12px" onclick="openEditOpportunityModal('${o.id}','${c.id}')" title="Tutarı düzenle">✎</span>
               </span>
             </div>
-            ${o.plan || o.expected_close_date ? `<div style="font-size:10.5px;color:var(--muted);margin-top:3px">${o.plan?esc(o.plan):''}${o.plan && o.expected_close_date?' · ':''}${o.expected_close_date?'Closes '+o.expected_close_date:''}</div>` : ''}
+            ${o.plan || o.expected_close_date ? `<div style="font-size:10.5px;color:var(--muted);margin-top:3px">${o.plan?esc(o.plan):''}${o.plan && o.expected_close_date?' · ':''}${o.expected_close_date?'Kapanış: '+o.expected_close_date:''}</div>` : ''}
             <div class="stage-track">
               ${STAGES.concat(['Lost','No Response','Not a Fit']).map(s=>`<span class="stage-pill" onclick="moveOpportunityStage('${o.id}','${s}','${c.id}')" style="background:${o.stage===s?(STAGE_COLORS[s]||OUTCOME_COLORS[s]||'#666'):'var(--surface-2)'};color:${o.stage===s?'#07110C':'var(--muted)'};border-color:${o.stage===s?'transparent':'var(--border)'}">${trStage(s)}</span>`).join('')}
             </div>
@@ -1369,16 +1429,17 @@ async function openCompanyPanel(companyId){
           <div class="contact-row">
             <div class="avatar" style="${p.is_decision_maker?'background:var(--amber-bg);color:var(--amber)':''}">${initials(p.full_name)}</div>
             <div style="flex:1;min-width:0">
-              <b>${esc(p.full_name)}</b> <span style="color:var(--muted)">— ${esc(p.position||'—')}</span>${p.is_decision_maker?' <span class="badge" style="background:var(--amber-bg);color:var(--amber)">👑 Decision Maker</span>':''}<br>
+              <b>${esc(p.full_name)}</b> <span style="color:var(--muted)">— ${esc(p.position||'—')}</span>${p.is_decision_maker?' <span class="badge" style="background:var(--amber-bg);color:var(--amber)">👑 Karar Verici</span>':''}<br>
               <span style="color:var(--muted);font-size:11px">${esc(p.email||'')}${p.phone?' · '+esc(p.phone):''}${p.linkedin?' · '+safeLink(p.linkedin,'LinkedIn'):''}</span>
             </div>
-            <span style="cursor:pointer;color:var(--muted);font-size:12px;margin-left:6px" onclick="openEditContactModal('${p.id}','${c.id}')" title="Edit">✎</span>
-            <span style="cursor:pointer;color:var(--faint);font-size:12px;margin-left:6px" onclick="deleteContactConfirm('${p.id}','${c.id}')" title="Delete">🗑</span>
+            ${emailButton(p, c.id, null, c.name)}${whatsappButton(p, c.id)}
+            <span style="cursor:pointer;color:var(--muted);font-size:12px;margin-left:6px" onclick="openEditContactModal('${p.id}','${c.id}')" title="Düzenle">✎</span>
+            <span style="cursor:pointer;color:var(--faint);font-size:12px;margin-left:6px" onclick="deleteContactConfirm('${p.id}','${c.id}')" title="Sil">🗑</span>
           </div>`).join('')}
         <div id="addContactForm-${c.id}" class="hidden" style="margin-top:6px">
           <div class="fi-row"><div class="fi"><input id="nct-name" placeholder="Ad Soyad"></div><div class="fi"><input id="nct-pos" placeholder="Pozisyon"></div></div>
           <div class="fi-row"><div class="fi"><input id="nct-email" placeholder="E-posta"></div><div class="fi"><input id="nct-phone" placeholder="Telefon"></div></div>
-          <div class="fi"><input id="nct-linkedin" placeholder="LinkedIn (optional)"></div>
+          <div class="fi"><input id="nct-linkedin" placeholder="LinkedIn (isteğe bağlı)"></div>
           <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text);margin-bottom:10px;cursor:pointer">
             <input type="checkbox" id="nct-decision" style="width:auto"> 👑 Bu kişi karar verici (Kurucu/CEO vb.)
           </label>
@@ -1388,14 +1449,14 @@ async function openCompanyPanel(companyId){
     </div>
 
     <div class="ps">
-      <div class="ps-head">Tasks (${d.tasks.filter(t=>t.status==='Open').length} open)<span style="cursor:pointer;color:var(--primary)" onclick="showAddTaskForm('${c.id}')">+ Ekle</span></div>
+      <div class="ps-head">Görevler (${d.tasks.filter(t=>t.status==='Open').length} açık)<span style="cursor:pointer;color:var(--primary)" onclick="showAddTaskForm('${c.id}')">+ Ekle</span></div>
       <div class="ps-body mini-list" id="tasksList">
-        ${d.tasks.length===0?'<div style="color:var(--muted);font-size:12px">No tasks.</div>':d.tasks.map(t=>`
+        ${d.tasks.length===0?'<div style="color:var(--muted);font-size:12px">Görev yok.</div>':d.tasks.map(t=>`
           <div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;${t.status==='Completed'?'opacity:.5':''}">
             <span>${t.status==='Completed'?'✓ ':''}${esc(t.title)} ${t.due_date?`<span style="color:var(--muted)">· ${t.due_date}</span>`:''}</span>
             <span style="display:flex;gap:8px;align-items:center;flex-shrink:0">
               ${t.status==='Open'?`<span style="cursor:pointer;color:var(--green);font-size:11px" onclick="completeTaskQuick('${t.id}','${c.id}')">Tamamla</span>`:''}
-              <span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="deleteTaskConfirm('${t.id}','${c.id}')" title="Delete">🗑</span>
+              <span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="deleteTaskConfirm('${t.id}','${c.id}')" title="Sil">🗑</span>
             </span>
           </div>`).join('')}
         <div id="addTaskForm-${c.id}" class="hidden" style="margin-top:6px">
@@ -1424,11 +1485,12 @@ async function openCompanyPanel(companyId){
         ${(d.meetings||[]).length===0?'<div style="color:var(--muted);font-size:12px">Planlanmış toplantı yok.</div>':d.meetings.map(m=>`
           <div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;${m.status!=='Scheduled'?'opacity:.5':''}">
             <span><span class="badge" style="background:var(--purple-bg);color:var(--purple);margin-right:5px">${trLabel(m.type)}</span>${esc(m.title)} <span style="color:var(--muted)">· ${m.meeting_date}${m.start_time?' '+m.start_time:''}</span></span>
-            ${m.status==='Scheduled'?`<span style="display:flex;gap:6px">
-              <span style="cursor:pointer;color:var(--green);font-size:11px" onclick="updateMeeting('${m.id}','Completed','${c.id}')">Done</span>
+            ${m.status==='Scheduled'?`<span style="display:flex;gap:6px;align-items:center">
+              ${calendarButtons(m, c.name)}
+              <span style="cursor:pointer;color:var(--green);font-size:11px" onclick="updateMeeting('${m.id}','Completed','${c.id}')">Tamamlandı</span>
               <span style="cursor:pointer;color:var(--red);font-size:11px" onclick="updateMeeting('${m.id}','Cancelled','${c.id}')">Vazgeç</span>
-              <span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="deleteMeetingConfirm('${m.id}','${c.id}')" title="Delete">🗑</span>
-            </span>`:`<span style="display:flex;align-items:center;gap:8px"><span style="font-size:10.5px;color:var(--muted)">${trLabel(m.status)}</span><span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="deleteMeetingConfirm('${m.id}','${c.id}')" title="Delete">🗑</span></span>`}
+              <span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="deleteMeetingConfirm('${m.id}','${c.id}')" title="Sil">🗑</span>
+            </span>`:`<span style="display:flex;align-items:center;gap:8px"><span style="font-size:10.5px;color:var(--muted)">${trLabel(m.status)}</span><span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="deleteMeetingConfirm('${m.id}','${c.id}')" title="Sil">🗑</span></span>`}
           </div>`).join('')}
         <div id="addMeetingForm-${c.id}" class="hidden" style="margin-top:6px">
           <div class="fi"><input id="nmt-title" placeholder="Toplantı başlığı — örn: Keşif görüşmesi"></div>
@@ -1461,11 +1523,11 @@ async function openCompanyPanel(companyId){
             <div style="display:flex;justify-content:space-between;align-items:center">
               <span style="color:var(--green);font-weight:700">${p.mrr?'₺'+Number(p.mrr).toLocaleString('tr-TR')+'/mo':(p.value?'₺'+Number(p.value).toLocaleString('tr-TR'):'—')}</span>
               <select onchange="updateProposal('${p.id}',this.value,'${c.id}')" style="width:auto;padding:3px 8px;font-size:11px">
-                ${['Draft','Sent','Viewed','Negotiating','Accepted','Rejected','Expired'].map(s=>`<option value="${s}" ${p.status===s?'selected':''}>${s}</option>`).join('')}
+                ${['Draft','Sent','Viewed','Negotiating','Accepted','Rejected','Expired'].map(s=>`<option value="${s}" ${p.status===s?'selected':''}>${trLabel(s)}</option>`).join('')}
               </select>
-              <span style="cursor:pointer;color:var(--faint);font-size:11px;margin-left:6px" onclick="deleteProposalConfirm('${p.id}','${c.id}')" title="Delete">🗑</span>
+              <span style="cursor:pointer;color:var(--faint);font-size:11px;margin-left:6px" onclick="deleteProposalConfirm('${p.id}','${c.id}')" title="Sil">🗑</span>
             </div>
-            <div style="font-size:10.5px;color:var(--muted);margin-top:3px">Sent ${p.sent_at||'—'}</div>
+            <div style="font-size:10.5px;color:var(--muted);margin-top:3px">Gönderim: ${p.sent_at||'—'}</div>
           </div>`).join('')}
         <div id="addProposalForm-${c.id}" class="hidden" style="margin-top:6px">
           ${(d.opportunities||[]).length===0?'<div style="color:var(--muted);font-size:11.5px;margin-bottom:8px">Önce bir fırsat ekleyin — teklif bir fırsata bağlı olmalı.</div>':`
@@ -1486,10 +1548,11 @@ async function openCompanyPanel(companyId){
       <div class="ps-body" style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn-ghost" onclick="logQuickActivity('${c.id}','email_sent')">📧 E-posta Gönderildi</button>
         <button class="btn-ghost" onclick="logQuickActivity('${c.id}','linkedin_message')">💼 LinkedIn Mesajı</button>
-        <button class="btn-ghost" onclick="logQuickActivity('${c.id}','call')">📞 Call</button>
+        <button class="btn-ghost" onclick="logQuickActivity('${c.id}','call')">📞 Arama Yapıldı</button>
+        <button class="btn-ghost" onclick="logQuickActivity('${c.id}','whatsapp_message')">💬 WhatsApp Mesajı</button>
         <button class="btn-ghost" onclick="logQuickActivity('${c.id}','reply_received')">↩️ Cevap Alındı</button>
       </div>
-      <div style="padding:0 15px 12px;font-size:10.5px;color:var(--faint)">Logging "E-posta Gönderildi" automatically schedules 3 follow-up tasks (+3 / +5 / +7 days).</div>
+      <div style="padding:0 15px 12px;font-size:10.5px;color:var(--faint)">"E-posta Gönderildi" kaydedilince +3 / +5 / +7 gün sonrasına otomatik 3 follow-up görevi oluşturulur.</div>
     </div>
 
     <div class="ps">
@@ -1500,17 +1563,12 @@ async function openCompanyPanel(companyId){
       </div>
     </div>
 
-    <button class="btn-danger" style="width:100%;margin-top:6px" onclick="deleteCompanyConfirm('${c.id}')">🗑 Delete Company</button>
+    <button class="btn-danger" style="width:100%;margin-top:6px" onclick="deleteCompanyConfirm('${c.id}')">🗑 Şirketi Sil</button>
   `;
-  document.getElementById('companyOverlay').classList.add('open');
+  openSidePanel('companyOverlay');
 }
 function closeCompanyPanel(){ document.getElementById('companyOverlay').classList.remove('open'); refreshBackgroundIfDirty(); }
 
-// ══════════════════════════════════════════════
-// ŞİRKET DOSYALARI
-// Yükleme: backend'den tek kullanımlık imzalı link al → dosyayı DOĞRUDAN Storage'a
-// gönder → backend'e "yüklendi" de (kayıt orada açılır). İndirme 60 sn'lik linkle.
-// ══════════════════════════════════════════════
 const MAX_FILE_MB = 50;
 function fmtSize(b){
   if(b==null) return '—';
@@ -1529,10 +1587,8 @@ function fileIcon(name){
   if(['html','htm','js','ts','css','json','sql','py'].includes(ext)) return '💻';
   return '📄';
 }
-// oppId verilirse bölüm fırsat panelinde gösteriliyor demektir: yükleme/silme sonrası o panel yenilenir.
-// (Pipeline ve Dashboard kartları şirket panelini değil fırsat panelini açıyor — dosyalar orada da görünsün.)
 function companyFilesSection(companyId, files, oppId){
-  const key = oppId ? 'opp-'+oppId : companyId;           // iki panel aynı anda DOM'da olabilir, id'ler çakışmasın
+  const key = oppId ? 'opp-'+oppId : companyId;
   const ctx = `'${companyId}','${oppId||''}'`;
   return `<div class="ps">
     <div class="ps-head">📁 Dosyalar (${files.length})<span style="cursor:pointer;color:var(--primary)" onclick="document.getElementById('fileInput-${key}').click()">+ Yükle</span></div>
@@ -1577,7 +1633,6 @@ async function uploadCompanyFiles(companyId, oppId, fileList){
     const up = await api('createFileUpload', { companyId, fileName: f.name, fileSize: f.size });
     if(!up.success) continue;
     try{
-      // Supabase Storage imzalı yükleme formatı (supabase-js uploadToSignedUrl ile aynı)
       const form = new FormData();
       form.append('cacheControl', '3600');
       form.append('', f);
@@ -1603,9 +1658,7 @@ async function deleteCompanyFile(fileId, companyId, oppId){
   if(d.success){ toast('🗑 Dosya silindi'); refreshFilesPanel(companyId, oppId); }
 }
 
-// ══════════════════════════════════════════════
-// OPPORTUNITY DETAIL
-// ══════════════════════════════════════════════
+// ── OPPORTUNITY DETAIL ──
 async function openOpportunityDetail(opportunityId){
   const d = await api('getOpportunityDetail', { opportunityId });
   if(!d.success) return;
@@ -1616,9 +1669,9 @@ async function openOpportunityDetail(opportunityId){
     <div class="panel-top">
       <div>
         <div style="font-size:11px;color:var(--muted);cursor:pointer" onclick="closeOppPanel();openCompanyPanel('${co.id}')">← ${esc(co.name)}</div>
-        <h2 style="margin:6px 0 4px">${esc(o.name || co.name + ' — ' + o.stage)}</h2>
+        <h2 style="margin:6px 0 4px">${esc(o.name || co.name + ' — ' + trStage(o.stage))}</h2>
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px">
-          <span class="badge" style="background:${STAGE_COLORS[o.stage]||OUTCOME_COLORS[o.stage]}22;color:${STAGE_COLORS[o.stage]||OUTCOME_COLORS[o.stage]}">${esc(o.stage)}</span>
+          <span class="badge" style="background:${STAGE_COLORS[o.stage]||OUTCOME_COLORS[o.stage]}22;color:${STAGE_COLORS[o.stage]||OUTCOME_COLORS[o.stage]}">${esc(trStage(o.stage))}</span>
           <span class="badge" style="background:${leadScoreColor(d.leadScore)}22;color:${leadScoreColor(d.leadScore)}">🎯 ${d.leadScore}/100</span>
           ${o.estimated_mrr?`<span class="badge" style="background:var(--green-bg);color:var(--green)">₺${Number(o.estimated_mrr).toLocaleString('tr-TR')}/mo</span>`:''}
         </div>
@@ -1643,9 +1696,10 @@ async function openOpportunityDetail(opportunityId){
       <div class="ps-head">İletişim</div>
       <div class="ps-body">
         ${pc?`<div class="contact-row"><div class="avatar" style="${pc.is_decision_maker?'background:var(--amber-bg);color:var(--amber)':''}">${initials(pc.full_name)}</div>
-          <div><b>${esc(pc.full_name)}</b> ${pc.is_decision_maker?'<span class="badge" style="background:var(--amber-bg);color:var(--amber)">👑 Decision Maker</span>':''}<br>
-          <span style="color:var(--muted);font-size:11px">${esc(pc.email||'')}${pc.phone?' · '+esc(pc.phone):''}${pc.linkedin?' · '+safeLink(pc.linkedin,'LinkedIn'):''}</span></div></div>`
-          :'<div style="color:var(--muted);font-size:12px">No primary contact set.</div>'}
+          <div><b>${esc(pc.full_name)}</b> ${pc.is_decision_maker?'<span class="badge" style="background:var(--amber-bg);color:var(--amber)">👑 Karar Verici</span>':''}<br>
+          <span style="color:var(--muted);font-size:11px">${esc(pc.email||'')}${pc.phone?' · '+esc(pc.phone):''}${pc.linkedin?' · '+safeLink(pc.linkedin,'LinkedIn'):''}</span></div>
+          <span style="margin-left:auto">${emailButton(pc, co.id, o.id, co.name)}${whatsappButton(pc, co.id, o.id)}</span></div>`
+          :'<div style="color:var(--muted);font-size:12px">Birincil kişi seçilmedi.</div>'}
         ${d.contacts.length>1?`<div class="fi" style="margin-top:10px"><label>Birincil kişiyi seç</label>
           <select onchange="setPrimaryContact('${o.id}',this.value)">
             <option value="">—</option>
@@ -1672,7 +1726,7 @@ async function openOpportunityDetail(opportunityId){
       <div class="ps-head">Toplantılar (${d.meetings.length})</div>
       <div class="ps-body mini-list">
         ${d.meetings.length===0?'<div style="color:var(--muted);font-size:12px">Planlanmış toplantı yok.</div>':d.meetings.map(m=>`
-          <div class="mini-item"><span class="badge" style="background:var(--purple-bg);color:var(--purple);margin-right:5px">${trLabel(m.type)}</span>${esc(m.title)} <span style="color:var(--muted)">· ${m.meeting_date}</span></div>`).join('')}
+          <div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;${m.status!=='Scheduled'?'opacity:.5':''}"><span><span class="badge" style="background:var(--purple-bg);color:var(--purple);margin-right:5px">${trLabel(m.type)}</span>${esc(m.title)} <span style="color:var(--muted)">· ${m.meeting_date}${m.start_time?' '+String(m.start_time).slice(0,5):''}</span></span>${m.status==='Scheduled'?`<span style="display:flex;gap:6px;align-items:center">${calendarButtons(m, co.name)}</span>`:`<span style="font-size:10.5px;color:var(--muted)">${trLabel(m.status)}</span>`}</div>`).join('')}
       </div>
     </div>
 
@@ -1711,7 +1765,7 @@ async function openOpportunityDetail(opportunityId){
       </div>
     </div>
   `;
-  document.getElementById('oppOverlay').classList.add('open');
+  openSidePanel('oppOverlay');
 }
 function closeOppPanel(){ document.getElementById('oppOverlay').classList.remove('open'); refreshBackgroundIfDirty(); }
 
@@ -1741,10 +1795,8 @@ async function addOppTask(opportunityId, companyId){
   if(d.success){ toast('✓ Görev eklendi'); openOpportunityDetail(opportunityId); }
 }
 async function moveOppFromDetail(opportunityId, newStage, companyId){
-  let lostReason = null;
-  if(newStage === 'Lost'){ lostReason = prompt('Loss reason (optional): Too expensive, No need, No budget, Using another CRM, Bad timing, No response, Not decision maker, Competitor, Other') || ''; }
-  const d = await api('updateOpportunityStage', { opportunityId, stage:newStage, lostReason });
-  if(d.success){ toast('✓ Stage updated: ' + newStage); openOpportunityDetail(opportunityId); }
+  const d = await changeOpportunityStage(opportunityId, newStage);
+  if(d?.success) openOpportunityDetail(opportunityId);
 }
 async function deleteOpportunityConfirm(opportunityId, companyId){
   if(!confirm('Bu fırsatı kalıcı olarak sil? Bu işlem geri alınamaz.')) return;
@@ -1759,7 +1811,7 @@ async function quickAddProposalFromOpp(opportunityId, companyId){
 async function logQuickActivity(companyId, activityType){
   const d = await api('addActivity', { companyId, activityType });
   if(d.success){
-    toast(d.followUpsCreated ? `✓ Logged — ${d.followUpsCreated} follow-up tasks scheduled` : '✓ Activity logged');
+    toast(d.followUpsCreated ? `✓ Kaydedildi — ${d.followUpsCreated} follow-up görevi planlandı` : '✓ Aktivite kaydedildi');
     openCompanyPanel(companyId);
   }
 }
@@ -1794,17 +1846,14 @@ async function quickAddOpportunity(companyId){
   if(d.success){
     toast('✓ Fırsat eklendi');
     openCompanyPanel(companyId);
-    openEditOpportunityModal(d.opportunity.id, companyId);   // hemen tutar/plan girmesi için modal açılıyor
+    openEditOpportunityModal(d.opportunity.id, companyId);
   }
 }
 async function moveOpportunityStage(opportunityId, newStage, companyId){
-  let lostReason = null;
-  if(newStage === 'Lost'){ lostReason = prompt('Loss reason (optional): Too expensive, No need, No budget, Using another CRM, Bad timing, No response, Not decision maker, Competitor, Other') || ''; }
-  const d = await api('updateOpportunityStage', { opportunityId, stage:newStage, lostReason });
-  if(d.success){ toast('✓ Stage updated: ' + newStage); openCompanyPanel(companyId); if(currentPage==='pipeline') renderPipeline(); }
+  const d = await changeOpportunityStage(opportunityId, newStage);
+  if(d?.success) openCompanyPanel(companyId);
 }
 
-// Companies listesinden tek tıkla fiyat girişi — fırsat yoksa önce sessizce oluşturur.
 async function quickSetPrice(companyId, opportunityId){
   if(!opportunityId){
     const d = await api('addOpportunity', { companyId, opportunity:{stage:'Prospect'} });
@@ -1816,7 +1865,6 @@ async function quickSetPrice(companyId, opportunityId){
 
 async function openEditOpportunityModal(opportunityId, companyId){
   editingOppId = opportunityId; editingOppCompanyId = companyId;
-  // Mevcut değerleri panelden değil, taze veriden çekelim (şirket detayını tekrar okuyup ilgili fırsatı bulalım)
   const d = await api('getCompanyDetail', { companyId });
   const opp = d.success ? d.opportunities.find(o => o.id === opportunityId) : null;
   document.getElementById('eo-mrr').value = opp?.estimated_mrr || '';
@@ -1840,8 +1888,8 @@ async function saveOpportunityDetails(){
     toast('✓ Anlaşma detayları kaydedildi');
     const cid = editingOppCompanyId;
     closeEditOppModal();
-    if(anySidePanelOpen()) refreshOpenPanels();   // panel açıksa onu tazele; arka plan panel kapanınca tazelenir
-    else refreshBackgroundIfDirty();              // panel yoksa (örn. dashboard kartından açıldıysa) sayfayı tazele
+    if(anySidePanelOpen()) refreshOpenPanels();
+    else refreshBackgroundIfDirty();
   }
 }
 
@@ -1921,10 +1969,9 @@ async function completeTaskQuick(taskId, companyId){
 async function deleteTaskConfirm(taskId, companyId){
   if(!confirm('Bu görevi sil?')) return;
   const d = await api('deleteTask', { taskId });
-  if(d.success){ toast('🗑 Task deleted'); openCompanyPanel(companyId); }
+  if(d.success){ toast('🗑 Görev silindi'); openCompanyPanel(companyId); }
 }
 
-// ── Meetings ──
 function showAddMeetingForm(companyId){ document.getElementById('addMeetingForm-'+companyId).classList.remove('hidden'); }
 async function submitAddMeeting(companyId){
   const meeting = {
@@ -1941,28 +1988,27 @@ async function submitAddMeeting(companyId){
 async function updateMeeting(meetingId, status, companyId){
   const d = await api('updateMeetingStatus', { meetingId, status });
   if(d.success){
-    toast('✓ Meeting ' + status.toLowerCase());
+    toast(status==='Completed' ? '✓ Toplantı tamamlandı' : '✓ Toplantı iptal edildi');
     if(companyId){ openCompanyPanel(companyId); }
     else if(currentPage==='myday'){ renderMyDay(); }
   }
 }
 
-// ── Proposals ──
 function showAddProposalForm(companyId){ document.getElementById('addProposalForm-'+companyId).classList.remove('hidden'); }
 async function submitAddProposal(companyId){
   const oppEl = document.getElementById('npr-opp');
-  if(!oppEl){ toast('Add an opportunity first'); return; }
+  if(!oppEl){ toast('Önce bir fırsat ekleyin'); return; }
   const opportunityId = oppEl.value;
   const proposal = {
     value: document.getElementById('npr-value').value || null,
     mrr: document.getElementById('npr-mrr').value || null,
   };
   const d = await api('addProposal', { companyId, opportunityId, proposal });
-  if(d.success){ toast('✓ Proposal added'); openCompanyPanel(companyId); }
+  if(d.success){ toast('✓ Teklif eklendi'); openCompanyPanel(companyId); }
 }
 async function updateProposal(proposalId, status, companyId){
   const d = await api('updateProposalStatus', { proposalId, status });
-  if(d.success){ toast('✓ Proposal updated: ' + status); openCompanyPanel(companyId); }
+  if(d.success){ toast('✓ Teklif güncellendi: ' + trLabel(status)); openCompanyPanel(companyId); }
 }
 async function deleteMeetingConfirm(meetingId, companyId){
   if(!confirm('Bu toplantıyı sil?')) return;
@@ -1981,9 +2027,7 @@ async function deleteCompanyConfirm(companyId){
   if(d.success){ toast('🗑 Şirket silindi'); closeOppPanel(); closeCompanyPanel(); }
 }
 
-// ══════════════════════════════════════════════
-// PIPELINE (Kanban, sürükle-bırak)
-// ══════════════════════════════════════════════
+// ── PIPELINE (Kanban, sürükle-bırak) ──
 async function renderPipeline(highlightStage){
   const d = await api('getOpportunities');
   const main = document.getElementById('main');
@@ -2002,7 +2046,7 @@ async function renderPipeline(highlightStage){
               <div class="kcard" style="--stat-color:${STAGE_COLORS[s]}" draggable="true" ondragstart="onDragStart(event,'${o.id}')" onclick="openOpportunityDetail('${o.id}')">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px">
                   <b>${esc(o.companies?.name||'—')}</b>
-                  ${o.companies?.priority==='High'?'<span title="High priority">🔥</span>':''}
+                  ${o.companies?.priority==='High'?'<span title="Yüksek öncelik">🔥</span>':''}
                 </div>
                 <div style="color:var(--muted);font-size:10.5px">${esc(o.companies?.industry||'')}${o.companies?.industry&&o.companies?.country?' · ':''}${esc(o.companies?.country||'')}</div>
                 ${o.primary_contact_name?`<div style="font-size:10.5px;color:var(--muted);margin-top:4px">👤 ${esc(o.primary_contact_name)}</div>`:''}
@@ -2031,16 +2075,12 @@ async function onDropCard(e, newStage){
   e.preventDefault();
   e.currentTarget.classList.remove('dragover');
   if(!draggedOppId) return;
-  let lostReason = null;
-  if(newStage === 'Lost'){ lostReason = prompt('Loss reason (optional):') || ''; }
-  const d = await api('updateOpportunityStage', { opportunityId: draggedOppId, stage: newStage, lostReason });
-  if(d.success){ toast('✓ ' + newStage + ' stage'); renderPipeline(); }
-  draggedOppId = null;
+  const id = draggedOppId; draggedOppId = null;
+  const d = await changeOpportunityStage(id, newStage);
+  if(d?.success) renderPipeline();
 }
 
-// ══════════════════════════════════════════════
-// GÖREVLER
-// ══════════════════════════════════════════════
+// ── GÖREVLER ──
 async function renderTasks(filter){
   const d = await api('getTasks');
   const main = document.getElementById('main');
@@ -2048,7 +2088,6 @@ async function renderTasks(filter){
   let tasksAll = d.tasks || [];
   const today = localDateStr();
 
-  // ── Dashboard kartlarından gelen filtre (örn: sadece Call/Meeting türü, ya da bu hafta) ──
   if(filter?.types){
     const typeList = filter.types.split(',');
     tasksAll = tasksAll.filter(t => typeList.includes(t.task_type));
@@ -2077,41 +2116,401 @@ async function renderTasks(filter){
           <span onclick="openCompanyPanel('${t.company_id}')" style="cursor:pointer"><b>${esc(t.companies?.name||'')}</b> — ${esc(t.title)} ${t.task_type?`<span class="badge" style="background:var(--surface-2);color:var(--muted);margin-left:4px">${trLabel(t.task_type)}</span>`:''} ${t.due_date?`<span style="color:var(--muted)">· ${t.due_date}</span>`:''}</span>
           <span style="display:flex;gap:8px;flex-shrink:0">
             <span style="cursor:pointer;color:var(--green);font-size:11px" onclick="event.stopPropagation();completeTaskFromList('${t.id}')">Tamamla</span>
-            <span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="event.stopPropagation();deleteTaskFromList('${t.id}')" title="Delete">🗑</span>
+            <span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="event.stopPropagation();deleteTaskFromList('${t.id}')" title="Sil">🗑</span>
           </span>
         </div>`).join('')}</div></div>`;
   }
   const filterBadge = filter ? `<span class="badge" style="background:var(--primary-bg);color:var(--primary);cursor:pointer" onclick="showPage('tasks')">Filtrelendi — temizlemek için tıkla ✕</span>` : '';
   document.getElementById('main').innerHTML = `
     <div class="page-head"><div><h1>Görevler</h1><p>${tasks.length} açık görev ${filterBadge}</p></div></div>
-    ${section('🔴 Overdue', overdue, 'var(--red)')}
-    ${section('🟡 Today', todayT, 'var(--amber)')}
-    ${section('🟢 Upcoming', upcoming, 'var(--green)')}
-    ${section('No date', noDate, 'var(--muted)')}
+    ${section('🔴 Geciken', overdue, 'var(--red)')}
+    ${section('🟡 Bugün', todayT, 'var(--amber)')}
+    ${section('🟢 Yaklaşan', upcoming, 'var(--green)')}
+    ${section('Tarihsiz', noDate, 'var(--muted)')}
     ${tasks.length===0?'<div class="empty">Bu görünümle eşleşen görev yok.</div>':''}
   `;
 }
+function downloadBlob(content, filename, type){
+  const url = URL.createObjectURL(new Blob([content], { type }));
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+// Excel Türkçe karakterleri doğru açsın diye BOM + noktalı virgül ayraç.
+function exportCompaniesCsv(){
+  const cols = [
+    ['Şirket', c=>c.name], ['Sektör', c=>c.industry], ['Ülke', c=>c.country], ['Website', c=>c.website],
+    ['Kaynak', c=>c.lead_source], ['Aşama', c=>c.current_stage ? trStage(c.current_stage) : ''],
+    ['Tahmini MRR (₺)', c=>c.current_mrr], ['Lead Score', c=>c.lead_score], ['Durum', c=>c.is_customer ? 'Müşteri' : 'Aday'],
+    ['Öncelik', c=>({High:'Yüksek',Normal:'Normal',Low:'Düşük'})[c.priority] || c.priority || ''], ['Eklenme', c=>c.created_at ? localDateStr(new Date(c.created_at)) : ''],
+  ];
+  const cell = v => { const t = v==null ? '' : String(v); return /[;"\n\r]/.test(t) ? '"' + t.replace(/"/g,'""') + '"' : t; };
+  const rows = [cols.map(c=>c[0]).join(';'), ...companies.map(c => cols.map(([,f]) => cell(f(c))).join(';'))];
+  downloadBlob('\uFEFF' + rows.join('\r\n'), `ahoraclario-sirketler-${localDateStr()}.csv`, 'text/csv;charset=utf-8');
+}
+async function downloadFullBackup(btn){
+  btn.disabled = true; const label = btn.textContent; btn.textContent = 'Hazırlanıyor…';
+  const d = await api('exportData');
+  btn.disabled = false; btn.textContent = label;
+  if(!d.success) return;
+  const counts = Object.entries(d.data).map(([t, rows]) => `${t}: ${rows.length}`).join(', ');
+  downloadBlob(JSON.stringify(d, null, 2), `ahoraclario-yedek-${localDateStr()}.json`, 'application/json');
+  toast('✓ Yedek indirildi — ' + counts);
+}
+// ══ WhatsApp ══
+// Türkiye numaraları: 0532..., 532..., +90 532... → 90532...
+function waNumber(phone){
+  let d = String(phone||'').replace(/\D/g,'');
+  if(d.startsWith('00')) d = d.slice(2);
+  if(d.length === 11 && d.startsWith('0')) d = '90' + d.slice(1);
+  else if(d.length === 10 && d.startsWith('5')) d = '90' + d;
+  return d.length >= 10 ? d : '';
+}
+function whatsappButton(contact, companyId, opportunityId){
+  const n = waNumber(contact?.phone);
+  if(!n) return '';
+  return `<span style="cursor:pointer;font-size:11px;color:#25D366;white-space:nowrap;margin-left:6px" title="WhatsApp'ta yaz ve aktivite olarak kaydet" onclick="event.stopPropagation();openWhatsApp('${n}','${contact.id}','${companyId}','${opportunityId||''}')">💬 WhatsApp</span>`;
+}
+function openWhatsApp(number, contactId, companyId, opportunityId){
+  window.open('https://wa.me/' + number, '_blank', 'noopener');   // açılır pencere engellenmesin diye önce sekme açılır
+  api('addActivity', { companyId, contactId, opportunityId: opportunityId || null, activityType:'whatsapp_message' })
+    .then(d => { if(d.success){ toast('✓ WhatsApp mesajı aktiviteye kaydedildi'); refreshOpenPanels(); } });
+}
+
+// ══ Takvim ══
+function meetingTimes(m){
+  const date = String(m.meeting_date).replace(/-/g,'');
+  if(!m.start_time) return { allDay:true, date, next: localDateStr(new Date(new Date(m.meeting_date+'T12:00:00').getTime()+86400000)).replace(/-/g,'') };
+  const st = String(m.start_time).slice(0,5), en = m.end_time ? String(m.end_time).slice(0,5) : null;
+  const start = new Date(`${m.meeting_date}T${st}:00+03:00`);
+  const end = en ? new Date(`${m.meeting_date}T${en}:00+03:00`) : new Date(start.getTime()+3600000);
+  const utc = d => d.toISOString().replace(/[-:]/g,'').slice(0,15)+'Z';
+  return { allDay:false, start: utc(start), end: utc(end > start ? end : new Date(start.getTime()+3600000)) };
+}
+function meetingTitle(m, companyName){ return `${trLabel(m.type)} — ${companyName||''}: ${m.title}`; }
+function calendarButtons(m, companyName){
+  const t = meetingTimes(m);
+  const dates = t.allDay ? `${t.date}/${t.next}` : `${t.start}/${t.end}`;
+  const g = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(meetingTitle(m, companyName)) + '&dates=' + dates + (m.notes ? '&details=' + encodeURIComponent(m.notes) : '');
+  return `<a href="${escAttr(g)}" target="_blank" rel="noopener" title="Google Takvim'e ekle" style="font-size:12px;text-decoration:none">📅</a>`
+    + `<span style="cursor:pointer;font-size:11px;color:var(--muted)" title="Outlook / Apple Takvim için .ics indir" data-m="${escAttr(JSON.stringify({id:m.id,meeting_date:m.meeting_date,start_time:m.start_time,end_time:m.end_time,title:m.title,type:m.type,notes:m.notes||''}))}" data-c="${escAttr(companyName||'')}" onclick="downloadIcs(this)">.ics</span>`;
+}
+function downloadIcs(el){
+  const m = JSON.parse(el.dataset.m), t = meetingTimes(m);
+  const esc2 = v => String(v||'').replace(/[\\;,]/g, x => '\\' + x).replace(/\n/g, '\\n');
+  const lines = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Ahoraclario//CRM//TR','BEGIN:VEVENT',
+    `UID:${m.id}@ahoraclario`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g,'').slice(0,15)}Z`,
+    ...(t.allDay ? [`DTSTART;VALUE=DATE:${t.date}`, `DTEND;VALUE=DATE:${t.next}`] : [`DTSTART:${t.start}`, `DTEND:${t.end}`]),
+    `SUMMARY:${esc2(meetingTitle(m, el.dataset.c))}`, ...(m.notes ? [`DESCRIPTION:${esc2(m.notes)}`] : []),
+    'END:VEVENT','END:VCALENDAR'];
+  downloadBlob(lines.join('\r\n'), `toplanti-${m.meeting_date}.ics`, 'text/calendar;charset=utf-8');
+}
+
+// ══ Excel / CSV'den içe aktarma ══
+const IMPORT_FIELDS = {
+  name: ['şirket','şirket adı','firma','firma adı','company','company name','name'],
+  industry: ['sektör','industry'], country: ['ülke','country'],
+  website: ['website','web','web sitesi','site'], lead_source: ['kaynak','source','lead source'],
+  priority: ['öncelik','priority'], research_notes: ['not','notlar','notes','açıklama'],
+  stage: ['aşama','stage'], estimated_mrr: ['tahmini mrr (₺)','tahmini mrr','mrr','tutar'],
+  contact_name: ['kişi','kişi adı','yetkili','ad soyad','contact','contact name'],
+  contact_email: ['e-posta','eposta','email','e-mail','mail'],
+  contact_phone: ['telefon','tel','phone','gsm','cep'],
+  contact_position: ['pozisyon','unvan','ünvan','title','position'],
+};
+function parseCsv(text){
+  text = text.replace(/^\uFEFF/, '');
+  const first = text.split(/\r?\n/)[0] || '';
+  const delim = [';', ',', '\t'].sort((a,b) => first.split(b).length - first.split(a).length)[0];
+  const rows = []; let row = [], cur = '', q = false;
+  for(let i=0; i<text.length; i++){
+    const ch = text[i];
+    if(q){
+      if(ch === '"'){ if(text[i+1] === '"'){ cur += '"'; i++; } else q = false; }
+      else cur += ch;
+    } else if(ch === '"') q = true;
+    else if(ch === delim){ row.push(cur); cur = ''; }
+    else if(ch === '\n' || ch === '\r'){
+      if(ch === '\r' && text[i+1] === '\n') i++;
+      row.push(cur); cur = ''; if(row.some(c => c.trim() !== '')) rows.push(row); row = [];
+    } else cur += ch;
+  }
+  row.push(cur); if(row.some(c => c.trim() !== '')) rows.push(row);
+  return rows;
+}
+function mapImportRows(table){
+  const header = (table[0]||[]).map(h => h.trim().toLocaleLowerCase('tr-TR'));
+  const colOf = {};
+  for(const [field, names] of Object.entries(IMPORT_FIELDS)){
+    const idx = header.findIndex(h => names.includes(h));
+    if(idx >= 0) colOf[field] = idx;
+  }
+  const stageByLabel = {}; Object.entries(STAGE_LABELS_TR).forEach(([k,v]) => { stageByLabel[v.toLocaleLowerCase('tr-TR')] = k; stageByLabel[k.toLowerCase()] = k; });
+  const prio = v => ({'yüksek':'High','high':'High','düşük':'Low','low':'Low'})[String(v||'').trim().toLocaleLowerCase('tr-TR')] || 'Normal';
+  const rows = table.slice(1).map(r => {
+    const o = {};
+    for(const [f, i] of Object.entries(colOf)) o[f] = (r[i] ?? '').trim();
+    if(o.priority !== undefined) o.priority = prio(o.priority);
+    if(o.stage !== undefined) o.stage = stageByLabel[String(o.stage).toLocaleLowerCase('tr-TR')] || 'Prospect';
+    return o;
+  }).filter(o => o.name);
+  return { rows, found: Object.keys(colOf) };
+}
+let importRows = [];
+function openImportModal(){
+  importRows = [];
+  document.getElementById('importBody').innerHTML = `
+    <p style="font-size:12.5px;color:var(--muted);margin:0 0 10px">Excel'de dosyanı <b>"CSV UTF-8"</b> olarak kaydedip buradan seç. İlk satır başlık olmalı; en az <b>Şirket</b> sütunu gerekli.
+    Tanınan diğer sütunlar: Sektör, Ülke, Website, Kaynak, Öncelik, Aşama, Tahmini MRR, Not, Kişi, E-posta, Telefon, Pozisyon.
+    Aynı isimde kayıtlı şirketler atlanır. "Excel'e Aktar" ile indirdiğin dosya da doğrudan içe aktarılabilir.</p>
+    <p style="margin:0 0 14px"><span style="cursor:pointer;color:var(--primary);font-size:12px" onclick="downloadImportTemplate()">⬇ Örnek şablonu indir</span></p>
+    <input type="file" accept=".csv,text/csv" onchange="previewImport(this.files[0])">
+    <div id="importPreview" style="margin-top:14px"></div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeImportModal()">Vazgeç</button>
+      <button class="btn-add" id="importGo" disabled onclick="runImport(this)">İçe Aktar</button>
+    </div>`;
+  document.getElementById('importModal').classList.add('open');
+}
+function closeImportModal(){ document.getElementById('importModal').classList.remove('open'); }
+function downloadImportTemplate(){
+  const rows = ['Şirket;Sektör;Ülke;Website;Kaynak;Öncelik;Aşama;Tahmini MRR;Kişi;E-posta;Telefon;Pozisyon;Not',
+                'Örnek Vize Danışmanlık;Vize Danışmanlığı;Türkiye;ornekvize.com;LinkedIn;Yüksek;Aday;15000;Ayşe Yılmaz;ayse@ornekvize.com;0532 000 00 00;Kurucu;Excel ile müşteri takibi yapıyor'];
+  downloadBlob('\uFEFF' + rows.join('\r\n'), 'ahoraclario-ice-aktarma-sablonu.csv', 'text/csv;charset=utf-8');
+}
+async function previewImport(file){
+  const box = document.getElementById('importPreview'), go = document.getElementById('importGo');
+  go.disabled = true; importRows = [];
+  if(!file) return;
+  if(/\.xlsx?$/i.test(file.name)){ box.innerHTML = '<div style="color:var(--red);font-size:12.5px">Bu bir Excel dosyası. Excel\'de "Farklı Kaydet → CSV UTF-8" seçip tekrar dene.</div>'; return; }
+  const { rows, found } = mapImportRows(parseCsv(await file.text()));
+  if(!found.includes('name')){ box.innerHTML = '<div style="color:var(--red);font-size:12.5px">"Şirket" sütunu bulunamadı. İlk satırda sütun başlıkları olmalı.</div>'; return; }
+  const existing = new Set(companies.map(c => String(c.name||'').trim().toLocaleLowerCase('tr-TR')));
+  const dup = rows.filter(r => existing.has(r.name.toLocaleLowerCase('tr-TR'))).length;
+  importRows = rows;
+  box.innerHTML = `<div style="font-size:12.5px;margin-bottom:8px"><b>${rows.length}</b> satır okundu${dup?` · <span style="color:var(--amber)">${dup} şirket zaten kayıtlı, atlanacak</span>`:''}</div>
+    <div class="tbl-wrap" style="max-height:220px;overflow:auto"><table><thead><tr><th>Şirket</th><th>Sektör</th><th>Aşama</th><th>Kişi</th><th>Telefon</th></tr></thead><tbody>
+    ${rows.slice(0,8).map(r=>`<tr><td><b>${esc(r.name)}</b></td><td>${esc(r.industry||'—')}</td><td>${esc(trStage(r.stage||'Prospect'))}</td><td>${esc(r.contact_name||'—')}</td><td>${esc(r.contact_phone||'—')}</td></tr>`).join('')}
+    </tbody></table></div>${rows.length>8?`<div style="font-size:11px;color:var(--muted);margin-top:4px">… ve ${rows.length-8} satır daha</div>`:''}`;
+  go.disabled = rows.length - dup <= 0;
+  go.textContent = `${Math.max(0, rows.length - dup)} Şirketi İçe Aktar`;
+}
+async function runImport(btn){
+  btn.disabled = true; let created = 0, skipped = 0;
+  for(let i=0; i<importRows.length; i+=200){
+    btn.textContent = `Aktarılıyor… ${Math.min(i+200, importRows.length)}/${importRows.length}`;
+    const d = await api('importCompanies', { rows: importRows.slice(i, i+200) });
+    if(!d.success){ btn.disabled = false; btn.textContent = 'Tekrar Dene'; return; }
+    created += d.created; skipped += (d.skipped||[]).length;
+  }
+  closeImportModal();
+  toast(`✓ ${created} şirket içe aktarıldı${skipped?` · ${skipped} tanesi zaten kayıtlıydı`:''}`);
+  rerenderCurrentPage();
+}
+
+// ══ E-posta (Gmail'de hazır açılır, CRM kaydeder) ══
+const EMAIL_TEMPLATES = {
+  blank: { label:'Boş', subject:'', body:'' },
+  intro: { label:'İlk tanışma', subject:'{sirket} için müşteri takibini kolaylaştırmak', body:'Merhaba {ad},\n\n{sirket} tarafında müşteri ve başvuru takibini nasıl yaptığınızı merak ettim. Ahoraclario ile vize ve danışmanlık firmalarının tüm süreci tek ekrandan yönetmesine yardımcı oluyoruz.\n\nBu hafta 15 dakikalık kısa bir görüşme için uygun musunuz?\n\nİyi çalışmalar,\n{ben}' },
+  followup: { label:'Follow-up', subject:'Önceki mesajım hakkında', body:'Merhaba {ad},\n\nGeçen hafta gönderdiğim mesaja dönmek istedim. Uygun olduğunuz bir zaman olursa kısa bir görüşme ayarlayabiliriz.\n\nİyi çalışmalar,\n{ben}' },
+  proposal: { label:'Teklif hatırlatma', subject:'{sirket} teklifi hakkında', body:'Merhaba {ad},\n\nGönderdiğim teklifi inceleme fırsatınız oldu mu? Aklınıza takılan bir şey varsa memnuniyetle yanıtlarım.\n\nİyi çalışmalar,\n{ben}' },
+  demo: { label:'Demo sonrası teşekkür', subject:'Demo için teşekkürler', body:'Merhaba {ad},\n\nBugünkü demo için zaman ayırdığınız için teşekkür ederim. Konuştuğumuz konuların özetini ve sonraki adımları aşağıda paylaşıyorum:\n\n- \n\nİyi çalışmalar,\n{ben}' },
+};
+let emailCtx = null;
+function emailButton(contact, companyId, opportunityId, companyName){
+  if(!contact?.email) return '';
+  return `<span style="cursor:pointer;font-size:11px;color:var(--blue);white-space:nowrap;margin-left:6px" title="E-posta yaz" data-ctx="${escAttr(JSON.stringify({contactId:contact.id, name:contact.full_name||'', email:contact.email, companyId, opportunityId:opportunityId||null, companyName:companyName||''}))}" onclick="event.stopPropagation();openEmailModal(JSON.parse(this.dataset.ctx))">✉️ E-posta</span>`;
+}
+function openEmailModal(ctx){
+  emailCtx = ctx;
+  document.getElementById('em-to').value = `${ctx.name} <${ctx.email}>`;
+  document.getElementById('em-tpl').innerHTML = Object.entries(EMAIL_TEMPLATES).map(([k,t])=>`<option value="${k}">${t.label}</option>`).join('');
+  applyEmailTemplate('blank');
+  document.getElementById('emailModal').classList.add('open');
+}
+function applyEmailTemplate(key){
+  const t = EMAIL_TEMPLATES[key] || EMAIL_TEMPLATES.blank;
+  const first = String(emailCtx?.name||'').split(/\s+/)[0] || '';
+  const fill = v => v.replace(/\{ad\}/g, first).replace(/\{sirket\}/g, emailCtx?.companyName || '').replace(/\{ben\}/g, CU?.name || '');
+  document.getElementById('em-subject').value = fill(t.subject);
+  document.getElementById('em-body').value = fill(t.body);
+}
+function closeEmailModal(){ document.getElementById('emailModal').classList.remove('open'); emailCtx = null; }
+function sendEmailViaGmail(){
+  const subject = document.getElementById('em-subject').value.trim();
+  const body = document.getElementById('em-body').value;
+  if(!subject){ toast('Konu zorunludur'); return; }
+  const ctx = emailCtx;
+  const url = 'https://mail.google.com/mail/?view=cm&fs=1&to=' + encodeURIComponent(ctx.email) + '&su=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body) + (CU?.email ? '&authuser=' + encodeURIComponent(CU.email) : '');
+  window.open(url, '_blank', 'noopener');     // açılır pencere engellenmesin diye önce sekme açılır
+  closeEmailModal();
+  api('addActivity', { companyId: ctx.companyId, contactId: ctx.contactId, opportunityId: ctx.opportunityId, activityType:'email_sent', description:`E-posta gönderildi: ${subject}` })
+    .then(d => { if(d.success){ toast(`✓ Kaydedildi — ${d.followUpsCreated||0} follow-up görevi planlandı`); refreshOpenPanels(); } });
+}
+
+// ══ Sabah özeti ══
+async function sendTestDigest(btn){
+  btn.disabled = true;
+  const d = await api('sendTestDigest');
+  btn.disabled = false;
+  if(d.success) toast('✓ Test özeti gönderildi: ' + d.to);
+}
+
+// ══ Müşteri CRM bağlantıları ══
+function toggleNewProjectForm(){
+  const f = document.getElementById('newProjectForm');
+  f.classList.toggle('hidden');
+  if(!f.classList.contains('hidden')){
+    api('getCompanies').then(d => {
+      if(!d.success) return;
+      const list = d.companies.slice().sort((a,b)=> (b.is_customer?1:0)-(a.is_customer?1:0) || a.name.localeCompare(b.name,'tr'));
+      document.getElementById('np-company').innerHTML = '<option value="">— Şirket seç —</option>' + list.map(c=>`<option value="${c.id}">${esc(c.name)}${c.is_customer?' (müşteri)':''}</option>`).join('');
+    });
+  }
+}
+async function loadClientProjects(){
+  const box = document.getElementById('projectsList');
+  if(!box) return;
+  const d = await api('getClientProjects');
+  if(!d.success){ box.innerHTML = '<div style="color:var(--muted);font-size:12px">Bağlantılar yüklenemedi. schema_faz9.sql çalıştırıldı mı?</div>'; return; }
+  const projects = d.projects || [];
+  box.innerHTML = projects.length ? `<div class="mini-list">${projects.map(p=>`
+    <div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;gap:10px;${p.is_active?'':'opacity:.5'}">
+      <div><b>${esc(p.name)}</b> <span style="color:var(--muted)">· ${esc(p.companies?.name||'')}</span><br>
+        <span style="font-size:10.5px;color:var(--muted)">Anahtar: ${esc(p.key_prefix||'')}… · ${p.last_used_at?'son kullanım '+fmtDT(p.last_used_at):'henüz kullanılmadı'}</span></div>
+      <span style="display:flex;gap:10px;flex-shrink:0;font-size:11px">
+        <span style="cursor:pointer;color:var(--primary)" onclick="rotateProjectKey('${p.id}')">Yeni anahtar</span>
+        <span style="cursor:pointer;color:${p.is_active?'var(--red)':'var(--green)'}" onclick="setProjectActive('${p.id}', ${!p.is_active})">${p.is_active?'Durdur':'Etkinleştir'}</span>
+      </span>
+    </div>`).join('')}</div>` : '<div style="color:var(--muted);font-size:12px">Henüz bağlantı yok.</div>';
+}
+function showApiKey(key, projectName){
+  document.getElementById('apiKeyBody').innerHTML = `
+    <p style="font-size:12.5px;margin:0 0 10px"><b>${esc(projectName)}</b> için API anahtarı. <span style="color:var(--amber)">Bu anahtar bir daha gösterilmez</span>; şimdi kopyala.</p>
+    <div class="fi"><label>AHORACLARIO_API_KEY</label><input readonly value="${escAttr(key)}" onclick="this.select()"></div>
+    <div class="fi"><label>AHORACLARIO_URL</label><input readonly value="${escAttr(EDGE_FUNCTION_URL)}" onclick="this.select()"></div>
+    <button class="btn-ghost" onclick="navigator.clipboard.writeText('${escAttr(key)}').then(()=>toast('✓ Anahtar kopyalandı'))">📋 Anahtarı kopyala</button>
+    <p style="font-size:11.5px;color:var(--muted);margin:12px 0 0">Bu iki değeri müşteri CRM'inin Supabase projesinde Edge Functions → Secrets'a aynı isimlerle ekle.</p>`;
+  document.getElementById('apiKeyModal').classList.add('open');
+}
+async function createClientProject(){
+  const companyId = document.getElementById('np-company').value, name = document.getElementById('np-name').value.trim();
+  if(!companyId || !name){ toast('Şirket ve proje adı zorunludur'); return; }
+  const d = await api('createClientProject', { companyId, name });
+  if(!d.success) return;
+  document.getElementById('newProjectForm').classList.add('hidden');
+  document.getElementById('np-name').value = '';
+  showApiKey(d.apiKey, d.project.name);
+  loadClientProjects();
+}
+async function rotateProjectKey(projectId){
+  if(!confirm('Yeni anahtar oluşturulursa eski anahtar hemen çalışmaz hale gelir. Devam edilsin mi?')) return;
+  const d = await api('rotateClientProjectKey', { projectId });
+  if(d.success){ showApiKey(d.apiKey, d.project.name); loadClientProjects(); }
+}
+async function setProjectActive(projectId, active){
+  const d = await api('setClientProjectActive', { projectId, active });
+  if(d.success){ toast(active ? '✓ Bağlantı etkinleştirildi' : '⏸ Bağlantı durduruldu'); loadClientProjects(); }
+}
+
+// ══ Destek talepleri ══
+const TICKET_OPEN = ['Open','In Progress','Waiting'];
+const TICKET_TR = { Open:'Açık', 'In Progress':'İnceleniyor', Waiting:'Müşteri bekleniyor', Resolved:'Çözüldü', Closed:'Kapandı',
+  Low:'Düşük', Normal:'Normal', High:'Yüksek', Urgent:'Acil', Bug:'Hata', Question:'Soru', Request:'İstek', Other:'Diğer' };
+const TICKET_COLORS = { Open:'#3B82F6', 'In Progress':'#F59E0B', Waiting:'#A78BFA', Resolved:'#39D98A', Closed:'#596579', Urgent:'#F87171', High:'#F59E0B', Normal:'#8B9AAF', Low:'#596579' };
+function ticketStatusBadge(v){ const c = TICKET_COLORS[v]||'#8B9AAF'; return `<span class="badge" style="background:${c}22;color:${c};white-space:nowrap">${TICKET_TR[v]||esc(v)}</span>`; }
+let currentTicketId = null, ticketFilter = 'open';
+async function renderTickets(filter){
+  if(filter) ticketFilter = filter;
+  const d = await api('getTickets', { filter: ticketFilter });
+  const main = document.getElementById('main');
+  if(!d.success){ main.innerHTML = '<div class="empty">Talepler yüklenemedi. schema_faz9.sql çalıştırıldı mı?<br><span style="cursor:pointer;color:var(--primary)" onclick="renderTickets()">↻ Tekrar Dene</span></div>'; return; }
+  const t = d.tickets;
+  const tab = (k,l) => `<span class="badge" style="cursor:pointer;padding:6px 12px;${ticketFilter===k?'background:var(--primary-bg);color:var(--primary)':'background:var(--surface-2);color:var(--muted)'}" onclick="renderTickets('${k}')">${l}</span>`;
+  main.innerHTML = `
+    <div class="page-head"><div><h1>🎫 Destek Talepleri</h1><p>Müşteri CRM'lerinden gelen talepler · ${t.length} kayıt</p></div>
+      <div style="display:flex;gap:6px;align-items:center">${tab('open','Açık')}${tab('closed','Çözülen')}${tab('all','Tümü')}</div></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>#</th><th>Şirket</th><th>Başlık</th><th>Kategori</th><th>Öncelik</th><th>Durum</th><th>Açan</th><th>Tarih</th></tr></thead>
+      <tbody>${t.length===0?`<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--muted)">${ticketFilter==='open'?'Açık talep yok 🎉':'Talep yok'}</td></tr>`:t.map(x=>`
+        <tr class="row-click" onclick="openTicketPanel('${x.id}')">
+          <td style="color:var(--muted)">#${x.ticket_no}</td>
+          <td><b>${esc(x.companies?.name||'—')}</b><div style="font-size:10.5px;color:var(--muted)">${esc(x.client_projects?.name||'')}</div></td>
+          <td>${esc(x.title)}</td>
+          <td>${TICKET_TR[x.category]||esc(x.category)}</td>
+          <td>${ticketStatusBadge(x.priority)}</td>
+          <td>${ticketStatusBadge(x.status)}</td>
+          <td style="color:var(--muted)">${esc(x.reporter_name||'—')}</td>
+          <td style="color:var(--muted)">${fmtDT(x.created_at)}</td>
+        </tr>`).join('')}</tbody>
+    </table></div>`;
+}
+async function openTicketPanel(ticketId){
+  const d = await api('getTicketDetail', { ticketId });
+  if(!d.success) return;
+  currentTicketId = ticketId;
+  const t = d.ticket;
+  const opt = (list, cur) => list.map(v=>`<option value="${v}" ${cur===v?'selected':''}>${TICKET_TR[v]}</option>`).join('');
+  document.getElementById('ticketPanel').innerHTML = `
+    <div class="panel-top">
+      <div>
+        <div style="font-size:11px;color:var(--muted);cursor:pointer" onclick="openCompanyPanel('${t.company_id}')">🏢 ${esc(t.companies?.name||'')} · ${esc(t.client_projects?.name||'')}</div>
+        <h2 style="margin:6px 0 4px">#${t.ticket_no} ${esc(t.title)}</h2>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">${ticketStatusBadge(t.status)}${ticketStatusBadge(t.priority)}<span class="badge" style="background:var(--surface-2);color:var(--muted)">${TICKET_TR[t.category]||esc(t.category)}</span></div>
+      </div>
+      <button class="panel-close" onclick="closeTicketPanel()">✕</button>
+    </div>
+    <div class="ps"><div class="ps-body">
+      <div class="fi-row">
+        <div class="fi"><label>Durum</label><select onchange="updateTicketField('${t.id}','status',this.value)">${opt(['Open','In Progress','Waiting','Resolved','Closed'], t.status)}</select></div>
+        <div class="fi"><label>Öncelik</label><select onchange="updateTicketField('${t.id}','priority',this.value)">${opt(['Low','Normal','High','Urgent'], t.priority)}</select></div>
+      </div>
+      <div style="font-size:11.5px;color:var(--muted)">Açan: <b style="color:var(--text)">${esc(t.reporter_name||'—')}</b>${t.reporter_email?` · <a href="mailto:${escAttr(t.reporter_email)}" style="color:var(--primary)">${esc(t.reporter_email)}</a>`:''} · ${fmtDT(t.created_at)}${t.external_ref?` · Ref: ${esc(t.external_ref)}`:''}</div>
+    </div></div>
+    <div class="ps"><div class="ps-head">Talep</div><div class="ps-body" style="white-space:pre-wrap;font-size:13px">${esc(t.description||'(açıklama yok)')}</div></div>
+    <div class="ps"><div class="ps-head">Yazışma (${d.messages.length})</div><div class="ps-body">
+      ${d.messages.length ? d.messages.map(m=>`
+        <div style="margin-bottom:10px;padding:10px 12px;border-radius:10px;font-size:12.5px;white-space:pre-wrap;${m.author_type==='staff'?'background:var(--primary-bg);margin-left:30px':'background:var(--surface-2);margin-right:30px'}">
+          <div style="font-size:10.5px;color:var(--muted);margin-bottom:4px">${esc(m.author_name||'')} · ${fmtDT(m.created_at)}</div>${esc(m.body)}</div>`).join('') : '<div style="color:var(--muted);font-size:12px">Henüz yazışma yok.</div>'}
+      <div class="fi" style="margin-top:10px"><textarea id="tk-reply" rows="4" placeholder="Müşteriye cevap yaz… (müşteri kendi CRM'indeki Destek sayfasında görür)"></textarea></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-add" style="flex:1" onclick="replyTicket('${t.id}')">Cevapla</button>
+        <button class="btn-ghost" onclick="replyTicket('${t.id}','Resolved')">Cevapla ve Çözüldü yap</button>
+      </div>
+    </div></div>`;
+  openSidePanel('ticketOverlay');
+}
+function closeTicketPanel(){ document.getElementById('ticketOverlay').classList.remove('open'); currentTicketId = null; refreshBackgroundIfDirty(); }
+async function replyTicket(ticketId, status){
+  const message = document.getElementById('tk-reply').value.trim();
+  if(!message){ toast('Mesaj boş olamaz'); return; }
+  const d = await api('replyTicket', { ticketId, message, status });
+  if(d.success){ toast(status==='Resolved' ? '✓ Cevaplandı ve çözüldü olarak işaretlendi' : '✓ Cevap gönderildi'); openTicketPanel(ticketId); }
+}
+async function updateTicketField(ticketId, field, value){
+  const d = await api('updateTicket', { ticketId, [field]: value });
+  if(d.success){ toast('✓ Talep güncellendi'); openTicketPanel(ticketId); }
+}
+
+function rerenderCurrentPage(){ if(lastPageArgs) showPage(...lastPageArgs); }
 async function completeTaskFromList(taskId){
   const d = await api('completeTask', { taskId });
-  if(d.success){ toast('✓ Tamamlandı'); renderTasks(); }
+  if(d.success){ toast('✓ Tamamlandı'); rerenderCurrentPage(); }
 }
 async function deleteTaskFromList(taskId){
   if(!confirm('Bu görevi sil?')) return;
   const d = await api('deleteTask', { taskId });
-  if(d.success){ toast('🗑 Task deleted'); renderTasks(); }
+  if(d.success){ toast('🗑 Görev silindi'); rerenderCurrentPage(); }
 }
 
-// ── Yardımcılar ──
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function escAttr(s){ return esc(s); }
-// Kullanıcının girdiği bir URL'yi (LinkedIn, Website vb.) güvenle tıklanabilir link yapar.
-// Sadece http/https şemasına izin verir — "javascript:..." gibi tehlikeli şemaları engeller.
 function safeLink(url, label){
   const u = String(url||'').trim();
-  if(!/^https?:\/\//i.test(u)) return esc(label);  // güvensiz/eksik şema — düz metin olarak göster, link yapma
+  if(!/^https?:\/\//i.test(u)) return esc(label);
   return `<a href="${escAttr(u)}" target="_blank" rel="noopener noreferrer">${esc(label)}</a>`;
 }
-// Tarayıcının yerel saatine göre "YYYY-MM-DD". toISOString() UTC verdiği için gece 00:00–03:00 arası bir önceki günü döndürüyordu.
 function localDateStr(d=new Date()){ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 function fmtDT(iso){ if(!iso) return '—'; const d=new Date(iso); return d.toLocaleDateString('tr-TR')+' '+d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}); }
 function daysSince(iso){ if(!iso) return 0; return Math.max(0, Math.floor((Date.now()-new Date(iso).getTime())/86400000)); }
@@ -2123,19 +2522,15 @@ function initials(name){
   return (first+last).toUpperCase();
 }
 function leadScoreColor(score){
-  if(score>=70) return '#39D98A';   // yüksek — yeşil
-  if(score>=40) return '#F59E0B';   // orta — amber
-  return '#8B9AAF';                 // düşük — var(--muted) ile birebir
+  if(score>=70) return '#39D98A';
+  if(score>=40) return '#F59E0B';
+  return '#8B9AAF';
 }
 </script>
 </body>
 </html>
 
 <style id="ahoraclario-sidebar-reference-exact">
-/* =========================================================
-   AHORACLARIO SIDEBAR — REFERENCE IMAGE MATCH
-   Visual-only override. Does not change page/data logic.
-   ========================================================= */
 :root{
   --sidebar-ref-bg:#010B17;
   --sidebar-ref-border:#102338;
@@ -2253,18 +2648,13 @@ function leadScoreColor(score){
   font-size:10px !important;
 }
 
-/* The reference uses compact line icons. Keep the existing icon glyphs
-   readable and visually subordinate until SVG icons are wired in. */
 .nav-item::first-letter{
   font-size:12px;
 }
 
-/* Prevent the narrower reference sidebar from being visually swallowed
-   by the main content. */
 .app-shell > .sidebar + *{
   min-width:0;
 }
-/* ── Şirket dosyaları ── */
 .file-drop{border:1.5px dashed var(--border);border-radius:10px;padding:14px;text-align:center;font-size:12px;color:var(--muted);cursor:pointer;transition:background .15s,border-color .15s;margin-bottom:10px}
 .file-drop:hover,.file-drop.dragover{border-color:var(--primary);background:var(--primary-bg);color:var(--primary)}
 .file-row{display:flex;align-items:center;gap:10px}
@@ -2274,8 +2664,6 @@ function leadScoreColor(score){
 .file-row .file-name:hover{color:var(--primary)}
 .file-row .file-sub{font-size:10.5px;color:var(--muted);margin-top:2px}
 .file-upload-status{font-size:11.5px;color:var(--muted);margin-bottom:8px}
-/* Drilldown listesi sağdan açılan detay panellerinin (z-index:200) ALTINDA kalsın:
-   listeden bir kayıt açılınca panel üste gelir, liste arkada açık bekler;
-   panel kapatılınca liste tekrar görünür, istersen onu ayrıca kapatırsın. */
 #drilldownOverlay{z-index:150}
+button:disabled{opacity:.45;cursor:not-allowed}
 </style>
