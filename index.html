@@ -24,9 +24,6 @@
   --red:#F87171; --red-bg:rgba(248,113,113,0.14); --red-glow:rgba(248,113,113,0.10);
   --glow-primary:0 0 0 1px rgba(57,217,138,0.15), 0 8px 24px rgba(57,217,138,0.10);
   --glow-blue:0 0 0 1px rgba(59,130,246,0.15), 0 8px 24px rgba(59,130,246,0.10);
-  --stage-prospect:#64748B; --stage-researched:#3B82F6; --stage-contacted:#22D3EE;
-  --stage-replied:#38BDF8; --stage-discovery:#818CF8; --stage-demo:#A78BFA;
-  --stage-proposal:#C084FC; --stage-negotiation:#F59E0B; --stage-won:#39D98A; --stage-lost:#F87171;
   --chart-green:#39D98A; --chart-cyan:#22D3EE; --chart-blue:#3B82F6; --chart-purple:#A78BFA; --chart-amber:#F59E0B;
   --ink:var(--text); --line:var(--border); --card:var(--surface);
 }
@@ -148,13 +145,6 @@ tr.row-click:hover{background:var(--surface-2)}
 .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .donut-legend-row .val{margin-left:auto;font-weight:700;color:var(--text)}
 
-.mini-kanban{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
-.mini-col{flex:0 0 148px}
-.mini-col-head{font-size:10.5px;font-weight:700;padding:6px 9px;border-radius:7px 7px 0 0;color:#07110C}
-.mini-col-body{background:var(--bg-raised);border:1px solid var(--border-subtle);border-top:none;border-radius:0 0 7px 7px;min-height:50px;padding:6px;display:flex;flex-direction:column;gap:6px}
-.mini-card{background:var(--surface);border:1px solid var(--border-subtle);border-radius:6px;padding:7px 8px;font-size:10.5px;cursor:pointer}
-.mini-card:hover{border-color:var(--border)}
-.mini-card b{display:block;font-size:10.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 .side-card{background:var(--surface);border:1px solid var(--border-subtle);border-radius:12px;padding:15px}
 .side-card-head{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:11px}
@@ -313,6 +303,168 @@ tr.row-click:hover{background:var(--surface-2)}
 @keyframes spotPulse{0%,100%{box-shadow:0 0 0 2px var(--primary),0 14px 36px rgba(57,217,138,.35)}50%{box-shadow:0 0 0 5px rgba(57,217,138,.45),0 18px 44px rgba(57,217,138,.5)}}
 .spot-empty{font-size:12px;color:var(--amber);padding:0 4px}
 </style>
+<style id="ahoraclario-sidebar-reference-exact">
+:root{
+  --sidebar-ref-bg:#010B17;
+  --sidebar-ref-border:#102338;
+  --sidebar-ref-text:#9CB1C9;
+  --sidebar-ref-muted:#6F87A3;
+  --sidebar-ref-active:#39D98A;
+  --sidebar-ref-active-bg:rgba(34,211,238,.075);
+  --sidebar-ref-hover:rgba(34,211,238,.055);
+  --sidebar-ref-badge-bg:#122842;
+  --sidebar-ref-badge-text:#B9CBE0;
+}
+
+.sidebar{
+  width:180px !important;
+  min-width:180px !important;
+  flex-basis:180px !important;
+  box-sizing:border-box !important;
+  background:var(--sidebar-ref-bg) !important;
+  border-right:1px solid var(--sidebar-ref-border) !important;
+  padding:0 8px 18px !important;
+}
+
+.sb-logo{
+  height:57px !important;
+  box-sizing:border-box !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:9px !important;
+  padding:0 10px !important;
+  margin:0 !important;
+}
+
+.sb-logo .mark{
+  width:31px !important;
+  height:31px !important;
+  min-width:31px !important;
+  border-radius:8px !important;
+  background:linear-gradient(145deg,#20C997 0%,#27DDB4 48%,#29B8E8 100%) !important;
+  color:#031016 !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+  box-shadow:0 7px 22px rgba(34,211,238,.14) !important;
+}
+
+.sb-logo b{
+  font-size:14px !important;
+  font-weight:700 !important;
+  color:#E7F0FA !important;
+  letter-spacing:-.15px !important;
+}
+
+.nav-item{
+  height:36px !important;
+  min-height:36px !important;
+  box-sizing:border-box !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:9px !important;
+  padding:0 9px !important;
+  margin:0 0 1px !important;
+  border:0 !important;
+  border-left:3px solid transparent !important;
+  border-radius:7px !important;
+  color:var(--sidebar-ref-text) !important;
+  background:transparent !important;
+  font-size:11.5px !important;
+  line-height:1 !important;
+  font-weight:500 !important;
+  letter-spacing:0 !important;
+  box-shadow:none !important;
+}
+
+.nav-item:hover{
+  color:#CFE1F4 !important;
+  background:var(--sidebar-ref-hover) !important;
+}
+
+.nav-item.active{
+  color:var(--sidebar-ref-active) !important;
+  background:linear-gradient(90deg,rgba(34,211,238,.115),rgba(34,211,238,.045)) !important;
+  border-left-color:var(--sidebar-ref-active) !important;
+  box-shadow:none !important;
+}
+
+.nav-item .nb{
+  margin-left:auto !important;
+  min-width:20px !important;
+  height:18px !important;
+  box-sizing:border-box !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  padding:0 5px !important;
+  border-radius:8px !important;
+  background:var(--sidebar-ref-badge-bg) !important;
+  color:var(--sidebar-ref-badge-text) !important;
+  font-size:9px !important;
+  font-weight:700 !important;
+  border:1px solid rgba(66,122,170,.18) !important;
+}
+
+.nav-item.active .nb{
+  background:rgba(57,217,138,.12) !important;
+  color:var(--sidebar-ref-active) !important;
+  border-color:rgba(57,217,138,.12) !important;
+}
+
+.sb-bottom{
+  padding-top:12px !important;
+  border-top:1px solid var(--sidebar-ref-border) !important;
+}
+
+.sb-tagline{
+  color:#617995 !important;
+  font-size:10px !important;
+}
+
+.nav-item::first-letter{
+  font-size:12px;
+}
+
+.file-drop{border:1.5px dashed var(--border);border-radius:10px;padding:14px;text-align:center;font-size:12px;color:var(--muted);cursor:pointer;transition:background .15s,border-color .15s;margin-bottom:10px}
+.file-drop:hover,.file-drop.dragover{border-color:var(--primary);background:var(--primary-bg);color:var(--primary)}
+.file-row{display:flex;align-items:center;gap:10px}
+.file-row .file-ic{font-size:18px;flex-shrink:0}
+.file-row .file-meta{flex:1;min-width:0}
+.file-row .file-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.file-row .file-name:hover{color:var(--primary)}
+.file-row .file-sub{font-size:10.5px;color:var(--muted);margin-top:2px}
+.file-upload-status{font-size:11.5px;color:var(--muted);margin-bottom:8px}
+#drilldownOverlay{z-index:150}
+button:disabled{opacity:.45;cursor:not-allowed}
+.co-tab{cursor:pointer;font-size:12px;padding:6px 12px;border-radius:20px;background:var(--surface-2);color:var(--muted);border:1px solid var(--border)}
+.co-tab.active{background:var(--primary-bg);color:var(--primary);border-color:transparent}
+.outcome-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:4px}
+.outcome-drop{border:1.5px dashed var(--oc);border-radius:10px;padding:10px 12px;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:2px 8px;background:color-mix(in srgb,var(--oc) 6%,transparent)}
+.outcome-drop b{color:var(--oc);font-size:12.5px}.outcome-drop span{font-weight:800;color:var(--oc)}
+.outcome-drop small{grid-column:1/-1;color:var(--muted);font-size:10.5px}
+.outcome-drop.dragover{background:color-mix(in srgb,var(--oc) 20%,transparent);border-style:solid}
+@media(max-width:900px){.outcome-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.join-btn{font-size:11px;font-weight:700;color:#07110C;background:var(--primary);padding:3px 9px;border-radius:6px;text-decoration:none;white-space:nowrap}
+.join-btn:hover{filter:brightness(1.1)}
+.cal-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+@media(max-width:1100px){.cal-layout{grid-template-columns:1fr}}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--border-subtle);border-top:1px solid var(--border-subtle)}
+.cal-dow{background:var(--surface);font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;padding:7px 8px}
+.cal-cell{background:var(--surface);min-height:96px;padding:5px 6px;cursor:pointer;overflow:hidden}
+.cal-cell:hover{background:var(--surface-2)}
+.cal-cell.out{opacity:.4}
+.cal-num{font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:3px}
+.cal-cell.today .cal-num{display:inline-block;background:var(--primary);color:#07110C;border-radius:10px;padding:0 7px}
+.cal-ev{font-size:10.5px;padding:2px 6px;border-radius:5px;margin-bottom:2px;background:color-mix(in srgb,var(--ev) 22%,transparent);color:var(--text);border-left:2px solid var(--ev);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-ev.done{opacity:.5;text-decoration:line-through}
+.cal-more{font-size:10px;color:var(--muted);padding-left:4px}
+.action-bar{display:flex;gap:8px;flex-wrap:wrap;margin:-2px 0 14px}
+.act-btn{font-size:12px;font-weight:600;padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);cursor:pointer;text-decoration:none;white-space:nowrap}
+.act-btn:hover{border-color:var(--primary);color:var(--primary)}
+.act-btn.primary{background:var(--primary);color:#07110C;border-color:transparent}
+.act-btn.primary:hover{filter:brightness(1.08);color:#07110C}
+.mini-act{cursor:pointer;font-size:11px;font-weight:600;white-space:nowrap;margin-left:6px;padding:3px 8px;border-radius:6px;border:1px solid currentColor}
+</style>
 </head>
 <body>
 
@@ -349,7 +501,7 @@ tr.row-click:hover{background:var(--surface-2)}
   <div class="content-area">
     <div class="topbar">
       <div class="search-box" style="position:relative">
-        🔍 <input id="globalSearch" placeholder="Şirket, kişi, fırsat ara..." oninput="onGlobalSearchInput()" onfocus="onGlobalSearchInput()" autocomplete="off"> <kbd>Esc</kbd>
+        🔍 <input id="globalSearch" placeholder="Şirket, kişi, fırsat ara..." oninput="onGlobalSearchInput(true)" onfocus="onGlobalSearchInput(false)" autocomplete="off"> <kbd>Esc</kbd>
         <div id="searchResults" class="search-dropdown hidden"></div>
       </div>
       <div class="topbar-right">
@@ -426,10 +578,21 @@ tr.row-click:hover{background:var(--surface-2)}
         <option value="Negotiation">Negotiation — pazarlık</option>
       </select>
     </div>
+    <details style="margin-bottom:10px"><summary style="cursor:pointer;font-size:12px;color:var(--primary);margin-bottom:8px">+ Daha fazla bilgi (isteğe bağlı)</summary>
+      <div class="fi-row">
+        <div class="fi"><label>Instagram</label><input id="nc-instagram" type="text"></div>
+        <div class="fi"><label>LinkedIn</label><input id="nc-linkedin" type="text"></div>
+      </div>
+      <div class="fi-row">
+        <div class="fi"><label>Şirket Büyüklüğü</label><input id="nc-size" type="text" placeholder="10-20"></div>
+        <div class="fi"><label>Mevcut CRM</label><input id="nc-crm" type="text" placeholder="Excel + WhatsApp"></div>
+      </div>
+      <div class="fi"><label>Ağrı Noktası</label><input id="nc-pain" type="text"></div>
+    </details>
     <div class="fi"><label>Not</label><textarea id="nc-notes" rows="2"></textarea></div>
     <div class="modal-actions">
       <button class="btn-ghost" onclick="closeAddCompanyModal()">Vazgeç</button>
-      <button class="btn-add" onclick="submitAddCompany()">Kaydet</button>
+      <button class="btn-add" id="nc-save" onclick="submitAddCompany()">Kaydet</button>
     </div>
   </div>
 </div>
@@ -437,7 +600,7 @@ tr.row-click:hover{background:var(--surface-2)}
 <div class="modal-overlay" id="editOppModal">
   <div class="modal">
     <h3>Anlaşma Detayları</h3>
-    <div class="fi"><label>Tahmini Anlaşma Değeri (₺)</label><input id="eo-mrr" type="number" placeholder="0"></div>
+    <div class="fi"><label>Tahmini MRR (₺/ay)</label><input id="eo-mrr" type="number" min="0" placeholder="0"></div>
     <div class="fi"><label>Plan</label><input id="eo-plan" type="text" placeholder="örn: Starter, Growth"></div>
     <div class="fi"><label>Tahmini Kapanış Tarihi</label><input id="eo-close" type="date"></div>
     <div class="modal-actions">
@@ -557,7 +720,7 @@ const STAGE_HINTS = {
 const TR_LABELS = {
   Discovery:'Tanışma', 'Follow-up':'Follow-up', Negotiation:'Pazarlık', Other:'Diğer',
   Scheduled:'Planlandı', Completed:'Tamamlandı', Cancelled:'İptal Edildi',
-  Call:'Arama', Meeting:'Toplantı', Research:'Araştırma',
+  Call:'Arama', Meeting:'Toplantı', Research:'Araştırma', Proposal:'Teklif', Demo:'Demo',
   Draft:'Taslak', Sent:'Gönderildi', Viewed:'Görüntülendi', Negotiating:'Pazarlıkta',
   Accepted:'Kabul Edildi', Rejected:'Reddedildi', Expired:'Süresi Doldu',
   Active:'Aktif', Inactive:'Pasif', Pending:'Beklemede', 'In Progress':'Devam Ediyor', Done:'Bitti',
@@ -567,6 +730,7 @@ const TR_LABELS = {
 };
 const LOST_REASONS = ['Too expensive','No need','No budget','Using another CRM','Bad timing','No response','Not decision maker','Competitor','Other'];
 function trLabel(v){ return TR_LABELS[v] || v; }
+const TASK_TYPES = ['Follow-up','Call','Meeting','Demo','Proposal','Research'];
 // Aşamalar ekranda İngilizce adlarıyla gösterilir; eski adlar (eski kayıtlar/aktiviteler) yeni karşılığına çevrilir.
 const STAGE_LABELS_TR = { Prospect:'Lead', Researched:'Lead', Replied:'Qualified', 'Discovery Call':'Meeting' };
 function trStage(v){ return STAGE_LABELS_TR[v] || v; }
@@ -576,10 +740,12 @@ let heartbeatInterval = null;
 let companies = [], opportunities = [], tasks = [];
 let currentPage = 'dashboard';
 
+let toastTimer = null;
 function toast(msg){
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2600);
+  clearTimeout(toastTimer);   // art arda gelen mesajda öncekinin zamanlayıcısı yenisini erken kapatmasın
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2600);
 }
 
 // ══════════════════════════════════════════════
@@ -623,6 +789,7 @@ function fetchFresh(action, params){
   if(cur && cur.gen === gen) return cur.pr;
   const pr = api(action, params).then(d => {
     if(inflight.get(k)?.pr === pr) inflight.delete(k);
+    if(!CU) return d;   // çıkış yapıldıktan sonra gelen yanıt önbelleğe yazılmaz
     if(d.success && gen !== cacheGen){
       if(!qcache.has(k)) qcache.set(k, { data:d, t:Date.now(), stale:true });
       return d;
@@ -692,9 +859,9 @@ function scheduleBackgroundRefresh(){
 function onCacheUpdated(k){
   if(pageKeys.has(k)) silentRerenderPage();
   const action = k.split('|')[0], params = JSON.parse(k.slice(action.length + 1));
-  if(action === 'getCompanyDetail' && isOpen('companyOverlay') && currentCompanyPanelId === params.companyId) silentRefreshPanel('companyOverlay', () => openCompanyPanel(params.companyId));
-  if(action === 'getOpportunityDetail' && isOpen('oppOverlay') && currentOppPanelId === params.opportunityId) silentRefreshPanel('oppOverlay', () => openOpportunityDetail(params.opportunityId));
-  if(action === 'getTicketDetail' && isOpen('ticketOverlay') && currentTicketId === params.ticketId) silentRefreshPanel('ticketOverlay', () => openTicketPanel(params.ticketId));
+  if(action === 'getCompanyDetail' && isOpen('companyOverlay') && currentCompanyPanelId === params.companyId) silentRefreshPanel('companyOverlay', () => openCompanyPanel(params.companyId, { refresh:true }));
+  if(action === 'getOpportunityDetail' && isOpen('oppOverlay') && currentOppPanelId === params.opportunityId) silentRefreshPanel('oppOverlay', () => openOpportunityDetail(params.opportunityId, { refresh:true }));
+  if(action === 'getTicketDetail' && isOpen('ticketOverlay') && currentTicketId === params.ticketId) silentRefreshPanel('ticketOverlay', () => openTicketPanel(params.ticketId, { refresh:true }));
   if(action === 'getDrilldown' && isOpen('drilldownOverlay') && lastDrilldownView === params.view) renderDrilldown(params.view);
 }
 function userIsEditingIn(root){
@@ -706,8 +873,33 @@ function userIsEditingIn(root){
 let liveInputs = {};
 ['input','change'].forEach(ev => document.addEventListener(ev, e => {
   const el = e.target;
-  if(el?.id && el.closest?.('#main') && el.type !== 'file') liveInputs[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+  if(el?.id && el.closest?.('#main') && el.type !== 'file' && el.type !== 'password') liveInputs[el.id] = el.type === 'checkbox' ? el.checked : el.value;
+  // Panellerde kullanıcının elle değiştirdiği yazı alanları işaretlenir: panel yeniden çizilince korunur.
+  if(ev === 'input' && el?.id && el.closest?.('.panel') && /^(INPUT|TEXTAREA)$/.test(el.tagName) && el.type !== 'checkbox' && el.type !== 'password') el.dataset.dirty = '1';
 }));
+// Ekleme formlarının kutuları hariç (kaydedince boşalmaları gerekir)
+const PANEL_KEEP_SKIP = /^(nct-|npr-|ntk-|od-task-|opr-|otk-)/;
+function captureDirty(root){
+  const v = {};
+  root.querySelectorAll('[data-dirty="1"][id]').forEach(el => { if(!PANEL_KEEP_SKIP.test(el.id) && !el.closest('[id*="Form-"]')) v[el.id] = el.value; });
+  return v;
+}
+function restoreDirty(v){ Object.entries(v).forEach(([id,val]) => { const el = document.getElementById(id); if(el){ el.value = val; el.dataset.dirty = '1'; } }); }
+// Panel açma sırası: daha yeni bir açma isteği gelirse eski yanıt çizilmez; kapatılan panel yenilemeyle geri açılmaz.
+const panelSeq = { companyOverlay:0, oppOverlay:0, ticketOverlay:0 };
+function cancelPendingPanels(){ for(const k in panelSeq) panelSeq[k]++; }
+// Panel verisini getirir; çizimden önce kullanıcı düzenlemelerini ve kaydırma konumunu alır, sonra geri koyar.
+async function loadPanel(overlayId, panelId, action, params, isSame, opts){
+  const seq = ++panelSeq[overlayId];
+  const d = await rq(action, params, { fresh:true });
+  if(seq !== panelSeq[overlayId]) return null;                  // bu arada başka kayıt açıldı
+  if(opts?.refresh && !isOpen(overlayId)) return null;          // yenileme beklerken panel kapatıldı
+  if(!d.success) return null;
+  const panel = document.getElementById(panelId), scroller = document.getElementById(overlayId).querySelector('.panel') || panel;
+  const same = isOpen(overlayId) && isSame();
+  const keep = same ? captureDirty(panel) : {}, y = same ? scroller.scrollTop : 0;
+  return { d, after(){ restoreDirty(keep); if(same) scroller.scrollTop = y; } };
+}
 let pageSeq = 0;
 function captureInputs(root){ const v = {}; root.querySelectorAll('input[id],textarea[id],select[id]').forEach(el => { if(el.type !== 'file') v[el.id] = el.type === 'checkbox' ? el.checked : el.value; }); return v; }
 function restoreInputs(v){ Object.entries(v).forEach(([id,val]) => { const el = document.getElementById(id); if(el){ if(el.type === 'checkbox') el.checked = val; else el.value = val; } }); }
@@ -731,10 +923,7 @@ function runSilentRender(fresh){
 async function silentRefreshPanel(overlayId, reopen){
   const panel = document.getElementById(overlayId).querySelector('.panel');
   if(userIsEditingIn(panel)) return;
-  const y = panel.scrollTop, vals = captureInputs(panel);
-  await reopen();
-  restoreInputs(vals);
-  panel.scrollTop = y;
+  await reopen();   // düzenlemeler ve kaydırma konumu loadPanel içinde korunur
 }
 // Arka planda tazeleme döngüsü: sekme görünürken 2 dakikada bir, sekmeye dönünce hemen.
 setInterval(() => { if(CU && document.visibilityState === 'visible') prefetchAllPages(); }, 120000);
@@ -759,7 +948,8 @@ document.addEventListener('mouseover', e => {
   }, 60);
 });
 
-const READ_ONLY_ACTIONS = new Set(['login','logout','heartbeat','globalSearch']);
+const READ_ONLY_ACTIONS = new Set(['login','logout','heartbeat','globalSearch','sendTestEmail','sendTestDigest','createFileUpload']);
+const mutInflight = new Map();   // aynı kayıt isteği bitmeden tekrar gönderilmez (çift tıklama → çift kayıt olmasın)
 let dataDirty = false;
 let lastPageArgs = null;
 let lastDrilldownView = null;
@@ -769,6 +959,7 @@ let sideZ = 200;
 // Sağdan açılan paneller aynı katmanda: son açılan üste gelir (form pencereleri 300'ün altında kalır).
 function openSidePanel(id){
   const el = document.getElementById(id);
+  if(el.classList.contains('open')) return;   // zaten açık: yenilenmesi katman sırasını değiştirmesin
   if(!SIDE_PANELS.some(p => p !== id && isOpen(p))) sideZ = 200;
   sideZ = Math.min(sideZ + 1, 299);
   el.style.zIndex = sideZ;
@@ -780,7 +971,8 @@ function topSidePanel(){
 function isOpen(id){ return document.getElementById(id)?.classList.contains('open'); }
 function anySidePanelOpen(){ return isOpen('companyOverlay') || isOpen('oppOverlay') || isOpen('ticketOverlay'); }
 function refreshBackgroundIfDirty(){
-  if(!dataDirty || anySidePanelOpen()) return;
+  if(!dataDirty) return;
+  if(anySidePanelOpen()){ refreshOpenPanels(); return; }   // alttaki panel de güncel veriyi göstersin
   dataDirty = false;
   if(isOpen('drilldownOverlay') && lastDrilldownView) renderDrilldown(lastDrilldownView, true);
   refreshPageFresh();
@@ -791,9 +983,9 @@ function refreshPageFresh(){
   runSilentRender(true);
 }
 function refreshOpenPanels(){
-  if(isOpen('companyOverlay') && currentCompanyPanelId) openCompanyPanel(currentCompanyPanelId);
-  if(isOpen('oppOverlay') && currentOppPanelId) openOpportunityDetail(currentOppPanelId);
-  if(isOpen('ticketOverlay') && currentTicketId) openTicketPanel(currentTicketId);
+  if(isOpen('companyOverlay') && currentCompanyPanelId) openCompanyPanel(currentCompanyPanelId, { refresh:true });
+  if(isOpen('oppOverlay') && currentOppPanelId) openOpportunityDetail(currentOppPanelId, { refresh:true });
+  if(isOpen('ticketOverlay') && currentTicketId) openTicketPanel(currentTicketId, { refresh:true });
 }
 let lostReasonResolver = null;
 function askLostReason(){
@@ -822,7 +1014,7 @@ async function changeOpportunityStage(opportunityId, newStage){
     if(lostReason === null) return null;
   }
   const d = await api('updateOpportunityStage', { opportunityId, stage:newStage, lostReason });
-  if(d.success) toast('✓ Aşama güncellendi: ' + trStage(newStage));
+  if(d.success) toast(d.warning ? '⚠ ' + d.warning : '✓ Aşama güncellendi: ' + trStage(newStage));
   return d;
 }
 
@@ -840,11 +1032,20 @@ function closeTopLayer(){
   if(top === 'oppOverlay') return closeOppPanel();
   if(top === 'companyOverlay') return closeCompanyPanel();
   if(isOpen('drilldownOverlay')) return closeDrilldownPanel();
+  cancelPendingPanels();   // hiçbir şey açık değilken Esc: yüklenmekte olan panel açılmasın
 }
 
-async function api(action, params={}){
-  const sentToken = CU?.token;
+function api(action, params={}){
   const mutating = !READ_ONLY_ACTIONS.has(action) && !action.startsWith('get') && action !== 'exportData';
+  if(!mutating && action !== 'login') return apiCall(action, params, false);
+  const k = action + '|' + JSON.stringify(params);
+  if(mutInflight.has(k)) return mutInflight.get(k);
+  const pr = apiCall(action, params, mutating).finally(() => mutInflight.delete(k));
+  mutInflight.set(k, pr);
+  return pr;
+}
+async function apiCall(action, params, mutating){
+  const sentToken = CU?.token;
   if(mutating) cacheGen++;   // bu andan önce başlamış okumalar eski sayılır
   try{
     const res = await fetch(EDGE_FUNCTION_URL, {
@@ -878,7 +1079,7 @@ async function doLogin(){
   if(!d.success){ errEl.textContent = d.error?.message || 'Giriş yapılamadı'; errEl.style.display='block'; return; }
   document.getElementById('li-pass').value = '';
   clearCache();
-  CU = { token: d.token, name: d.user.name, username: d.user.username, email: d.user.email || null };
+  CU = { token: d.token, name: d.user.name, username: d.user.username, email: d.user.email || null, role: d.user.role || 'admin' };
   sessionStorage.setItem('ahoraclario_session', JSON.stringify(CU));
   enterApp();
 }
@@ -888,6 +1089,17 @@ function doLogout(silent){
   if(heartbeatInterval){ clearInterval(heartbeatInterval); heartbeatInterval = null; }
   CU = null;
   sessionStorage.removeItem('ahoraclario_session');
+  // Ekranda müşteri verisi kalmasın: tüm paneller/pencereler kapanır, bekleyen istekler ve zamanlayıcılar iptal edilir.
+  cacheGen++; inflight.clear(); mutInflight.clear(); cancelPendingPanels();
+  [persistTimer, bgRefreshTimer, navBadgeTimer, hoverTimer, searchDebounce].forEach(t => clearTimeout(t));
+  document.querySelectorAll('[id$="Overlay"].open, [id$="Modal"].open').forEach(el => el.classList.remove('open'));
+  ['companyPanel','oppPanel','ticketPanel','main'].forEach(id => { const el = document.getElementById(id); if(el) el.innerHTML = ''; });
+  ['notifDropdown','searchResults'].forEach(id => document.getElementById(id)?.classList.add('hidden'));
+  const gs = document.getElementById('globalSearch'); if(gs) gs.value = '';
+  if(typeof closeRangePicker === 'function') closeRangePicker();
+  liveInputs = {}; notifItems = []; lastPageArgs = null; lastDrilldownView = null;
+  currentCompanyPanelId = currentOppPanelId = currentTicketId = null;
+  pipeF.q = ''; pipeF.spotCompany = null;
   clearCache();
   document.getElementById('app').classList.remove('open');
   document.getElementById('login-screen').style.display='flex';
@@ -914,17 +1126,19 @@ async function refreshNavBadges(){
   setBadge('nbCompanies', d.companies);
   setBadge('nbTasks', d.openTasks);
   setBadge('nbTickets', d.openTickets);
-  setBadge('nbCalendar', d.upcomingMeetings);   // bugün + yarın
+  setBadge('nbCalendar', d.upcomingMeetings);   // önümüzdeki 7 gün (Takvim sayfasıyla aynı)
   buildNotifications().catch(()=>{});   // kırmızı nokta sadece görülmemiş bildirim varsa
 }
 let navBadgeTimer = null;
 function scheduleNavBadgeRefresh(){ clearTimeout(navBadgeTimer); navBadgeTimer = setTimeout(refreshNavBadges, 700); }
 let searchDebounce = null;
-function onGlobalSearchInput(){
+let searchSeq = 0;
+function onGlobalSearchInput(typed){
   clearTimeout(searchDebounce);
   const q = document.getElementById('globalSearch').value.trim();
   const box = document.getElementById('searchResults');
-  if(currentPage === 'pipeline'){   // pipeline'da yazarken kartlar canlı olarak öne çıkar
+  const mySeq = ++searchSeq;
+  if(currentPage === 'pipeline' && typed){   // sadece yazarken; kutuya tıklamak pipeline aramasını silmesin   // pipeline'da yazarken kartlar canlı olarak öne çıkar
     pipeF.q = q; pipeF.spotCompany = null;
     const pi = document.getElementById('pipe-search'); if(pi) pi.value = q; liveInputs['pipe-search'] = q;
     applyPipeSpot(true);
@@ -932,7 +1146,8 @@ function onGlobalSearchInput(){
   if(q.length < 2){ box.classList.add('hidden'); return; }
   searchDebounce = setTimeout(async () => {
     const d = await api('globalSearch', { query: q });
-    if(!d.success) return;
+    // Geç gelen eski sonuç yenisinin üstüne yazmasın; kutu temizlendiyse/sonuç seçildiyse tekrar açılmasın
+    if(!d.success || mySeq !== searchSeq || document.getElementById('globalSearch').value.trim() !== q) return;
     renderSearchResults(d);
   }, 280);
 }
@@ -951,12 +1166,13 @@ function renderSearchResults(d){
   }
   if(d.opportunities.length){
     html += '<div class="search-group-label">Fırsatlar</div>';
-    html += d.opportunities.map(o=>`<div class="search-result-row" onclick="closeSearchAndOpen('${o.company_id}')"><b>${esc(o.companies?.name||'—')}</b><span class="meta">${esc(o.stage)}${o.estimated_mrr?' · ₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span></div>`).join('');
+    html += d.opportunities.map(o=>`<div class="search-result-row" onclick="closeSearchAndOpen('${o.company_id}')"><b>${esc(o.companies?.name||'—')}</b><span class="meta">${esc(trStage(o.stage))}${o.estimated_mrr?' · '+fmtMoney(o.estimated_mrr)+'/ay':''}</span></div>`).join('');
   }
   box.innerHTML = html;
   box.classList.remove('hidden');
 }
 function closeSearchAndOpen(companyId){
+  searchSeq++;
   document.getElementById('searchResults').classList.add('hidden');
   document.getElementById('globalSearch').value = '';
   // Pipeline'dayken: şirketin kartı panoda varsa paneli açmak yerine kartı öne çıkar
@@ -998,7 +1214,7 @@ let notifItems = [];
 async function buildNotifications(){
   const [myDayRes, dashRes, tkRes] = await Promise.all([ rq('getMyDay'), rq('getDashboard', {period: dashboardPeriod}), rq('getTickets', { filter:'open' }) ]);
   const items = [];
-  if(tkRes.success) (tkRes.tickets||[]).filter(t=>t.status==='Open').slice(0,5).forEach(t => items.push({ key:`t:${t.id}:${t.updated_at||t.created_at}`, color:'var(--blue)', text:`🎫 Yeni talep #${t.ticket_no}: ${t.title}`, sub:t.companies?.name, ticketId:t.id }));
+  if(tkRes.success) (tkRes.tickets||[]).filter(t=>t.status==='Open').slice(0,5).forEach(t => items.push({ key:`t:${t.id}:${t.client_updated_at||t.created_at}`, color:'var(--blue)', text:`🎫 Yeni talep #${t.ticket_no}: ${t.title}`, sub:t.companies?.name, ticketId:t.id }));
   if(myDayRes.success){
     (myDayRes.overdueTasks||[]).forEach(t => items.push({ key:`task:${t.id}`, color:'var(--red)', text:`Geciken görev: ${t.title}`, sub:t.companies?.name, companyId:t.company_id }));
     (myDayRes.openProposals||[]).forEach(o => items.push({ key:`prop:${o.id}`, color:'var(--purple)', text:'Teklif cevap bekliyor', sub:o.companies?.name, companyId:o.company_id }));
@@ -1021,14 +1237,14 @@ function drawNotifications(){
   const dd = document.getElementById('notifDropdown');
   dd.innerHTML = notifItems.length ? `
     <div style="display:flex;justify-content:flex-end;padding:2px 6px 6px"><span style="font-size:11px;color:var(--primary);cursor:pointer" onclick="event.stopPropagation();markAllNotifsSeen()">Tümünü okundu say</span></div>
-    ${notifItems.map((i,idx)=>`
-    <div class="notif-item" onclick="openNotification(${idx})">
+    ${notifItems.map(i=>`
+    <div class="notif-item" data-key="${escAttr(i.key)}" onclick="openNotification(this.dataset.key)">
       <div class="nd" style="background:${i.color}"></div>
       <div><div>${esc(i.text)}</div><div style="color:var(--muted);font-size:10.5px">${esc(i.sub||'')}</div></div>
     </div>`).join('')}` : '<div class="search-empty">Yeni bildirim yok 🎉</div>';
 }
-function openNotification(idx){
-  const i = notifItems[idx]; if(!i) return;
+function openNotification(key){
+  const idx = notifItems.findIndex(x => x.key === key), i = notifItems[idx]; if(!i) return;   // listeyle değil anahtarla bulunur
   const seen = loadSeen(); seen[i.key] = Date.now(); saveSeen(seen);
   notifItems.splice(idx, 1);
   document.getElementById('notifDot')?.classList.toggle('hidden', notifItems.length===0);
@@ -1091,7 +1307,8 @@ async function showPage(page, searchQuery, sourceFilter, stageFilter, taskFilter
   }catch(err){
     console.error('Sayfa render hatası:', err);
     if(currentPage !== page) return;
-    main.innerHTML = `<div class="empty" style="padding:40px">Bir hata oluştu.<br><span style="color:var(--faint);font-size:11px">${esc(err.message||String(err))}</span><br><span style="cursor:pointer;color:var(--primary)" onclick="showPage('${page}')">↻ Tekrar Dene</span></div>`;
+    const en = ['dashboard','pipeline','calendar'].includes(page);
+    main.innerHTML = `<div class="empty" style="padding:40px">${en?'Something went wrong.':'Bir hata oluştu.'}<br><span style="color:var(--faint);font-size:11px">${esc(err.message||String(err))}</span><br><span style="cursor:pointer;color:var(--primary)" onclick="showPage('${page}')">↻ ${en?'Retry':'Tekrar Dene'}</span></div>`;
   }finally{
     clearTimeout(loadingTimer);
     if(renderKeys === myKeys) renderKeys = null;
@@ -1176,8 +1393,8 @@ function openRangePicker(btn, value, onApply, allLabel){
 }
 document.addEventListener('mousedown', e => { if(drpState && !e.target.closest('#drp') && e.target.closest('button') !== drpState.btn) closeRangePicker(); });
 window.addEventListener('resize', closeRangePicker);
-function pickDashPeriod(btn){ openRangePicker(btn, dashboardPeriod, v => { dashboardPeriod = v; renderDashboard(); }); }
-function pickDashPipeDate(btn){ openRangePicker(btn, dashboardPipeDateFilter, v => { dashboardPipeDateFilter = v; renderDashboard(); }, 'All Dates'); }
+function pickDashPeriod(btn){ openRangePicker(btn, dashboardPeriod, v => { dashboardPeriod = v; runSilentRender(false); }); }
+function pickDashPipeDate(btn){ openRangePicker(btn, dashboardPipeDateFilter, v => { dashboardPipeDateFilter = v; runSilentRender(false); }, 'All Dates'); }
 
 // ══ Pipeline filtreleri + spot ışığı ══
 const pipeF = { q:'', spotCompany:null, date:'all', priority:'all', deal:'all' };
@@ -1290,7 +1507,7 @@ async function renderDashboard(){
               <div class="ref-meta"><span class="ref-mrr" style="cursor:pointer;${o.estimated_mrr==null?'color:var(--primary)':''}" onclick="event.stopPropagation();openEditOpportunityModal('${o.id}','${o.company_id}')" title="Edit amount">◷ ${esc(mrr)}</span><span class="ref-age">${age}</span></div>
             </div>`;
           }).join('') : '<div class="dashboard-ref-empty">Empty</div>'}
-          <div class="dashboard-ref-add" onclick="openAddCompanyModal('${s}')"><span>+</span> Add Deal</div>
+          ${s==='Won'?'':`<div class="dashboard-ref-add" onclick="openAddCompanyModal('${s}')"><span>+</span> Add Deal</div>`}
         </div>
       </div>`;
     }).join('')}
@@ -1298,8 +1515,9 @@ async function renderDashboard(){
 
   const donutColors = ['#39D98A','#22D3EE','#3B82F6','#A78BFA','#F59E0B'];
   const sources = (analytics?.sourcePerformance || []).filter(s=>s.total>0);
-  const donutHtml = sources.length ? donutChart(sources.map((s,i)=>({label:s.source, value:s.total, color:donutColors[i%donutColors.length]})), 'Total') : '<div class="empty" style="padding:20px">No source data yet</div>';
-  const donutLegend = sources.map((s,i)=>`<div class="donut-legend-row" style="cursor:pointer" data-view="${escAttr('source:'+encodeURIComponent(s.source))}" onclick="renderDrilldown(this.dataset.view)"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(s.source)}<span class="val">${s.total}</span></div>`).join('');
+  const srcEn = v => v === 'Belirtilmemiş' ? 'Not specified' : v;
+  const donutHtml = sources.length ? donutChart(sources.map((s,i)=>({label:srcEn(s.source), value:s.total, color:donutColors[i%donutColors.length]})), 'Total') : '<div class="empty" style="padding:20px">No source data yet</div>';
+  const donutLegend = sources.map((s,i)=>`<div class="donut-legend-row" style="cursor:pointer" data-view="${escAttr('source:'+encodeURIComponent(s.source))}" onclick="renderDrilldown(this.dataset.view)"><span class="dot" style="background:${donutColors[i%donutColors.length]}"></span>${esc(srcEn(s.source))}<span class="val">${s.total}</span></div>`).join('');
 
   const TASK_TYPE_TAG = {
     Call: { tag:'Call', color:'#3B82F6' },
@@ -1329,13 +1547,13 @@ async function renderDashboard(){
     </div>
     <div class="stats">
       ${statCard('💰','#39D98A','₺'+(d.pipelineValue||0).toLocaleString('tr-TR'),'Pipeline Value', d.trends?.pipelineValue, "renderDrilldown('pipelineValue')",
-        `Monthly · ${d.openOpportunities||0} open deal${d.openOpportunities===1?'':'s'}${d.openWithoutValue?` · <span style="color:var(--amber)">${d.openWithoutValue} without an amount</span>`:''}`)}
+        `MRR · ${d.openOpportunities||0} open deal${d.openOpportunities===1?'':'s'}${d.openWithoutValue?` · <span style="color:var(--amber)">${d.openWithoutValue} without an amount</span>`:''}`)}
       ${statCard('👥','#3B82F6',d.newProspects||0,'New Leads', d.trends?.newProspects, "renderDrilldown('newProspectsMonth')")}
       ${statCard('📅','#A78BFA',d.followUpsToday||0,'Follow-ups', d.trends?.followUps, "renderDrilldown('followUpsToday')")}
       ${statCard('🖥️','#22D3EE',d.demosThisWeek||0,'Demos', d.trends?.demos, "renderDrilldown('demosWeek')")}
       ${statCard('📄','#F59E0B',d.openProposals||0,'Open Proposals', d.trends?.openProposals, "renderDrilldown('openProposals')")}
       ${statCard('🏆','#39D98A','₺'+(d.wonThisMonthRevenue||0).toLocaleString('tr-TR'),'Won Revenue', d.trends?.wonRevenue, "renderDrilldown('wonMonth')",
-        `Monthly · ${d.wonThisMonth||0} deal${d.wonThisMonth===1?'':'s'} won`)}
+        `MRR · ${d.wonThisMonth||0} deal${d.wonThisMonth===1?'':'s'} won · ${esc(rangeLabel(dashboardPeriod))}`)}
     </div>
 
     <div class="dash-grid">
@@ -1381,7 +1599,7 @@ async function renderDashboard(){
             <div class="action-item" onclick="openCompanyPanel('${m.company_id}')">
               <div class="chk" style="border-color:var(--purple)"></div>
               <div class="at-body"><b>${esc(m.companies?.name||'—')}</b><div class="at-time">${MEETING_TYPE_EN[m.type]||esc(m.type)} · ${m.meeting_date}${m.start_time?' '+String(m.start_time).slice(0,5):''}</div></div>
-              ${m.meeting_link?`<a href="${escAttr(m.meeting_link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="join-btn">Join</a>`:''}
+              ${isWebLink(m.meeting_link)?`<a href="${escAttr(m.meeting_link)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="join-btn">Join</a>`:''}
             </div>`).join('') : '<div class="empty" style="padding:16px 0">No meetings scheduled.</div>'}
         </div>
 
@@ -1398,7 +1616,7 @@ async function renderDashboard(){
     </div>`;
   }catch(err){
     console.error('Dashboard render hatası:', err);
-    main.innerHTML = `<div class="empty" style="padding:40px">Something went wrong.<br><span style="color:var(--faint);font-size:11px">${esc(err.message||String(err))}</span><br><span style="cursor:pointer;color:var(--primary)" onclick="renderDashboard()">↻ Tekrar Dene</span></div>`;
+    main.innerHTML = `<div class="empty" style="padding:40px">Something went wrong.<br><span style="color:var(--faint);font-size:11px">${esc(err.message||String(err))}</span><br><span style="cursor:pointer;color:var(--primary)" onclick="renderDashboard()">↻ Retry</span></div>`;
   }
 }
 
@@ -1436,15 +1654,7 @@ function donutChart(segments, totalLabel){
 
 function renderFunnelChevron(funnel){
   const byStage = Object.fromEntries((funnel||[]).map(x=>[x.stage,x]));
-  const defs = [
-    {label:'Lead', key:'Lead', color:'#64748B'},
-    {label:'Contacted', key:'Contacted', color:'#3B82F6'},
-    {label:'Qualified', key:'Qualified', color:'#22D3EE'},
-    {label:'Meeting', key:'Meeting', color:'#818CF8'},
-    {label:'Demo', key:'Demo', color:'#A78BFA'},
-    {label:'Proposal', key:'Proposal', color:'#F59E0B'},
-    {label:'Won', key:'Won', color:'#39D98A'}
-  ];
+  const defs = [].concat(STAGES.map(k => ({ label:k, key:k, color:STAGE_COLORS[k] })));
   const first = byStage['Lead']?.reached || 0;
   return `<div class="dashboard-ref-funnel">
     ${defs.map((d,i)=>{
@@ -1487,7 +1697,7 @@ async function renderMyDay(){
   }
   function demoMeetingRow(m){
     return `<div class="mini-item" style="display:flex;justify-content:space-between;align-items:center;border-left:3px solid #A78BFA">
-      <span onclick="openCompanyPanel('${m.company_id}')" style="cursor:pointer"><b>${esc(m.companies?.name||'')}</b> — ${esc(m.title)} ${m.start_time?`<span style="color:var(--muted)">· ${m.start_time}</span>`:''}</span>
+      <span onclick="openCompanyPanel('${m.company_id}')" style="cursor:pointer"><b>${esc(m.companies?.name||'')}</b> — ${esc(m.title)} <span class="badge" style="background:var(--surface-2);color:var(--muted)">${esc(trLabel(m.type))}</span> ${m.start_time?`<span style="color:var(--muted)">· ${String(m.start_time).slice(0,5)}</span>`:''}${m.location?`<span style="color:var(--muted)"> · 📍 ${esc(m.location)}</span>`:''}</span>
       <span style="display:flex;gap:8px;align-items:center;flex-shrink:0;margin-left:10px">${joinLink(m)}<span style="cursor:pointer;color:var(--green);font-size:11px" onclick="updateMeeting('${m.id}','Completed')">Tamamla</span></span>
     </div>`;
   }
@@ -1512,14 +1722,14 @@ async function renderMyDay(){
     ${d.overdueTasks.length ? section('🔴 Geciken Follow-up\'lar', 'var(--red)', d.overdueTasks.map(t=>taskRow(t,'#F87171')).join(''), d.overdueTasks.length) : ''}
     ${section('📩 Bugünkü Follow-up\'lar', 'var(--amber)', d.todayTasks.length?d.todayTasks.map(t=>taskRow(t,'#F59E0B')).join(''):'<div style="color:var(--muted);font-size:12px">Bugün için görev yok.</div>', d.todayTasks.length)}
 
-    ${d.demosToday.length ? section('🖥️ Bugünkü Demolar', 'var(--purple)', d.demosToday.map(m=>demoMeetingRow(m)).join(''), d.demosToday.length) : ''}
+    ${d.demosToday.length ? section('📅 Bugünkü Toplantılar', 'var(--purple)', d.demosToday.map(m=>demoMeetingRow(m)).join(''), d.demosToday.length) : ''}
 
     ${section('🎯 Henüz İletişime Geçilmemiş Adaylar', 'var(--blue)',
       d.notContacted.length?d.notContacted.map(c=>`<div class="mini-item" style="cursor:pointer" onclick="openCompanyPanel('${c.companyId}')"><b>${esc(c.companyName||'—')}</b> <span style="color:var(--muted)">— hiç iletişim kaydı yok</span></div>`).join(''):'<div style="color:var(--muted);font-size:12px">Harika, hepsiyle iletişime geçilmiş!</div>',
       d.notContacted.length)}
 
     ${section('💰 Cevap Bekleyen Teklifler', 'var(--green)',
-      d.openProposals.length?d.openProposals.map(o=>`<div class="mini-item" style="cursor:pointer" onclick="openCompanyPanel('${o.company_id}')"><b>${esc(o.companies?.name||'—')}</b> <span style="color:var(--green);font-weight:700">${o.mrr?'₺'+Number(o.mrr).toLocaleString('tr-TR')+'/mo':(o.value?'₺'+Number(o.value).toLocaleString('tr-TR'):'—')}</span> <span class="badge" style="background:var(--surface-2);color:var(--muted);margin-left:6px">${esc(o.status)}</span></div>`).join(''):'<div style="color:var(--muted);font-size:12px">Bekleyen teklif yok.</div>',
+      d.openProposals.length?d.openProposals.map(o=>`<div class="mini-item" style="cursor:pointer" onclick="openCompanyPanel('${o.company_id}')"><b>${esc(o.companies?.name||'—')}</b> <span style="color:var(--green);font-weight:700">${proposalAmount(o)}</span> <span class="badge" style="background:var(--surface-2);color:var(--muted);margin-left:6px">${esc(trLabel(o.status))}</span></div>`).join(''):'<div style="color:var(--muted);font-size:12px">Bekleyen teklif yok.</div>',
       d.openProposals.length)}
 
     ${d.upcomingTasks.length ? section('🟢 Yaklaşan (7 gün)', 'var(--green)', d.upcomingTasks.map(t=>taskRow(t,'#39D98A')).join(''), d.upcomingTasks.length) : ''}
@@ -1707,7 +1917,7 @@ async function renderDrilldown(view, fresh){
               <td><b>${esc(r.title)}</b></td>
               <td style="color:var(--muted)">${esc(r.subtitle||'')}</td>
               <td style="color:var(--green);font-weight:700">${r.value?'₺'+Number(r.value).toLocaleString('tr-TR'):'—'}</td>
-              <td style="color:var(--muted)">${r.date?String(r.date).slice(0,10):'—'}</td>
+              <td style="color:var(--muted)">${r.date?(/^\d{4}-\d{2}-\d{2}$/.test(r.date)?r.date:localDateStr(new Date(r.date))):'—'}</td>
             </tr>`).join('')}
         </tbody>
       </table>`}
@@ -1791,7 +2001,7 @@ function openAddCompanyModal(startStage){
 }
 function closeAddCompanyModal(){
   document.getElementById('addCompanyModal').classList.remove('open');
-  ['name','industry','country','website','notes'].forEach(k=>document.getElementById('nc-'+k).value='');
+  ['name','industry','country','website','email','phone','instagram','linkedin','size','crm','pain','notes'].forEach(k=>document.getElementById('nc-'+k).value='');
   document.getElementById('nc-source').value='';
   document.getElementById('nc-priority').value='Normal';
   document.getElementById('nc-stage').value='Lead';
@@ -1808,9 +2018,16 @@ async function submitAddCompany(){
     lead_source: document.getElementById('nc-source').value,
     priority: document.getElementById('nc-priority').value,
     research_notes: document.getElementById('nc-notes').value.trim(),
+    instagram: document.getElementById('nc-instagram').value.trim(),
+    linkedin: document.getElementById('nc-linkedin').value.trim(),
+    company_size: document.getElementById('nc-size').value.trim(),
+    current_crm: document.getElementById('nc-crm').value.trim(),
+    pain_point: document.getElementById('nc-pain').value.trim(),
   };
   const startStage = document.getElementById('nc-stage').value || 'Lead';
+  const btn = document.getElementById('nc-save'); btn.disabled = true;
   const d = await api('addCompany', { company, stage: startStage });
+  btn.disabled = false;
   if(d.success){
     toast('✓ Şirket eklendi');
     closeAddCompanyModal();
@@ -1820,16 +2037,17 @@ async function submitAddCompany(){
   }
 }
 
-async function openCompanyPanel(companyId){
-  const d = await rq('getCompanyDetail', { companyId }, { fresh:true });
-  if(!d.success) return;
+async function openCompanyPanel(companyId, opts){
+  const lp = await loadPanel('companyOverlay', 'companyPanel', 'getCompanyDetail', { companyId }, () => currentCompanyPanelId === companyId, opts);
+  if(!lp) return;
+  const d = lp.d;
   currentCompanyPanelId = companyId;
   const c = d.company;
   const panel = document.getElementById('companyPanel');
   panel.innerHTML = `
     <div class="panel-top">
       <div style="display:flex;gap:12px;align-items:flex-start">
-        <div class="avatar" style="width:40px;height:40px;font-size:14px;background:var(--primary-bg);color:var(--primary);flex-shrink:0">${initials(c.name)}</div>
+        <div class="avatar" style="width:40px;height:40px;font-size:14px;background:var(--primary-bg);color:var(--primary);flex-shrink:0">${esc(initials(c.name))}</div>
         <div><h2 style="margin:0 0 4px">${esc(c.name)}</h2>
           <div style="font-size:12px;color:var(--muted)">${esc(c.industry||'—')} · ${esc(c.country||'—')}</div>
           <div style="margin-top:6px;display:flex;gap:6px;align-items:center">
@@ -1877,7 +2095,7 @@ async function openCompanyPanel(companyId){
           <select id="ec-priority">
             <option value="Normal" ${c.priority==='Normal'||!c.priority?'selected':''}>Normal</option>
             <option value="High" ${c.priority==='High'?'selected':''}>Yüksek 🔥</option>
-            <option value="Low" ${c.priority==='Low'?'selected':''}>Low</option>
+            <option value="Low" ${c.priority==='Low'?'selected':''}>Düşük</option>
           </select>
         </div>
         <div class="fi"><label>Araştırma Notları</label><textarea id="ec-notes" rows="3">${esc(c.research_notes)}</textarea></div>
@@ -1905,17 +2123,8 @@ async function openCompanyPanel(companyId){
       </div></div>` : ''}
 
     ${companyFilesSection(c.id, d.files || [])}
-    ${(d.emails||[]).length ? `<div class="ps"><div class="ps-head">✉️ Gönderilen E-postalar (${d.emails.length})</div>
-      <div class="ps-body mini-list">${d.emails.map(e=>`<details class="mini-item" style="cursor:pointer">
-        <summary style="display:flex;justify-content:space-between;gap:8px;list-style:none">
-          <span><b>${esc(e.subject)}</b> <span style="color:var(--muted)">→ ${esc(e.to_name||e.to_email)}</span></span>
-          <span style="font-size:10.5px;white-space:nowrap;color:${e.status==='sent'?'var(--muted)':'var(--red)'}">${e.status==='sent'?'':'✗ gönderilemedi · '}${fmtDT(e.created_at)}</span>
-        </summary>
-        <div style="white-space:pre-wrap;font-size:12px;color:var(--muted);margin-top:8px;border-top:1px solid var(--border-subtle);padding-top:8px">${esc(e.body||'')}${e.error?`\n\n⚠ ${esc(e.error)}`:''}</div>
-      </details>`).join('')}</div></div>` : ''}
-    ${(d.tickets||[]).length ? `<div class="ps"><div class="ps-head">🎫 Destek Talepleri (${d.tickets.filter(t=>TICKET_OPEN.includes(t.status)).length} açık)</div>
-      <div class="ps-body mini-list">${d.tickets.map(t=>`<div class="mini-item row-click" style="cursor:pointer;display:flex;justify-content:space-between;gap:8px" onclick="openTicketPanel('${t.id}')">
-        <span><b>#${t.ticket_no}</b> ${esc(t.title)}</span>${ticketStatusBadge(t.status)}</div>`).join('')}</div></div>` : ''}
+    ${emailsSection(d.emails)}
+    ${ticketsSection(d.tickets)}
 
     <div class="ps">
       <div class="ps-head">Fırsatlar (${d.opportunities.length})<span style="cursor:pointer;color:var(--primary)" onclick="quickAddOpportunity('${c.id}')">+ Ekle</span></div>
@@ -1942,7 +2151,7 @@ async function openCompanyPanel(companyId){
       <div class="ps-body mini-list" id="contactsList">
         ${d.contacts.length===0?'<div style="color:var(--muted);font-size:12px">Henüz kişi yok.</div>':d.contacts.map(p=>`
           <div class="contact-row">
-            <div class="avatar" style="${p.is_decision_maker?'background:var(--amber-bg);color:var(--amber)':''}">${initials(p.full_name)}</div>
+            <div class="avatar" style="${p.is_decision_maker?'background:var(--amber-bg);color:var(--amber)':''}">${esc(initials(p.full_name))}</div>
             <div style="flex:1;min-width:0">
               <b>${esc(p.full_name)}</b> <span style="color:var(--muted)">— ${esc(p.position||'—')}</span>${p.is_decision_maker?' <span class="badge" style="background:var(--amber-bg);color:var(--amber)">👑 Karar Verici</span>':''}<br>
               <span style="color:var(--muted);font-size:11px">${esc(p.email||'')}${p.phone?' · '+esc(p.phone):''}${p.linkedin?' · '+safeLink(p.linkedin,'LinkedIn'):''}</span>
@@ -1978,14 +2187,7 @@ async function openCompanyPanel(companyId){
           <div class="fi"><input id="ntk-title" placeholder="Görev — örn: Ahmet'e follow-up yap"></div>
           <div class="fi-row">
             <div class="fi"><label>Tür</label>
-              <select id="ntk-type">
-                <option value="Follow-up">Follow-up</option>
-                <option value="Call">Call</option>
-                <option value="Meeting">Meeting</option>
-                <option value="Demo">Demo</option>
-                <option value="Proposal">Proposal</option>
-                <option value="Research">Research</option>
-              </select>
+              <select id="ntk-type">${TASK_TYPES.map(t=>`<option value="${t}">${trLabel(t)}</option>`).join('')}</select>
             </div>
             <div class="fi"><label>Bitiş tarihi</label><input id="ntk-due" type="date"></div>
           </div>
@@ -1999,21 +2201,11 @@ async function openCompanyPanel(companyId){
     <div class="ps">
       <div class="ps-head">Teklifler (${(d.proposals||[]).length})<span style="cursor:pointer;color:var(--primary)" onclick="showAddProposalForm('${c.id}')">+ Ekle</span></div>
       <div class="ps-body mini-list">
-        ${(d.proposals||[]).length===0?'<div style="color:var(--muted);font-size:12px">Henüz teklif yok.</div>':d.proposals.map(p=>`
-          <div class="mini-item">
-            <div style="display:flex;justify-content:space-between;align-items:center">
-              <span style="color:var(--green);font-weight:700">${p.mrr?'₺'+Number(p.mrr).toLocaleString('tr-TR')+'/mo':(p.value?'₺'+Number(p.value).toLocaleString('tr-TR'):'—')}</span>
-              <select onchange="updateProposal('${p.id}',this.value,'${c.id}')" style="width:auto;padding:3px 8px;font-size:11px">
-                ${['Draft','Sent','Viewed','Negotiating','Accepted','Rejected','Expired'].map(s=>`<option value="${s}" ${p.status===s?'selected':''}>${trLabel(s)}</option>`).join('')}
-              </select>
-              <span style="cursor:pointer;color:var(--faint);font-size:11px;margin-left:6px" onclick="deleteProposalConfirm('${p.id}','${c.id}')" title="Sil">🗑</span>
-            </div>
-            <div style="font-size:10.5px;color:var(--muted);margin-top:3px">Gönderim: ${p.sent_at||'—'}</div>
-          </div>`).join('')}
+        ${proposalsList(d.proposals||[])}
         <div id="addProposalForm-${c.id}" class="hidden" style="margin-top:6px">
           ${(d.opportunities||[]).length===0?'<div style="color:var(--muted);font-size:11.5px;margin-bottom:8px">Önce bir fırsat ekleyin — teklif bir fırsata bağlı olmalı.</div>':`
           <div class="fi"><label>Fırsat</label>
-            <select id="npr-opp">${d.opportunities.map(o=>`<option value="${o.id}">${esc(o.stage)}${o.plan?' — '+esc(o.plan):''}</option>`).join('')}</select>
+            <select id="npr-opp">${d.opportunities.map(o=>`<option value="${o.id}">${esc(trStage(o.stage))}${o.plan?' — '+esc(o.plan):''}</option>`).join('')}</select>
           </div>
           <div class="fi-row">
             <div class="fi"><label>Tutar (₺)</label><input id="npr-value" type="number" placeholder="0"></div>
@@ -2046,6 +2238,7 @@ async function openCompanyPanel(companyId){
 
     <button class="btn-danger" style="width:100%;margin-top:6px" onclick="deleteCompanyConfirm('${c.id}')">🗑 Şirketi Sil</button>
   `;
+  lp.after();
   openSidePanel('companyOverlay');
 }
 function closeCompanyPanel(){ document.getElementById('companyOverlay').classList.remove('open'); refreshBackgroundIfDirty(); }
@@ -2140,9 +2333,10 @@ async function deleteCompanyFile(fileId, companyId, oppId){
 }
 
 // ── OPPORTUNITY DETAIL ──
-async function openOpportunityDetail(opportunityId){
-  const d = await rq('getOpportunityDetail', { opportunityId }, { fresh:true });
-  if(!d.success) return;
+async function openOpportunityDetail(opportunityId, opts){
+  const lp = await loadPanel('oppOverlay', 'oppPanel', 'getOpportunityDetail', { opportunityId }, () => currentOppPanelId === opportunityId, opts);
+  if(!lp) return;
+  const d = lp.d;
   currentOppPanelId = opportunityId;
   const o = d.opportunity, co = d.company, pc = d.primaryContact;
   const panel = document.getElementById('oppPanel');
@@ -2154,7 +2348,7 @@ async function openOpportunityDetail(opportunityId){
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px">
           <span class="badge" style="background:${STAGE_COLORS[o.stage]||OUTCOME_COLORS[o.stage]}22;color:${STAGE_COLORS[o.stage]||OUTCOME_COLORS[o.stage]}">${esc(trStage(o.stage))}</span>
           <span class="badge" style="background:${leadScoreColor(d.leadScore)}22;color:${leadScoreColor(d.leadScore)}">🎯 ${d.leadScore}/100</span>
-          ${o.estimated_mrr?`<span class="badge" style="background:var(--green-bg);color:var(--green)">₺${Number(o.estimated_mrr).toLocaleString('tr-TR')}/mo</span>`:''}
+          ${o.estimated_mrr?`<span class="badge" style="background:var(--green-bg);color:var(--green)">${fmtMoney(o.estimated_mrr)}/ay</span>`:''}
         </div>
       </div>
       <button class="panel-close" onclick="closeOppPanel()">✕</button>
@@ -2165,7 +2359,7 @@ async function openOpportunityDetail(opportunityId){
       <div class="ps-body">
         <div class="fi-row">
           <div class="fi"><label>Plan</label><input id="od-plan" value="${escAttr(o.plan)}"></div>
-          <div class="fi"><label>Tahmini MRR (₺)</label><input id="od-mrr" type="number" value="${o.estimated_mrr||''}"></div>
+          <div class="fi"><label>Tahmini MRR (₺/ay)</label><input id="od-mrr" type="number" min="0" value="${o.estimated_mrr||''}"></div>
         </div>
         <div class="fi"><label>Tahmini Kapanış Tarihi</label><input id="od-close" type="date" value="${o.expected_close_date||''}"></div>
         <div class="fi"><label>Notlar</label><textarea id="od-notes" rows="3">${esc(o.notes)}</textarea></div>
@@ -2176,12 +2370,12 @@ async function openOpportunityDetail(opportunityId){
     <div class="ps">
       <div class="ps-head">İletişim</div>
       <div class="ps-body">
-        ${pc?`<div class="contact-row"><div class="avatar" style="${pc.is_decision_maker?'background:var(--amber-bg);color:var(--amber)':''}">${initials(pc.full_name)}</div>
+        ${pc?`<div class="contact-row"><div class="avatar" style="${pc.is_decision_maker?'background:var(--amber-bg);color:var(--amber)':''}">${esc(initials(pc.full_name))}</div>
           <div><b>${esc(pc.full_name)}</b> ${pc.is_decision_maker?'<span class="badge" style="background:var(--amber-bg);color:var(--amber)">👑 Karar Verici</span>':''}<br>
           <span style="color:var(--muted);font-size:11px">${esc(pc.email||'')}${pc.phone?' · '+esc(pc.phone):''}${pc.linkedin?' · '+safeLink(pc.linkedin,'LinkedIn'):''}</span></div>
           <span style="margin-left:auto">${emailButton(pc, co.id, o.id, co.name)}${whatsappButton(pc, co.id, o.id)}</span></div>`
           :'<div style="color:var(--muted);font-size:12px">Birincil kişi seçilmedi.</div>'}
-        ${d.contacts.length>1?`<div class="fi" style="margin-top:10px"><label>Birincil kişiyi seç</label>
+        ${d.contacts.length>=1?`<div class="fi" style="margin-top:10px"><label>Birincil kişiyi seç</label>
           <select onchange="setPrimaryContact('${o.id}',this.value)">
             <option value="">—</option>
             ${d.contacts.map(c=>`<option value="${c.id}" ${o.primary_contact_id===c.id?'selected':''}>${esc(c.full_name)}</option>`).join('')}
@@ -2192,11 +2386,12 @@ async function openOpportunityDetail(opportunityId){
     <div class="ps">
       <div class="ps-head">Sıradaki Aksiyon</div>
       <div class="ps-body">
-        ${d.nextTask?`<div class="mini-item"><b>${esc(d.nextTask.title)}</b> <span style="color:var(--muted)">· ${d.nextTask.due_date||'no date'}</span>
+        ${d.nextTask?`<div class="mini-item"><b>${esc(d.nextTask.title)}</b> <span style="color:var(--muted)">· ${d.nextTask.due_date||'tarihsiz'}</span>
           <span style="cursor:pointer;color:var(--green);font-size:11px;float:right" onclick="completeOppTask('${d.nextTask.id}','${o.id}')">Tamamla</span></div>`
           :'<div style="color:var(--muted);font-size:12px">Açık görev yok. Her şey tamam.</div>'}
         <div class="fi" style="margin-top:8px"><input id="od-task-title" placeholder="Yeni görev — örn: Takip e-postası gönder"></div>
         <div class="fi-row">
+          <div class="fi"><select id="od-task-type">${TASK_TYPES.map(t=>`<option value="${t}">${trLabel(t)}</option>`).join('')}</select></div>
           <div class="fi"><input id="od-task-date" type="date"></div>
           <button class="btn-add" onclick="addOppTask('${o.id}','${co.id}')">Görev Ekle</button>
         </div>
@@ -2208,13 +2403,20 @@ async function openOpportunityDetail(opportunityId){
     ${companyFilesSection(co.id, d.files || [], o.id)}
 
     <div class="ps">
-      <div class="ps-head">Teklifler (${d.proposals.length})<span style="cursor:pointer;color:var(--primary)" onclick="quickAddProposalFromOpp('${o.id}','${co.id}')">+ Ekle</span></div>
+      <div class="ps-head">Teklifler (${d.proposals.length})<span style="cursor:pointer;color:var(--primary)" onclick="document.getElementById('oppPropForm-${o.id}').classList.toggle('hidden')">+ Ekle</span></div>
       <div class="ps-body mini-list">
-        ${d.proposals.length===0?'<div style="color:var(--muted);font-size:12px">Henüz teklif yok.</div>':d.proposals.map(p=>`
-          <div class="mini-item"><span style="color:var(--green);font-weight:700">${p.mrr?'₺'+Number(p.mrr).toLocaleString('tr-TR')+'/mo':'—'}</span>
-          <span class="badge" style="background:var(--surface-2);color:var(--muted);margin-left:6px">${trLabel(p.status)}</span></div>`).join('')}
+        ${proposalsList(d.proposals)}
+        <div id="oppPropForm-${o.id}" class="hidden" style="margin-top:6px">
+          <div class="fi-row">
+            <div class="fi"><label>Toplam Tutar (₺)</label><input id="opr-new-value" type="number" min="0" placeholder="0"></div>
+            <div class="fi"><label>MRR (₺/ay)</label><input id="opr-new-mrr" type="number" min="0" placeholder="${o.estimated_mrr||0}"></div>
+          </div>
+          <button class="btn-add" style="width:100%" onclick="quickAddProposalFromOpp('${o.id}','${co.id}', this)">Teklifi Kaydet</button>
+        </div>
       </div>
     </div>
+    ${emailsSection(d.emails)}
+    ${ticketsSection(d.tickets)}
 
     <div class="ps">
       <div class="ps-head">Zaman Çizelgesi</div>
@@ -2240,6 +2442,7 @@ async function openOpportunityDetail(opportunityId){
       </div>
     </div>
   `;
+  lp.after();
   openSidePanel('oppOverlay');
 }
 function closeOppPanel(){ document.getElementById('oppOverlay').classList.remove('open'); refreshBackgroundIfDirty(); }
@@ -2252,7 +2455,10 @@ async function saveOppDetailFields(opportunityId){
     notes: document.getElementById('od-notes').value.trim() || null,
   };
   const d = await api('updateOpportunity', { opportunityId, opportunity });
-  if(d.success){ toast('✓ Kaydedildi'); }
+  if(d.success){
+    ['od-plan','od-mrr','od-close','od-notes'].forEach(id => { const el = document.getElementById(id); if(el) delete el.dataset.dirty; });
+    toast('✓ Kaydedildi'); openOpportunityDetail(opportunityId, { refresh:true });   // başlıktaki tutar vb. güncellensin
+  }
 }
 async function setPrimaryContact(opportunityId, contactId){
   const d = await api('updateOpportunity', { opportunityId, opportunity:{ primary_contact_id: contactId || null } });
@@ -2266,7 +2472,8 @@ async function addOppTask(opportunityId, companyId){
   const title = document.getElementById('od-task-title').value.trim();
   const due_date = document.getElementById('od-task-date').value || null;
   if(!title){ toast('Görev başlığı zorunludur'); return; }
-  const d = await api('addTask', { companyId, opportunityId, task:{ title, due_date, task_type:'Follow-up' } });
+  const task_type = document.getElementById('od-task-type')?.value || 'Follow-up';
+  const d = await api('addTask', { companyId, opportunityId, task:{ title, due_date, task_type } });
   if(d.success){ toast('✓ Görev eklendi'); openOpportunityDetail(opportunityId); }
 }
 async function moveOppFromDetail(opportunityId, newStage, companyId){
@@ -2278,9 +2485,12 @@ async function deleteOpportunityConfirm(opportunityId, companyId){
   const d = await api('deleteOpportunity', { opportunityId });
   if(d.success){ toast('🗑 Fırsat silindi'); closeOppPanel(); openCompanyPanel(companyId); }
 }
-async function quickAddProposalFromOpp(opportunityId, companyId){
-  const d = await api('addProposal', { companyId, opportunityId, proposal:{} });
-  if(d.success){ toast('✓ Teklif eklendi — tutarını şirket görünümünden gir'); openOpportunityDetail(opportunityId); }
+async function quickAddProposalFromOpp(opportunityId, companyId, btn){
+  const value = document.getElementById('opr-new-value').value || null, mrr = document.getElementById('opr-new-mrr').value || null;
+  if(btn) btn.disabled = true;
+  const d = await api('addProposal', { companyId, opportunityId, proposal:{ value, mrr } });
+  if(btn) btn.disabled = false;
+  if(d.success){ toast('✓ Teklif eklendi'); openOpportunityDetail(opportunityId); }
 }
 
 async function logQuickActivity(companyId, activityType){
@@ -2366,7 +2576,6 @@ async function saveOpportunityDetails(){
   const d = await api('updateOpportunity', { opportunityId: editingOppId, opportunity });
   if(d.success){
     toast('✓ Anlaşma detayları kaydedildi');
-    const cid = editingOppCompanyId;
     closeEditOppModal();
     if(anySidePanelOpen()) refreshOpenPanels();
     else refreshBackgroundIfDirty();
@@ -2452,13 +2661,53 @@ async function deleteTaskConfirm(taskId, companyId){
   if(d.success){ toast('🗑 Görev silindi'); openCompanyPanel(companyId); }
 }
 
-function showAddMeetingForm(companyId){ openMeetingModal({ companyId }); }
 async function updateMeeting(meetingId, status){
   const d = await api('updateMeetingStatus', { meetingId, status });
   if(d.success){
     toast(status==='Completed' ? '✓ Toplantı tamamlandı' : status==='Scheduled' ? '✓ Toplantı yeniden planlandı' : '✓ Toplantı iptal edildi');
     afterMeetingChange();
   }
+}
+
+// Şirket ve fırsat panellerinde ortak bölümler
+function emailsSection(emails){ const d = { emails: emails || [] }; return d.emails.length ? `<div class="ps"><div class="ps-head">✉️ Gönderilen E-postalar (${d.emails.length})</div>
+      <div class="ps-body mini-list">${d.emails.map(e=>`<details class="mini-item" style="cursor:pointer">
+        <summary style="display:flex;justify-content:space-between;gap:8px;list-style:none">
+          <span><b>${esc(e.subject)}</b> <span style="color:var(--muted)">→ ${esc(e.to_name||e.to_email)}</span></span>
+          <span style="font-size:10.5px;white-space:nowrap;color:${e.status==='sent'?'var(--muted)':'var(--red)'}">${e.status==='sent'?'':'✗ gönderilemedi · '}${fmtDT(e.created_at)}</span>
+        </summary>
+        <div style="white-space:pre-wrap;font-size:12px;color:var(--muted);margin-top:8px;border-top:1px solid var(--border-subtle);padding-top:8px">${esc(e.body||'')}${e.error?`\n\n⚠ ${esc(e.error)}`:''}</div>
+      </details>`).join('')}</div></div>` : ''; }
+function ticketsSection(tickets){ const d = { tickets: tickets || [] }; return d.tickets.length ? `<div class="ps"><div class="ps-head">🎫 Destek Talepleri (${d.tickets.filter(t=>TICKET_OPEN.includes(t.status)).length} açık)</div>
+      <div class="ps-body mini-list">${d.tickets.map(t=>`<div class="mini-item row-click" style="cursor:pointer;display:flex;justify-content:space-between;gap:8px" onclick="openTicketPanel('${t.id}')">
+        <span><b>#${t.ticket_no}</b> ${esc(t.title)}</span>${ticketStatusBadge(t.status)}</div>`).join('')}</div></div>` : ''; }
+function fmtMoney(n){ return '₺' + Number(n).toLocaleString('tr-TR'); }
+function proposalAmount(p){ return p.mrr ? fmtMoney(p.mrr) + '/ay' : (p.value ? fmtMoney(p.value) : '—'); }
+// Teklif listesi: durum, tutar düzenleme, silme — iki panelde aynı
+function proposalsList(proposals){
+  if(!proposals.length) return '<div style="color:var(--muted);font-size:12px">Henüz teklif yok.</div>';
+  return proposals.map(p=>`
+    <div class="mini-item">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:6px">
+        <span style="color:var(--green);font-weight:700">${proposalAmount(p)}</span>
+        <span style="display:flex;align-items:center;gap:6px">
+          <select onchange="updateProposal('${p.id}',this.value)" style="width:auto;padding:3px 8px;font-size:11px">
+            ${PROPOSAL_STATUSES.map(s=>`<option value="${s}" ${p.status===s?'selected':''}>${trLabel(s)}</option>`).join('')}
+          </select>
+          <span style="cursor:pointer;font-size:11px" onclick="document.getElementById('propEdit-${p.id}').classList.toggle('hidden')" title="Tutarı düzenle">✏️</span>
+          <span style="cursor:pointer;color:var(--faint);font-size:11px" onclick="deleteProposalConfirm('${p.id}')" title="Sil">🗑</span>
+        </span>
+      </div>
+      <div style="font-size:10.5px;color:var(--muted);margin-top:3px">Gönderim: ${p.sent_at||'—'}${p.notes?' · '+esc(p.notes):''}</div>
+      <div id="propEdit-${p.id}" class="hidden" style="margin-top:8px">
+        <div class="fi-row">
+          <div class="fi"><label>Toplam Tutar (₺)</label><input id="opr-${p.id}-value" type="number" min="0" value="${p.value||''}"></div>
+          <div class="fi"><label>MRR (₺/ay)</label><input id="opr-${p.id}-mrr" type="number" min="0" value="${p.mrr||''}"></div>
+        </div>
+        <div class="fi"><label>Not</label><input id="opr-${p.id}-notes" value="${escAttr(p.notes||'')}"></div>
+        <button class="btn-add" style="width:100%" onclick="saveProposalEdit('${p.id}', this)">Kaydet</button>
+      </div>
+    </div>`).join('');
 }
 
 function showAddProposalForm(companyId){ document.getElementById('addProposalForm-'+companyId).classList.remove('hidden'); }
@@ -2473,19 +2722,26 @@ async function submitAddProposal(companyId){
   const d = await api('addProposal', { companyId, opportunityId, proposal });
   if(d.success){ toast('✓ Teklif eklendi'); openCompanyPanel(companyId); }
 }
-async function updateProposal(proposalId, status, companyId){
+async function updateProposal(proposalId, status){
   const d = await api('updateProposalStatus', { proposalId, status });
-  if(d.success){ toast('✓ Teklif güncellendi: ' + trLabel(status)); openCompanyPanel(companyId); }
+  if(d.success){ toast('✓ Teklif güncellendi: ' + trLabel(status)); refreshOpenPanels(); }
+}
+async function saveProposalEdit(proposalId, btn){
+  const v = k => document.getElementById(`opr-${proposalId}-${k}`).value;
+  btn.disabled = true;
+  const d = await api('updateProposal', { proposalId, proposal:{ value: v('value') || null, mrr: v('mrr') || null, notes: v('notes') } });
+  btn.disabled = false;
+  if(d.success){ toast('✓ Teklif kaydedildi'); refreshOpenPanels(); }
 }
 async function deleteMeetingConfirm(meetingId){
   if(!confirm('Bu toplantıyı sil?')) return;
   const d = await api('deleteMeeting', { meetingId });
   if(d.success){ toast('🗑 Toplantı silindi'); closeMeetingModal(); afterMeetingChange(); }
 }
-async function deleteProposalConfirm(proposalId, companyId){
+async function deleteProposalConfirm(proposalId){
   if(!confirm('Bu teklifi sil?')) return;
   const d = await api('deleteProposal', { proposalId });
-  if(d.success){ toast('🗑 Teklif silindi'); openCompanyPanel(companyId); }
+  if(d.success){ toast('🗑 Teklif silindi'); refreshOpenPanels(); }
 }
 
 async function deleteCompanyConfirm(companyId){
@@ -2538,7 +2794,7 @@ function drawPipeline(highlightStage){
                 <div style="color:var(--muted);font-size:10.5px">${esc(o.companies?.industry||'')}${o.companies?.industry&&o.companies?.country?' · ':''}${esc(o.companies?.country||'')}</div>
                 ${o.primary_contact_name?`<div style="font-size:10.5px;color:var(--muted);margin-top:4px">👤 ${esc(o.primary_contact_name)}</div>`:''}
                 <div class="meta">
-                  <span class="mrr">${o.estimated_mrr?'₺'+Number(o.estimated_mrr).toLocaleString('tr-TR'):''}</span>
+                  <span class="mrr">${o.estimated_mrr?fmtMoney(o.estimated_mrr)+'/mo':''}</span>
                   <span style="display:flex;align-items:center;gap:6px">
                     <span style="color:${leadScoreColor(o.lead_score||0)};font-weight:700">🎯${o.lead_score||0}</span>
                     <span>${daysSince(o.stage_changed_at)}d</span>
@@ -2546,7 +2802,7 @@ function drawPipeline(highlightStage){
                 </div>
                 ${o.next_task?`<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border-subtle);font-size:10px;color:var(--amber)">📅 ${esc(o.next_task.title)}${o.next_task.due_date?' · '+o.next_task.due_date:''}</div>`:''}
               </div>`).join('')}
-            <div class="add-deal" style="cursor:pointer;color:var(--muted);font-size:11px;padding:7px 5px;text-align:center;border-radius:6px" onmouseover="this.style.background='var(--surface-2)';this.style.color='var(--primary)'" onmouseout="this.style.background='';this.style.color='var(--muted)'" onclick="openAddCompanyModal('${s}')">+ Add Deal</div>
+            ${s==='Won'?'':`<div class="add-deal" style="cursor:pointer;color:var(--muted);font-size:11px;padding:7px 5px;text-align:center;border-radius:6px" onmouseover="this.style.background='var(--surface-2)';this.style.color='var(--primary)'" onmouseout="this.style.background='';this.style.color='var(--muted)'" onclick="openAddCompanyModal('${s}')">+ Add Deal</div>`}
           </div>
         </div>`;
       }).join('')}
@@ -2586,7 +2842,7 @@ async function onDropCard(e, newStage){
   drawPipeline();
   const d = await api('updateOpportunityStage', { opportunityId: id, stage: newStage, lostReason });
   if(d.success){
-    toast('✓ ' + trStage(newStage));
+    toast(d.warning ? '⚠ ' + d.warning : '✓ ' + trStage(newStage));
   } else {
     Object.assign(opp, before);
     if(currentPage === 'pipeline') drawPipeline();
@@ -2656,7 +2912,9 @@ function exportCompaniesCsv(){
   const cols = [
     ['Şirket', c=>c.name], ['Şirket E-postası', c=>c.email], ['Şirket Telefonu', c=>c.phone], ['Sektör', c=>c.industry], ['Ülke', c=>c.country], ['Website', c=>c.website],
     ['Kaynak', c=>c.lead_source], ['Aşama', c=>c.current_stage ? trStage(c.current_stage) : ''],
+    ['Kayıp Nedeni', c=>c.current_lost_reason ? trLabel(c.current_lost_reason) : ''],
     ['Tahmini MRR (₺)', c=>c.current_mrr], ['Lead Score', c=>c.lead_score], ['Durum', c=>c.is_customer ? 'Müşteri' : 'Aday'],
+    ['Kişi', c=>c.primary_contact?.full_name], ['E-posta', c=>c.primary_contact?.email], ['Telefon', c=>c.primary_contact?.phone], ['Pozisyon', c=>c.primary_contact?.position],
     ['Öncelik', c=>({High:'Yüksek',Normal:'Normal',Low:'Düşük'})[c.priority] || c.priority || ''], ['Eklenme', c=>c.created_at ? localDateStr(new Date(c.created_at)) : ''],
   ];
   const cell = v => { const t = v==null ? '' : String(v); return /[;"\n\r]/.test(t) ? '"' + t.replace(/"/g,'""') + '"' : t; };
@@ -2739,6 +2997,7 @@ const IMPORT_FIELDS = {
   contact_email: ['e-posta','eposta','email','e-mail','mail'],
   contact_phone: ['telefon','tel','phone','gsm','cep'],
   contact_position: ['pozisyon','unvan','ünvan','title','position'],
+  lost_reason: ['kayıp nedeni','lost reason'],
 };
 function parseCsv(text){
   text = text.replace(/^\uFEFF/, '');
@@ -2768,16 +3027,20 @@ function mapImportRows(table){
     if(idx >= 0) colOf[field] = idx;
   }
   const stageByLabel = {};
-  STAGES.forEach(k => { stageByLabel[k.toLowerCase()] = k; });
+  STAGES.concat(OUTCOMES).forEach(k => { stageByLabel[k.toLowerCase()] = k; });
+  const lostByLabel = {};
+  LOST_REASONS.forEach(k => { lostByLabel[k.toLocaleLowerCase('tr-TR')] = k; lostByLabel[trLabel(k).toLocaleLowerCase('tr-TR')] = k; });
   Object.entries({ prospect:'Lead', aday:'Lead', researched:'Lead', 'araştırıldı':'Lead', 'iletişime geçildi':'Contacted',
     replied:'Qualified', 'cevap verdi':'Qualified', 'discovery call':'Meeting', 'keşif görüşmesi':'Meeting', 'toplantı':'Meeting',
-    teklif:'Proposal', 'pazarlık':'Negotiation', 'kazanıldı':'Won' }).forEach(([k,v]) => { stageByLabel[k] = v; });
+    teklif:'Proposal', 'pazarlık':'Negotiation', 'kazanıldı':'Won', 'kaybedildi':'Lost', 'ilgilenmedi':'Not Interested',
+    'cevap yok':'No Response', 'uygun değil':'Not a Fit' }).forEach(([k,v]) => { stageByLabel[k] = v; });
   const prio = v => ({'yüksek':'High','high':'High','düşük':'Low','low':'Low'})[String(v||'').trim().toLocaleLowerCase('tr-TR')] || 'Normal';
   const rows = table.slice(1).map(r => {
     const o = {};
     for(const [f, i] of Object.entries(colOf)) o[f] = (r[i] ?? '').trim();
     if(o.priority !== undefined) o.priority = prio(o.priority);
     if(o.stage !== undefined) o.stage = stageByLabel[String(o.stage).toLocaleLowerCase('tr-TR')] || 'Lead';
+    if(o.lost_reason) o.lost_reason = lostByLabel[o.lost_reason.toLocaleLowerCase('tr-TR')] || o.lost_reason;
     return o;
   }).filter(o => o.name);
   return { rows, found: Object.keys(colOf) };
@@ -2992,7 +3255,7 @@ function showApiKey(key, projectName){
     <p style="font-size:12.5px;margin:0 0 10px"><b>${esc(projectName)}</b> için API anahtarı. <span style="color:var(--amber)">Bu anahtar bir daha gösterilmez</span>; şimdi kopyala.</p>
     <div class="fi"><label>AHORACLARIO_API_KEY</label><input readonly value="${escAttr(key)}" onclick="this.select()"></div>
     <div class="fi"><label>AHORACLARIO_URL</label><input readonly value="${escAttr(EDGE_FUNCTION_URL)}" onclick="this.select()"></div>
-    <button class="btn-ghost" onclick="navigator.clipboard.writeText('${escAttr(key)}').then(()=>toast('✓ Anahtar kopyalandı'))">📋 Anahtarı kopyala</button>
+    <button class="btn-ghost" data-key="${escAttr(key)}" onclick="navigator.clipboard.writeText(this.dataset.key).then(()=>toast('✓ Anahtar kopyalandı'))">📋 Anahtarı kopyala</button>
     <p style="font-size:11.5px;color:var(--muted);margin:12px 0 0">Bu iki değeri müşteri CRM'inin Supabase projesinde Edge Functions → Secrets'a aynı isimlerle ekle.</p>`;
   document.getElementById('apiKeyModal').classList.add('open');
 }
@@ -3017,6 +3280,7 @@ async function setProjectActive(projectId, active){
 }
 
 // ══ Destek talepleri ══
+const PROPOSAL_STATUSES = ['Draft','Sent','Viewed','Negotiating','Accepted','Rejected','Expired'];
 const TICKET_OPEN = ['Open','In Progress','Waiting'];
 const TICKET_TR = { Open:'Açık', 'In Progress':'İnceleniyor', Waiting:'Müşteri bekleniyor', Resolved:'Çözüldü', Closed:'Kapandı',
   Low:'Düşük', Normal:'Normal', High:'Yüksek', Urgent:'Acil', Bug:'Hata', Question:'Soru', Request:'İstek', Other:'Diğer' };
@@ -3030,7 +3294,7 @@ async function renderTickets(filter){
   const main = document.getElementById('main');
   if(!d.success){ main.innerHTML = '<div class="empty">Talepler yüklenemedi. schema_faz9.sql çalıştırıldı mı?<br><span style="cursor:pointer;color:var(--primary)" onclick="renderTickets()">↻ Tekrar Dene</span></div>'; return; }
   const t = d.tickets;
-  const tab = (k,l) => `<span class="badge" style="cursor:pointer;padding:6px 12px;${ticketFilter===k?'background:var(--primary-bg);color:var(--primary)':'background:var(--surface-2);color:var(--muted)'}" onclick="renderTickets('${k}')">${l}</span>`;
+  const tab = (k,l) => `<span class="badge" style="cursor:pointer;padding:6px 12px;${ticketFilter===k?'background:var(--primary-bg);color:var(--primary)':'background:var(--surface-2);color:var(--muted)'}" onclick="ticketFilter='${k}';runSilentRender(false)">${l}</span>`;
   main.innerHTML = `
     <div class="page-head"><div><h1>🎫 Destek Talepleri</h1><p>Müşteri CRM'lerinden gelen talepler · ${t.length} kayıt</p></div>
       <div style="display:flex;gap:6px;align-items:center">${tab('open','Açık')}${tab('closed','Çözülen')}${tab('all','Tümü')}</div></div>
@@ -3049,9 +3313,10 @@ async function renderTickets(filter){
         </tr>`).join('')}</tbody>
     </table></div>`;
 }
-async function openTicketPanel(ticketId){
-  const d = await rq('getTicketDetail', { ticketId }, { fresh:true });
-  if(!d.success) return;
+async function openTicketPanel(ticketId, opts){
+  const lp = await loadPanel('ticketOverlay', 'ticketPanel', 'getTicketDetail', { ticketId }, () => currentTicketId === ticketId, opts);
+  if(!lp) return;
+  const d = lp.d;
   currentTicketId = ticketId;
   const t = d.ticket;
   const opt = (list, cur) => list.map(v=>`<option value="${v}" ${cur===v?'selected':''}>${TICKET_TR[v]}</option>`).join('');
@@ -3082,14 +3347,18 @@ async function openTicketPanel(ticketId){
         <button class="btn-ghost" onclick="replyTicket('${t.id}','Resolved')">Cevapla ve Çözüldü yap</button>
       </div>
     </div></div>`;
+  lp.after();
   openSidePanel('ticketOverlay');
 }
 function closeTicketPanel(){ document.getElementById('ticketOverlay').classList.remove('open'); currentTicketId = null; refreshBackgroundIfDirty(); }
 async function replyTicket(ticketId, status){
-  const message = document.getElementById('tk-reply').value.trim();
+  const box = document.getElementById('tk-reply'), message = box.value.trim();
   if(!message){ toast('Mesaj boş olamaz'); return; }
   const d = await api('replyTicket', { ticketId, message, status });
-  if(d.success){ toast(status==='Resolved' ? '✓ Cevaplandı ve çözüldü olarak işaretlendi' : '✓ Cevap gönderildi'); openTicketPanel(ticketId); }
+  if(d.success){
+    const b2 = document.getElementById('tk-reply'); if(b2){ b2.value = ''; delete b2.dataset.dirty; }   // gönderilen cevap kutuda kalmasın
+    toast(status==='Resolved' ? '✓ Cevaplandı ve çözüldü olarak işaretlendi' : '✓ Cevap gönderildi'); openTicketPanel(ticketId);
+  }
 }
 async function updateTicketField(ticketId, field, value){
   const d = await api('updateTicket', { ticketId, [field]: value });
@@ -3115,7 +3384,7 @@ const MEETING_MAP = {};   // id → toplantı (düzenleme penceresi için)
 const MEETING_TYPE_TR = { Discovery:'Tanışma', Demo:'Demo', 'Follow-up':'Follow-up', Negotiation:'Pazarlık', Other:'Diğer' };
 const MEETING_COLORS = { Discovery:'#818CF8', Demo:'#A78BFA', 'Follow-up':'#22D3EE', Negotiation:'#F59E0B', Other:'#8B9AAF' };
 function joinLink(m, label){
-  return m.meeting_link ? `<a href="${escAttr(m.meeting_link)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="join-btn" title="${escAttr(m.meeting_link)}">🔗 ${label||'Katıl'}</a>` : '';
+  return isWebLink(m.meeting_link) ? `<a href="${escAttr(m.meeting_link)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" class="join-btn" title="${escAttr(m.meeting_link)}">🔗 ${label||'Katıl'}</a>` : '';
 }
 function meetingRow(m, companyName){
   MEETING_MAP[m.id] = { ...m, companyName };
@@ -3180,19 +3449,21 @@ async function openMeetingModal(opts = {}){
 }
 function closeMeetingModal(){ document.getElementById('meetingModal').classList.remove('open'); meetingCtx = null; }
 async function saveMeetingModal(){
+  if(!meetingCtx) return;
+  const ctx = { ...meetingCtx };   // kayıt sürerken pencere kapatılsa da (Esc) bilgi kaybolmasın
   const v = id => document.getElementById(id).value.trim();
   const meeting = { title:v('mm-title'), type:v('mm-type'), meeting_date:v('mm-date'), start_time:v('mm-start')||null, end_time:v('mm-end')||null,
     meeting_link:v('mm-link'), location:v('mm-location'), notes:v('mm-notes') };
-  const companyId = meetingCtx.companyId || v('mm-company');
+  const companyId = ctx.companyId || v('mm-company');
   if(!companyId){ toast('Şirket seçin'); return; }
   if(!meeting.title || !meeting.meeting_date){ toast('Başlık ve tarih zorunludur'); return; }
   const btn = document.getElementById('mm-save'); btn.disabled = true;
-  const d = meetingCtx.meetingId
-    ? await api('updateMeeting', { meetingId: meetingCtx.meetingId, meeting })
-    : await api('addMeeting', { companyId, opportunityId: meetingCtx.opportunityId, meeting });
+  const d = ctx.meetingId
+    ? await api('updateMeeting', { meetingId: ctx.meetingId, meeting })
+    : await api('addMeeting', { companyId, opportunityId: ctx.opportunityId, meeting });
   btn.disabled = false;
   if(!d.success) return;
-  toast(meetingCtx.meetingId ? '✓ Toplantı güncellendi' : '✓ Toplantı planlandı');
+  toast(ctx.meetingId ? '✓ Toplantı güncellendi' : '✓ Toplantı planlandı');
   closeMeetingModal();
   afterMeetingChange();
 }
@@ -3286,6 +3557,7 @@ async function deleteTaskFromList(taskId){
 
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function escAttr(s){ return esc(s); }
+function isWebLink(u){ return /^https?:\/\//i.test(String(u||'').trim()); }
 function safeLink(url, label){
   const u = String(url||'').trim();
   if(!/^https?:\/\//i.test(u)) return esc(label);
@@ -3309,169 +3581,3 @@ function leadScoreColor(score){
 </script>
 </body>
 </html>
-
-<style id="ahoraclario-sidebar-reference-exact">
-:root{
-  --sidebar-ref-bg:#010B17;
-  --sidebar-ref-border:#102338;
-  --sidebar-ref-text:#9CB1C9;
-  --sidebar-ref-muted:#6F87A3;
-  --sidebar-ref-active:#39D98A;
-  --sidebar-ref-active-bg:rgba(34,211,238,.075);
-  --sidebar-ref-hover:rgba(34,211,238,.055);
-  --sidebar-ref-badge-bg:#122842;
-  --sidebar-ref-badge-text:#B9CBE0;
-}
-
-.sidebar{
-  width:180px !important;
-  min-width:180px !important;
-  flex-basis:180px !important;
-  box-sizing:border-box !important;
-  background:var(--sidebar-ref-bg) !important;
-  border-right:1px solid var(--sidebar-ref-border) !important;
-  padding:0 8px 18px !important;
-}
-
-.sb-logo{
-  height:57px !important;
-  box-sizing:border-box !important;
-  display:flex !important;
-  align-items:center !important;
-  gap:9px !important;
-  padding:0 10px !important;
-  margin:0 !important;
-}
-
-.sb-logo .mark{
-  width:31px !important;
-  height:31px !important;
-  min-width:31px !important;
-  border-radius:8px !important;
-  background:linear-gradient(145deg,#20C997 0%,#27DDB4 48%,#29B8E8 100%) !important;
-  color:#031016 !important;
-  font-size:13px !important;
-  font-weight:900 !important;
-  box-shadow:0 7px 22px rgba(34,211,238,.14) !important;
-}
-
-.sb-logo b{
-  font-size:14px !important;
-  font-weight:700 !important;
-  color:#E7F0FA !important;
-  letter-spacing:-.15px !important;
-}
-
-.nav-item{
-  height:36px !important;
-  min-height:36px !important;
-  box-sizing:border-box !important;
-  display:flex !important;
-  align-items:center !important;
-  gap:9px !important;
-  padding:0 9px !important;
-  margin:0 0 1px !important;
-  border:0 !important;
-  border-left:3px solid transparent !important;
-  border-radius:7px !important;
-  color:var(--sidebar-ref-text) !important;
-  background:transparent !important;
-  font-size:11.5px !important;
-  line-height:1 !important;
-  font-weight:500 !important;
-  letter-spacing:0 !important;
-  box-shadow:none !important;
-}
-
-.nav-item:hover{
-  color:#CFE1F4 !important;
-  background:var(--sidebar-ref-hover) !important;
-}
-
-.nav-item.active{
-  color:var(--sidebar-ref-active) !important;
-  background:linear-gradient(90deg,rgba(34,211,238,.115),rgba(34,211,238,.045)) !important;
-  border-left-color:var(--sidebar-ref-active) !important;
-  box-shadow:none !important;
-}
-
-.nav-item .nb{
-  margin-left:auto !important;
-  min-width:20px !important;
-  height:18px !important;
-  box-sizing:border-box !important;
-  display:inline-flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  padding:0 5px !important;
-  border-radius:8px !important;
-  background:var(--sidebar-ref-badge-bg) !important;
-  color:var(--sidebar-ref-badge-text) !important;
-  font-size:9px !important;
-  font-weight:700 !important;
-  border:1px solid rgba(66,122,170,.18) !important;
-}
-
-.nav-item.active .nb{
-  background:rgba(57,217,138,.12) !important;
-  color:var(--sidebar-ref-active) !important;
-  border-color:rgba(57,217,138,.12) !important;
-}
-
-.sb-bottom{
-  padding-top:12px !important;
-  border-top:1px solid var(--sidebar-ref-border) !important;
-}
-
-.sb-tagline{
-  color:#617995 !important;
-  font-size:10px !important;
-}
-
-.nav-item::first-letter{
-  font-size:12px;
-}
-
-.app-shell > .sidebar + *{
-  min-width:0;
-}
-.file-drop{border:1.5px dashed var(--border);border-radius:10px;padding:14px;text-align:center;font-size:12px;color:var(--muted);cursor:pointer;transition:background .15s,border-color .15s;margin-bottom:10px}
-.file-drop:hover,.file-drop.dragover{border-color:var(--primary);background:var(--primary-bg);color:var(--primary)}
-.file-row{display:flex;align-items:center;gap:10px}
-.file-row .file-ic{font-size:18px;flex-shrink:0}
-.file-row .file-meta{flex:1;min-width:0}
-.file-row .file-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
-.file-row .file-name:hover{color:var(--primary)}
-.file-row .file-sub{font-size:10.5px;color:var(--muted);margin-top:2px}
-.file-upload-status{font-size:11.5px;color:var(--muted);margin-bottom:8px}
-#drilldownOverlay{z-index:150}
-button:disabled{opacity:.45;cursor:not-allowed}
-.co-tab{cursor:pointer;font-size:12px;padding:6px 12px;border-radius:20px;background:var(--surface-2);color:var(--muted);border:1px solid var(--border)}
-.co-tab.active{background:var(--primary-bg);color:var(--primary);border-color:transparent}
-.outcome-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:4px}
-.outcome-drop{border:1.5px dashed var(--oc);border-radius:10px;padding:10px 12px;cursor:pointer;display:grid;grid-template-columns:1fr auto;gap:2px 8px;background:color-mix(in srgb,var(--oc) 6%,transparent)}
-.outcome-drop b{color:var(--oc);font-size:12.5px}.outcome-drop span{font-weight:800;color:var(--oc)}
-.outcome-drop small{grid-column:1/-1;color:var(--muted);font-size:10.5px}
-.outcome-drop.dragover{background:color-mix(in srgb,var(--oc) 20%,transparent);border-style:solid}
-@media(max-width:900px){.outcome-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.join-btn{font-size:11px;font-weight:700;color:#07110C;background:var(--primary);padding:3px 9px;border-radius:6px;text-decoration:none;white-space:nowrap}
-.join-btn:hover{filter:brightness(1.1)}
-.cal-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
-@media(max-width:1100px){.cal-layout{grid-template-columns:1fr}}
-.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--border-subtle);border-top:1px solid var(--border-subtle)}
-.cal-dow{background:var(--surface);font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;padding:7px 8px}
-.cal-cell{background:var(--surface);min-height:96px;padding:5px 6px;cursor:pointer;overflow:hidden}
-.cal-cell:hover{background:var(--surface-2)}
-.cal-cell.out{opacity:.4}
-.cal-num{font-size:11.5px;font-weight:700;color:var(--muted);margin-bottom:3px}
-.cal-cell.today .cal-num{display:inline-block;background:var(--primary);color:#07110C;border-radius:10px;padding:0 7px}
-.cal-ev{font-size:10.5px;padding:2px 6px;border-radius:5px;margin-bottom:2px;background:color-mix(in srgb,var(--ev) 22%,transparent);color:var(--text);border-left:2px solid var(--ev);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cal-ev.done{opacity:.5;text-decoration:line-through}
-.cal-more{font-size:10px;color:var(--muted);padding-left:4px}
-.action-bar{display:flex;gap:8px;flex-wrap:wrap;margin:-2px 0 14px}
-.act-btn{font-size:12px;font-weight:600;padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--text);cursor:pointer;text-decoration:none;white-space:nowrap}
-.act-btn:hover{border-color:var(--primary);color:var(--primary)}
-.act-btn.primary{background:var(--primary);color:#07110C;border-color:transparent}
-.act-btn.primary:hover{filter:brightness(1.08);color:#07110C}
-.mini-act{cursor:pointer;font-size:11px;font-weight:600;white-space:nowrap;margin-left:6px;padding:3px 8px;border-radius:6px;border:1px solid currentColor}
-</style>
