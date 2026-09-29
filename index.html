@@ -67,16 +67,22 @@ a{color:var(--blue);text-decoration:none}
   -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 4px),#000 100%);
           mask:radial-gradient(farthest-side,transparent calc(100% - 9px),#000 calc(100% - 4px),#000 100%)}
 .lb-arc-tl{width:clamp(620px,62vw,1180px);aspect-ratio:1;left:calc(clamp(620px,62vw,1180px) * -.34);top:calc(clamp(620px,62vw,1180px) * -.78);
-  filter:drop-shadow(0 0 20px rgba(57,217,138,.25))}
-.lb-arc-tl i{background:conic-gradient(from 120deg,transparent 0deg,rgba(34,211,238,.12) 12deg,rgba(57,217,138,.42) 40deg,rgba(57,217,138,.55) 62deg,rgba(34,211,238,.35) 82deg,transparent 110deg)}
+  filter:drop-shadow(0 0 22px rgba(57,217,138,.45))}
+.lb-arc-tl i{background:conic-gradient(from 115deg,transparent 0deg,rgba(57,217,138,.35) 10deg,rgba(80,240,170,.85) 32deg,rgba(57,217,138,.7) 58deg,rgba(34,211,238,.35) 80deg,transparent 108deg)}
+.lb-arc-l2{width:clamp(700px,70vw,1340px);aspect-ratio:1;left:calc(clamp(700px,70vw,1340px) * -.52);top:calc(clamp(700px,70vw,1340px) * -.6);opacity:.8;filter:drop-shadow(0 0 16px rgba(37,99,235,.35))}
+.lb-arc-l2 i{background:conic-gradient(from 110deg,transparent 0deg,rgba(37,99,235,.15) 20deg,rgba(59,130,246,.75) 55deg,rgba(37,99,235,.25) 85deg,transparent 110deg)}
+.lb-arc-t2{width:clamp(640px,62vw,1180px);aspect-ratio:1;left:calc(50% - clamp(640px,62vw,1180px) * .12);top:calc(clamp(640px,62vw,1180px) * -.83);opacity:.55;filter:drop-shadow(0 0 14px rgba(37,99,235,.35))}
+.lb-arc-t2 i{background:conic-gradient(from 150deg,transparent 0deg,rgba(37,99,235,.5) 30deg,rgba(59,130,246,.55) 50deg,transparent 80deg)}
+.lb-arc-r2{width:clamp(700px,70vw,1300px);aspect-ratio:1;right:calc(clamp(700px,70vw,1300px) * -.55);top:calc(12% );opacity:.2}
+.lb-arc-r2 i{background:conic-gradient(from 240deg,transparent 0deg,rgba(34,211,238,.35) 30deg,rgba(57,217,138,.3) 55deg,transparent 85deg)}
 .lb-arc-br{width:clamp(640px,64vw,1240px);aspect-ratio:1;right:calc(clamp(640px,64vw,1240px) * -.6);bottom:calc(clamp(640px,64vw,1240px) * -.64);
-  filter:drop-shadow(0 0 18px rgba(34,211,238,.22))}
-.lb-arc-br i{background:conic-gradient(from 240deg,transparent 0deg,rgba(37,99,235,.2) 30deg,rgba(34,211,238,.55) 75deg,rgba(37,99,235,.5) 110deg,rgba(37,99,235,.15) 150deg,transparent 180deg)}
+  filter:drop-shadow(0 0 18px rgba(37,99,235,.5))}
+.lb-arc-br i{background:conic-gradient(from 240deg,transparent 0deg,rgba(37,99,235,.25) 30deg,rgba(59,150,255,.95) 62deg,rgba(37,99,235,.8) 95deg,rgba(37,99,235,.25) 135deg,transparent 170deg)}
 /* ikinci, daha sönük iz (derinlik) */
 .lb-arc-br2{width:clamp(760px,76vw,1480px);aspect-ratio:1;right:calc(clamp(760px,76vw,1480px) * -.62);bottom:calc(clamp(760px,76vw,1480px) * -.66);opacity:.45}
 .lb-arc-br2 i{background:conic-gradient(from 250deg,transparent 0deg,rgba(37,99,235,.25) 50deg,rgba(34,211,238,.3) 85deg,transparent 150deg)}
 /* Katman 5: veri parçacıkları + nokta matrisleri + neredeyse görünmez akış çizgileri */
-.lb-dots{width:150px;height:78px;background-image:radial-gradient(circle,rgba(34,211,238,.5) 1.2px,transparent 1.8px);background-size:30px 30px;opacity:.35;
+.lb-dots{width:150px;height:78px;background-image:radial-gradient(circle,rgba(59,130,246,.9) 1.6px,transparent 2.2px);background-size:30px 30px;opacity:.6;
   -webkit-mask-image:linear-gradient(90deg,#000 40%,transparent);mask-image:linear-gradient(90deg,#000 40%,transparent)}
 .lb-dots-tr{top:72px;right:88px}
 .lb-dots-bl{bottom:112px;left:72px;-webkit-mask-image:linear-gradient(270deg,transparent,#000 60%);mask-image:linear-gradient(270deg,transparent,#000 60%)}
@@ -85,12 +91,42 @@ a{color:var(--blue);text-decoration:none}
 .lb-lines-bl{left:0;bottom:0;width:min(560px,70vw);height:260px}
 .lb-lines-br{right:0;bottom:0;width:min(640px,80vw);height:300px;opacity:.05}
 /* Katman 6: kart çevresinde çok hafif ortam ışığı (kartın kendisi değişmez) */
-#login-screen .login-box{box-shadow:0 30px 80px rgba(0,0,0,.5),0 0 40px rgba(34,211,238,.05),0 0 50px rgba(57,217,138,.035)}
+/* ── Giriş kartı (referans görsel) ── */
+.login-brand{position:absolute;top:clamp(20px,3.4vw,38px);left:clamp(20px,3vw,54px);z-index:2;display:flex;align-items:center;gap:14px;color:#fff;font-weight:700;font-size:clamp(18px,1.45vw,23px);letter-spacing:-.2px}
+.login-brand svg{width:clamp(38px,2.9vw,52px);height:auto;filter:drop-shadow(0 0 14px rgba(34,211,238,.25))}
+#login-screen .login-box{max-width:460px;padding:44px 48px 46px;border-radius:16px;border:1.5px solid transparent;
+  background:linear-gradient(160deg,rgba(9,26,42,.92),rgba(5,17,30,.94)) padding-box,
+             linear-gradient(135deg,rgba(57,217,138,.9) 0%,rgba(34,211,238,.45) 40%,rgba(37,99,235,.35) 70%,rgba(37,99,235,.85) 100%) border-box;
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 40px rgba(34,211,238,.07),0 0 60px rgba(57,217,138,.06),-10px 18px 50px -20px rgba(57,217,138,.25),10px -10px 50px -20px rgba(37,99,235,.25)}
+#login-screen .login-logo{width:62px;height:62px;border-radius:12px;font-size:25px;margin-bottom:28px;background:linear-gradient(135deg,#43E6A0,#1FC985);box-shadow:0 0 26px rgba(57,217,138,.35)}
+#login-screen .login-box h1{font-size:27px;font-weight:700;margin:0 0 10px;letter-spacing:-.3px}
+#login-screen .login-box p{font-size:15px;color:#9FB3C8;margin:0 0 30px}
+#login-screen .field{margin-bottom:22px}
+#login-screen .field label{font-size:14px;font-weight:600;color:#C4D3E3;margin-bottom:10px}
+.lf-wrap{position:relative}
+.lf-wrap .lf-ic{position:absolute;left:15px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:#7F97B0;pointer-events:none}
+#login-screen .field input{height:48px;padding:0 46px 0 45px;font-size:15px;border-radius:9px;background:rgba(10,31,52,.85);border:1px solid rgba(59,130,246,.28);color:#EAF2FA}
+#login-screen .field input:focus{border-color:rgba(34,211,238,.7);box-shadow:0 0 0 3px rgba(34,211,238,.12)}
+#login-screen .field input[type=password]{letter-spacing:3px}
+.lf-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:#7F97B0;padding:6px;display:flex;border-radius:6px}
+.lf-eye:hover{color:#C4D3E3}
+.lf-eye svg{width:20px;height:20px}
+#login-screen #loginBtn{height:48px;margin-top:4px;border-radius:8px;font-size:15.5px;font-weight:700;color:#04140C;
+  background:linear-gradient(90deg,#34DC8F,#10D39A);box-shadow:0 8px 24px -8px rgba(16,211,154,.55)}
+#login-screen #loginBtn:hover{filter:brightness(1.06)}
+#login-screen #loginBtn:not(:disabled)::after{content:' →';font-weight:800}
+@media (max-height:720px){ #login-screen{padding:90px 16px 24px} }   /* kısa ekranlarda kart logonun üstüne binmesin */
+@media (max-width:640px){
+  #login-screen{padding:84px 16px 24px}
+  #login-screen .login-box{padding:32px 24px 34px}
+  #login-screen .login-box h1{font-size:23px}
+}
 @media (max-width:640px){
   .lb-dots{display:none}
   .lb-arc-tl{left:-62vw;top:-150vw;width:170vw}
   .lb-arc-br{right:-118vw;bottom:-120vw;width:180vw}
-  .lb-arc-br2{display:none}
+  .lb-arc-br2,.lb-arc-l2,.lb-arc-t2,.lb-arc-r2{display:none}
 }
 @media (prefers-reduced-motion:no-preference){ .lb-p{animation:lbTwinkle 6s ease-in-out infinite} }
 @keyframes lbTwinkle{0%,100%{opacity:var(--o,.25)}50%{opacity:calc(var(--o,.25) * .4)}}
@@ -516,6 +552,9 @@ button:disabled{opacity:.45;cursor:not-allowed}
     <div class="lb-grid"></div>
     <div class="lb-glow"></div>
     <div class="lb-center"></div>
+    <div class="lb-arc lb-arc-l2"><i></i></div>
+    <div class="lb-arc lb-arc-t2"><i></i></div>
+    <div class="lb-arc lb-arc-r2"><i></i></div>
     <div class="lb-arc lb-arc-tl"><i></i><i class="bloom"></i></div>
     <div class="lb-arc lb-arc-br2"><i></i></div>
     <div class="lb-arc lb-arc-br"><i></i><i class="bloom"></i></div>
@@ -528,14 +567,24 @@ button:disabled{opacity:.45;cursor:not-allowed}
       <path d="M0 290 C 160 270, 260 200, 400 210 S 580 150, 640 120"/><path d="M80 300 C 220 280, 320 240, 450 245 S 600 200, 640 185"/>
     </svg>
   </div>
+  <div class="login-brand">
+    <svg viewBox="0 0 52 52" aria-hidden="true"><defs><linearGradient id="lbA" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#39D98A"/><stop offset=".55" stop-color="#22D3EE"/><stop offset="1" stop-color="#2563EB"/></linearGradient></defs>
+      <path d="M21 4h10l19 44H39.5l-4-9.8H16.5l-4 9.8H2L21 4Zm5 11.5L19.8 30h12.4L26 15.5Z" fill="url(#lbA)"/><path d="M2 48 21 4h5L8.5 48Z" fill="#39D98A" opacity=".55"/></svg>
+    <span>Ahoraclario</span>
+  </div>
   <div class="login-box">
     <div class="login-logo">A</div>
     <h1>Ahoraclario</h1>
     <p>Founder Sales CRM'e giriş yapın.</p>
     <div class="login-err" id="loginErr"></div>
     <form onsubmit="event.preventDefault(); doLogin();" autocomplete="on">
-      <div class="field"><label>Kullanıcı Adı</label><input id="li-user" type="text" name="username" autocomplete="username" autofocus></div>
-      <div class="field"><label>Şifre</label><input id="li-pass" type="password" name="password" autocomplete="current-password"></div>
+      <div class="field"><label for="li-user">Kullanıcı Adı</label><div class="lf-wrap">
+        <svg class="lf-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5v1H4z"/></svg>
+        <input id="li-user" type="text" name="username" autocomplete="username" autofocus></div></div>
+      <div class="field"><label for="li-pass">Şifre</label><div class="lf-wrap">
+        <svg class="lf-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>
+        <input id="li-pass" type="password" name="password" autocomplete="current-password">
+        <button type="button" class="lf-eye" title="Şifreyi göster" aria-label="Şifreyi göster" onclick="const i=document.getElementById('li-pass');i.type=i.type==='password'?'text':'password';this.title=this.ariaLabel=i.type==='password'?'Şifreyi göster':'Şifreyi gizle'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
       <button class="btn btn-primary" id="loginBtn" type="submit" style="width:100%">Giriş Yap</button>
     </form>
   </div>
